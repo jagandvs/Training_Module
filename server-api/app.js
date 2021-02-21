@@ -7,6 +7,7 @@ const fs = require("fs");
 const path = require("path");
 const morgan = require("morgan");
 const { sql, poolPromise } = require("./database/db");
+const authRouter = require("./routes/auth");
 
 const app = express();
 
@@ -28,6 +29,7 @@ var accessLogStream = fs.createWriteStream(
 
 // setup the logger
 app.use(morgan("combined", { stream: accessLogStream }));
+app.use("/api/auth", authRouter);
 
 const port = process.env.PORT || 3000;
 

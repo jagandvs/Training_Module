@@ -1,0 +1,4 @@
+::1 - - [21/Feb/2021:19:06:47 +0000] "POST /api/auth/getCompanyDetails HTTP/1.1" 200 2759 "http://localhost:4200/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.74"
+::1 - - [21/Feb/2021:19:07:05 +0000] "POST /api/auth/signin HTTP/1.1" 401 26 "http://localhost:4200/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.74"
+::1 - - [21/Feb/2021:19:08:18 +0000] "POST /api/auth/signin HTTP/1.1" 200 1883 "http://localhost:4200/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.74"
+::1 - - [21/Feb/2021:19:13:32 +0000] "POST /api/auth/getCompanyDetails HTTP/1.1" 200 2759 "http://localhost:4200/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.74"
