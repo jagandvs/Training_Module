@@ -13,9 +13,10 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { JwtInterceptor } from "./_helper/JwtInterceptor";
 import { LogoutComponent } from './components/logout/logout.component';
+import { AdministratorComponent } from './components/administrator/administrator.component';
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent, DashboardComponent, LogoutComponent],
+  declarations: [AppComponent, LoginComponent, DashboardComponent, LogoutComponent, AdministratorComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

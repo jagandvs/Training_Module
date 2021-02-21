@@ -13,11 +13,19 @@ const routes: Routes = [
     component: DashboardComponent,
     canActivate: [AuthGuard],
   },
+  {
+    path: "administrator",
+    loadChildren: () =>
+      import("./components/administrator/administrator.module").then(
+        (mod) => mod.AdministratorModule
+      ),
+    canActivate: [AuthGuard],
+  },
   { path: "**", redirectTo: "login" },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { relativeLinkResolution: "legacy" })],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}
