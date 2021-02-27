@@ -12,11 +12,24 @@ import { CommonService } from "./_services/common.service";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { JwtInterceptor } from "./_helper/JwtInterceptor";
-import { LogoutComponent } from './components/logout/logout.component';
-import { AdministratorComponent } from './components/administrator/administrator.component';
+import { LogoutComponent } from "./components/logout/logout.component";
+import { AdministratorComponent } from "./components/administrator/administrator.component";
+import { CategoryMasterComponent } from "./components/masters/category-master/category-master.component";
+import { CategoryToSkillLevelMasterComponent } from "./components/masters/category-to-skill-level-master/category-to-skill-level-master.component";
+import { CustomerMasterComponent } from "./components/masters/customer-master/customer-master.component";
+import { DepartmentMasterComponent } from "./components/masters/department-master/department-master.component";
+import { ProcessMasterComponent } from "./components/masters/process-master/process-master.component";
+import { StudyMaterialMasterComponent } from "./components/masters/study-material-master/study-material-master.component";
+import { TrainingProgramMasterComponent } from "./components/masters/training-program-master/training-program-master.component";
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent, DashboardComponent, LogoutComponent, AdministratorComponent],
+  declarations: [
+    AppComponent,
+    LoginComponent,
+    DashboardComponent,
+    LogoutComponent,
+    AdministratorComponent,
+  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

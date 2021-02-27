@@ -1,1 +1,426 @@
-<p>user-rights works!</p>
+<div class="container-scroller">
+  <app-header></app-header>
+  <div class="container-fluid page-body-wrapper">
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <p-toast position="bottom-center" key="t1"></p-toast>
+        <p-confirmDialog
+          [style]="{width: '30vw'}"
+          [baseZIndex]="10000"
+          key="c1"
+        ></p-confirmDialog>
+        <div class="row mt-4 mb-4">
+          <div class="col-lg-12 grid-margin">
+            <form [formGroup]="userRightForm">
+              <div class="card card-body shadow">
+                <div class="row justify-content-center align-items-center">
+                  <div class="form-group col-12 col-md-6">
+                    <label for="username">User Name</label
+                    ><span class="text-danger">*</span>
+                    <input
+                      list="users"
+                      formControlName="username"
+                      placeholder="Select User Name"
+                      class="form-control"
+                      (change)="checkUsername($event.target.value, 'username')"
+                    />
+                    <datalist id="users">
+                      <option *ngFor="let user of users"
+                        >{{user.UM_USERNAME}}</option
+                      >
+                    </datalist>
+                    <div
+                      *ngIf="submitted && f.username.errors"
+                      class="alert alert-danger"
+                    >
+                      <div *ngIf="f.username.errors.required">
+                        Username is required
+                      </div>
+                    </div>
+                    <div *ngIf="userNameError" class="alert alert-danger">
+                      Please Select Username from drop down list
+                    </div>
+                  </div>
+                </div>
+                <!-- <div class="row justify-content-center">
+                    <div class="form-group col-12 col-md-6">
+                      <div
+                        class="custom-control custom-checkbox custom-control-inline"
+                      >
+                        <input
+                          type="checkbox"
+                          class="custom-control-input"
+                          id="copyRights"
+                          formControlName="copyRights"
+                          (change)="toggleForUsername();"
+                        />
+                        <label class="custom-control-label" for="copyRights"
+                          >Copy Rights from Another User</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+                 <div class="row justify-content-center">
+                    <div class="form-group col-12 col-md-6">
+                      <label for="fromusername">From User Name</label
+                      ><span class="text-danger">*</span>
+                      <input
+                        list="users"
+                        formControlName="fromUserName"
+                        class="form-control"
+                        placeholder="Select User Name"
+                        (change)="checkUsername($event.target.value, 'forUserName')"
+                      />
+                      <datalist id="fromUserName">
+                        <option *ngFor="let user of users"
+                          >{{user.UM_USERNAME}}</option
+                        >
+                      </datalist>
+                      <div *ngIf="forUserNameError" class="alert alert-danger">
+                        Please Select Username from drop down list
+                      </div>
+                    </div>
+                  </div> -->
+                <div class="row justify-content-center">
+                  <div class="form-group col-12 col-md-6">
+                    <label for="moduleName">Module Name</label
+                    ><span class="text-danger">*</span>
+                    <input
+                      list="moduleNames"
+                      formControlName="moduleName"
+                      class="form-control"
+                      placeholder="Select Module Name"
+                      (change)="getScreen($event.target.value)"
+                    />
+                    <datalist id="moduleNames">
+                      <option *ngFor="let module of moduleNames"
+                        >{{module.MODULE_NAME}}</option
+                      >
+                    </datalist>
+                    <div
+                      *ngIf="submitted && f.moduleName.errors"
+                      class="alert alert-danger"
+                    >
+                      <div *ngIf="f.moduleName.errors.required">
+                        Module Name is required
+                      </div>
+                    </div>
+                    <div *ngIf="moduleNameError" class="alert alert-danger">
+                      Please Select Module Name from drop down list
+                    </div>
+                  </div>
+                </div>
+                <div class="row justify-content-center">
+                  <div class="form-group col-12 col-md-6">
+                    <label for="fromname">Form Name</label
+                    ><span class="text-danger">*</span>
+                    <input
+                      list="screens"
+                      formControlName="formName"
+                      class="form-control"
+                      placeholder="Select Form Name"
+                      (change)="checkFormName($event.target.value)"
+                    />
+                    <datalist id="screens">
+                      <option *ngFor="let screen of screens"
+                        >{{screen.SM_NAME}}</option
+                      >
+                    </datalist>
+                    <div
+                      *ngIf="submitted && f.formName.errors"
+                      class="alert alert-danger"
+                    >
+                      <div *ngIf="f.formName.errors.required">
+                        Module Name is required
+                      </div>
+                    </div>
+                    <div *ngIf="formNameError" class="alert alert-danger">
+                      Please Select Form Name from drop down list
+                    </div>
+                  </div>
+                </div>
+                <div class="row justify-content-center">
+                  <div
+                    class="custom-control custom-checkbox custom-control-inline"
+                  >
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      id="forms"
+                      formControlName="forms"
+                      (change)="toggleForFormName()"
+                    />
+                    <label class="custom-control-label" for="forms"
+                      >select all forms</label
+                    >
+                  </div>
+                  <div class="form-group">
+                    <button
+                      class="btn btn-primary"
+                      type="submit"
+                      name="submit"
+                      (click)="show();"
+                    >
+                      Show
+                    </button>
+                  </div>
+                </div>
+                <hr />
+                <div class="row justify-content-around">
+                  <div
+                    class="custom-control col-6 col-md-2 custom-checkbox custom-control-inline"
+                  >
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      id="menu"
+                      formControlName="menu"
+                      (change)="checkRights()"
+                    />
+                    <label class="custom-control-label" for="menu">Menu</label>
+                  </div>
+                  <div
+                    class="custom-control col-6 col-md-2 custom-checkbox custom-control-inline"
+                  >
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      id="add"
+                      formControlName="add"
+                      (change)="checkRights()"
+                    />
+                    <label class="custom-control-label" for="add">Add</label>
+                  </div>
+                  <div
+                    class="custom-control col-6 col-md-2 custom-checkbox custom-control-inline"
+                  >
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      id="view"
+                      formControlName="view"
+                      (change)="checkRights()"
+                    />
+                    <label class="custom-control-label" for="view">View</label>
+                  </div>
+                  <div
+                    class="custom-control col-6 col-md-2 custom-checkbox custom-control-inline"
+                  >
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      id="update"
+                      formControlName="update"
+                      (change)="checkRights()"
+                    />
+                    <label class="custom-control-label" for="update"
+                      >Update</label
+                    >
+                  </div>
+                </div>
+                <div class="row justify-content-around">
+                  <div
+                    class="custom-control col-6 col-md-2 custom-checkbox custom-control-inline"
+                  >
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      id="delete"
+                      formControlName="delete"
+                      (change)="checkRights()"
+                    />
+                    <label class="custom-control-label" for="delete"
+                      >Delete</label
+                    >
+                  </div>
+                  <div
+                    class="custom-control col-6 col-md-2 custom-checkbox custom-control-inline"
+                  >
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      id="print"
+                      formControlName="print"
+                      (change)="checkRights()"
+                    />
+                    <label class="custom-control-label" for="print"
+                      >Print</label
+                    >
+                  </div>
+                  <div
+                    class="custom-control col-6 col-md-2 custom-checkbox custom-control-inline"
+                  >
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      id="backdate"
+                      formControlName="back_date"
+                      (change)="checkRights()"
+                    />
+                    <label class="custom-control-label" for="backdate"
+                      >BackDate</label
+                    >
+                  </div>
+                  <div
+                    class="custom-control col-6 col-md-2 custom-checkbox custom-control-inline"
+                  >
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      id="all"
+                      formControlName="all"
+                      (change)="selectAllRights()"
+                    />
+                    <label class="custom-control-label" for="all">All</label>
+                  </div>
+                </div>
+              </div>
+              <!-- {{userRightForm.value | json }} -->
+              <div
+                class="card shadow"
+                style="margin-top: 20px;"
+                *ngIf="showUserRightTable"
+              >
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>
+                          Form Name
+                        </th>
+                        <th>
+                          Menu
+                        </th>
+                        <th>
+                          Add
+                        </th>
+                        <th>
+                          View
+                        </th>
+                        <th>
+                          Update
+                        </th>
+                        <th>
+                          Delete
+                        </th>
+                        <th>
+                          Print
+                        </th>
+                        <th>
+                          Back Date
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody
+                      formArrayName="userRightsTable"
+                      *ngFor="let data of userRightForm.controls.userRightsTable?.value | paginate: { itemsPerPage: 10, currentPage: p }; let i=index"
+                    >
+                      <tr [formGroupName]="i">
+                        <td>{{data.SM_NAME}}</td>
+                        <td>
+                          <div class="form-check">
+                            <input
+                              class="form-check-input"
+                              type="checkbox"
+                              formControlName="MENU"
+                              [value]="data.MENU"
+                              (mousedown)="changeMenuAccess(i)"
+                            />
+                          </div>
+                        </td>
+                        <td>
+                          <div class="form-check">
+                            <input
+                              class="form-check-input"
+                              type="checkbox"
+                              formControlName="ADD"
+                              [value]="data.ADD"
+                              (mousedown)="changeAddAccess(i)"
+                            />
+                          </div>
+                        </td>
+                        <td>
+                          <div class="form-check">
+                            <input
+                              class="form-check-input"
+                              type="checkbox"
+                              formControlName="VIEW"
+                              [value]="data.VIEW"
+                              (mousedown)="changeViewAccess(i)"
+                            />
+                          </div>
+                        </td>
+                        <td>
+                          <div class="form-check">
+                            <input
+                              class="form-check-input"
+                              type="checkbox"
+                              formControlName="UPDATE"
+                              [value]="data.UPDATE"
+                              (mousedown)="changeUpdateAccess(i)"
+                            />
+                          </div>
+                        </td>
+                        <td>
+                          <div class="form-check">
+                            <input
+                              class="form-check-input"
+                              type="checkbox"
+                              formControlName="DELETE"
+                              [value]="data.DELETE"
+                              (mousedown)="changeDeleteAccess(i)"
+                            />
+                          </div>
+                        </td>
+                        <td>
+                          <div class="form-check">
+                            <input
+                              class="form-check-input"
+                              type="checkbox"
+                              formControlName="PRINT"
+                              [value]="data.PRINT"
+                              (mousedown)="changePrintAccess(i)"
+                            />
+                          </div>
+                        </td>
+                        <td>
+                          <div class="form-check">
+                            <input
+                              class="form-check-input"
+                              type="checkbox"
+                              formControlName="BACK_DATE"
+                              [value]="data.BACK_DATE"
+                              (mousedown)="changeBackDateAccess(i)"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+
+                    <pagination-controls
+                      (pageChange)="p = $event"
+                    ></pagination-controls>
+                  </table>
+                </div>
+              </div>
+
+              <div
+                class="card card-body shadow"
+                style="position: sticky; bottom: 0;"
+              >
+                <div class="row justify-content-center">
+                  <button class="btn btn-outline-success mr-5" (click)="save()">
+                    <i class="fas fa-check"></i> Save
+                  </button>
+                  <button class="btn btn-outline-danger" (click)="cancel()">
+                    <i class="fas fa-times"></i> Cancel
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

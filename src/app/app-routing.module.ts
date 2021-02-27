@@ -21,6 +21,14 @@ const routes: Routes = [
       ),
     canActivate: [AuthGuard],
   },
+  {
+    path: "masters",
+    loadChildren: () =>
+      import("./components/masters/masters.module").then(
+        (mod) => mod.MastersModule
+      ),
+    canActivate: [AuthGuard],
+  },
   { path: "**", redirectTo: "login" },
 ];
 

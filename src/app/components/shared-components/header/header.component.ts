@@ -9,6 +9,8 @@ import { AuthenticationService } from "src/app/_services/authentication.service"
 })
 export class HeaderComponent implements OnInit {
   public user: string;
+  public collapsed = false;
+
   constructor(
     public router: Router,
     private authenticationService: AuthenticationService
@@ -23,5 +25,8 @@ export class HeaderComponent implements OnInit {
 
   logout() {
     this.authenticationService.logout();
+  }
+  toggleCollapsed(): void {
+    this.collapsed = !this.collapsed;
   }
 }

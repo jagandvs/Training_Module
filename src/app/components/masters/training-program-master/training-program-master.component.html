@@ -1,0 +1,252 @@
+<div class="container-scroller">
+  <app-header></app-header>
+  <div class="container-fluid page-body-wrapper">
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <p-toast position="bottom-center" key="t1"></p-toast>
+        <p-confirmDialog
+          [style]="{width: '30vw'}"
+          [baseZIndex]="10000"
+          key="c1"
+        ></p-confirmDialog>
+        <div class="row mt-4 mb-4">
+          <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Training Program Master Table</h4>
+                <button class="btn btn-primary float-right" (click)="add()">
+                  <i class="mdi mdi-plus-circle-multiple-outline"></i> Add
+                  Training Program Master
+                </button>
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr class="text-center">
+                        <th>Title</th>
+                        <th>Duration</th>
+                        <th>Location</th>
+                        <th>Mode of Training</th>
+                        <th>Evaluation From</th>
+                        <th>Evaluation To</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        *ngFor="let training of trainingMaster"
+                        class="text-center"
+                      >
+                        <td>{{training.TrainingProgramMaster_title}}</td>
+                        <td>{{training.TrainingProgramMaster_duration}}</td>
+
+                        <td>{{training.TrainingProgramMaster_location}}</td>
+                        <td>
+                          {{training.TrainingProgramMaster_modeOfTraining}}
+                        </td>
+                        <td>
+                          {{training.TrainingProgramMaster_evalfrom | date :
+                          'dd/MM/yyyy'}}
+                        </td>
+
+                        <td>
+                          {{training.TrainingProgramMaster_evalto | date :
+                          'dd/MM/yyyy'}}
+                        </td>
+
+                        <td>
+                          <button
+                            class="btn btn-primary mr-4"
+                            (click)="edit(training)"
+                          >
+                            <i class="mdi mdi-pencil-box"></i> Edit
+                          </button>
+
+                          <button
+                            class="btn btn-danger"
+                            (click)="delete(training.TrainingProgramMaster_ID)"
+                          >
+                            <i class="mdi mdi-delete"></i> Delete
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p-dialog
+          [contentStyle]="{'overflow':'scroll'}"
+          header="Study Material Master"
+          [(visible)]="displayBasic"
+          [style]="{width: '80vw'}"
+          [baseZIndex]="10000"
+          [closable]="false"
+        >
+          <p-toast key="t2"></p-toast>
+          <p-confirmDialog
+            [style]="{width: '30vw'}"
+            [baseZIndex]="10000"
+          ></p-confirmDialog>
+          <div class="row justify-content-center">
+            <div class="co1-12 col-8">
+              <form class="forms-sample" [formGroup]="trainingMasterForm">
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label">Process Master</label>
+                  <div class="col-sm-6">
+                    <select
+                      class="form-control"
+                      formControlName="TrainingProgramMaster_processMasterid"
+                    >
+                      <option value="" selected>Select Process Master..</option>
+                      <option
+                        *ngFor="let process of processMasterDropdown"
+                        [value]="process.process_id"
+                        >{{process.process_name}}</option
+                      >
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label">Category Master</label>
+                  <div class="col-sm-6">
+                    <select
+                      class="form-control"
+                      formControlName="TrainingProgramMaster_categoryid"
+                    >
+                      <option value="" selected
+                        >Select Category Master..</option
+                      >
+                      <option
+                        *ngFor="let category of categoryMasterDropdown"
+                        [value]="category.category_id"
+                        >{{category.category_name}}</option
+                      >
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label"
+                    >Skill Level Master Title</label
+                  >
+                  <div class="col-sm-6">
+                    <select
+                      class="form-control"
+                      formControlName="TrainingProgramMaster_skilllevelid"
+                    >
+                      <option value="" selected
+                        >Select Skill Level Master..</option
+                      >
+                      <option
+                        *ngFor="let skill of skillMasterDropdown"
+                        [value]="skill.CategoryToSkillLevelMaster_ID"
+                        >{{skill.CategoryToSkillLevelMaster_title}}</option
+                      >
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label">Title</label>
+                  <div class="col-sm-6">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Title"
+                      formControlName="TrainingProgramMaster_title"
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label">Duration</label>
+                  <div class="col-sm-6">
+                    <input
+                      type="number"
+                      class="form-control"
+                      placeholder="Duration"
+                      formControlName="TrainingProgramMaster_duration"
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label">Location</label>
+                  <div class="col-sm-6">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Location"
+                      formControlName="TrainingProgramMaster_location"
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label"
+                    >Mode OF Training</label
+                  >
+                  <div class="col-sm-6">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Mode Of Training"
+                      formControlName="TrainingProgramMaster_modeOfTraining"
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label"
+                    >Evaluation From
+                  </label>
+                  <div class="col-sm-6">
+                    <input
+                      type="date"
+                      class="form-control"
+                      formControlName="TrainingProgramMaster_evalfrom"
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label">Evaluation To </label>
+                  <div class="col-sm-6">
+                    <input
+                      type="date"
+                      class="form-control"
+                      formControlName="TrainingProgramMaster_evalto"
+                    />
+                  </div>
+                </div>
+                <div class="form-group row justify-content-center">
+                  <div class="form-check">
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      id="isCustomer"
+                      formControlName="TrainingProgramMaster_iscustomerend"
+                    />
+                    <label class="form-check-label" for="isCustomer"
+                      >Is Customer End</label
+                    >
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="row justify-content-around">
+            <button class="btn btn-outline-primary" (click)="save()">
+              <i class="fas fa-save"></i> Save
+            </button>
+            <button
+              class="btn btn-outline-dark"
+              (click)="trainingMasterForm.reset()"
+            >
+              <i class="fas fa-save"></i> Reset
+            </button>
+            <button class="btn btn-outline-danger" (click)="cancel()">
+              <i class="fas fa-save"></i> Cancel
+            </button>
+          </div>
+        </p-dialog>
+        <app-footer></app-footer>
+      </div>
+    </div>
+  </div>
+</div>

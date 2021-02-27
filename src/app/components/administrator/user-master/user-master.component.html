@@ -1,0 +1,185 @@
+<div class="container-scroller">
+  <app-header></app-header>
+  <div class="container-fluid page-body-wrapper">
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <p-toast position="bottom-center" key="t1"></p-toast>
+        <p-confirmDialog
+          [style]="{width: '30vw'}"
+          [baseZIndex]="10000"
+          key="c1"
+        ></p-confirmDialog>
+        <div class="row mt-4 mb-4">
+          <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">User Master Table</h4>
+                <button class="btn btn-primary float-right" (click)="addUser()">
+                  <i class="mdi mdi-plus-circle-multiple-outline"></i> Add User
+                  Master
+                </button>
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr class="text-center">
+                        <th>User ID</th>
+                        <th>User Name</th>
+                        <th>User Email</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let user of userMaster" class="text-center">
+                        <td>{{user.UM_USERNAME}}</td>
+                        <td>{{user.UM_NAME}}</td>
+                        <td>{{user.UM_EMAIL}}</td>
+                        <td>
+                          <button
+                            class="btn btn-primary mr-4"
+                            (click)="editUser(user)"
+                          >
+                            <i class="mdi mdi-pencil-box"></i> Edit
+                          </button>
+
+                          <button
+                            class="btn btn-danger"
+                            (click)="deleteUser(user.UM_CODE)"
+                          >
+                            <i class="mdi mdi-delete"></i> Delete
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p-dialog
+          [contentStyle]="{'overflow':'scroll'}"
+          header="Unit Master"
+          [(visible)]="displayBasic"
+          [style]="{width: '80vw'}"
+          [baseZIndex]="10000"
+          [closable]="false"
+        >
+          <p-toast key="t2"></p-toast>
+          <p-confirmDialog
+            [style]="{width: '30vw'}"
+            [baseZIndex]="10000"
+          ></p-confirmDialog>
+          <div class="row justify-content-center">
+            <div class="co1-12 col-8">
+              <form class="forms-sample" [formGroup]="userMasterForm">
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label">User Name</label>
+                  <div class="col-sm-6">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="User Name"
+                      formControlName="UM_NAME"
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label">User Id</label>
+                  <div class="col-sm-6">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="User Id"
+                      formControlName="UM_USERNAME"
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label">User Type</label>
+                  <div class="col-sm-6">
+                    <select class="form-control" formControlName="UM_LEVEL">
+                      <option value="">Select User Type..</option>
+                      <option value="Administrator">Administrator</option>
+                      <option value="Manager">Manager</option>
+                      <option value="Accountant">Accountant</option>
+                      <option value="Operator">Operator</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label">E-Mail ID</label>
+                  <div class="col-sm-6">
+                    <input
+                      type="email"
+                      class="form-control"
+                      placeholder="E-Mail Id"
+                      formControlName="UM_EMAIL"
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label">Password</label>
+                  <div class="col-sm-6">
+                    <input
+                      type="password"
+                      class="form-control"
+                      placeholder="Password"
+                      formControlName="UM_PASSWORD"
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label"
+                    >Re-Enter Password</label
+                  >
+                  <div class="col-sm-6">
+                    <input
+                      type="password"
+                      class="form-control"
+                      placeholder="Re-Enter Password"
+                      formControlName="UM_CNFPASSWORD"
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <div class="form-check col-6">
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      id="active"
+                      formControlName="IS_ACTIVE"
+                    />
+                    <label class="form-check-label" for="active">Active</label>
+                  </div>
+                  <div class="form-check col-6">
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      id="isadmin"
+                      formControlName="UM_IS_ADMIN"
+                    />
+                    <label class="form-check-label" for="isadmin"
+                      >Is Admin</label
+                    >
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="row justify-content-around">
+            <button class="btn btn-outline-primary" (click)="saveUser()">
+              <i class="fas fa-save"></i> Save
+            </button>
+            <button class="btn btn-outline-dark">
+              <i class="fas fa-save"></i> Reset
+            </button>
+            <button class="btn btn-outline-danger" (click)="cancel()">
+              <i class="fas fa-save"></i> Cancel
+            </button>
+          </div>
+        </p-dialog>
+        <app-footer></app-footer>
+      </div>
+    </div>
+  </div>
+</div>

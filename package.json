@@ -21,6 +21,9 @@
     "@angular/platform-browser-dynamic": "~11.2.1",
     "@angular/router": "~11.2.1",
     "bn-ng-idle": "^1.0.1",
+    "ngx-pagination": "^5.0.0",
+    "primeflex": "^2.0.0",
+    "primeng": "^11.2.3",
     "rxjs": "~6.5.5",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.3"

@@ -1,0 +1,146 @@
+<div class="container-scroller">
+  <app-header></app-header>
+  <div class="container-fluid page-body-wrapper">
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <p-toast position="bottom-center" key="t1"></p-toast>
+        <p-confirmDialog
+          [style]="{width: '30vw'}"
+          [baseZIndex]="10000"
+          key="c1"
+        ></p-confirmDialog>
+        <div class="row mt-4 mb-4">
+          <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Category To Skill Level Table</h4>
+                <button
+                  class="btn btn-primary float-right"
+                  (click)="addCategory()"
+                >
+                  <i class="mdi mdi-plus-circle-multiple-outline"></i> Add
+                  Category Master
+                </button>
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr class="text-center">
+                        <th>Title</th>
+                        <th>Passing Percentage</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        *ngFor="let category of categorySkillMaster"
+                        class="text-center"
+                      >
+                        <td>{{category.CategoryToSkillLevelMaster_title}}</td>
+                        <td>
+                          {{category.CategoryToSkillLevelMaster_passingpercentage}}
+                        </td>
+
+                        <td>
+                          <button
+                            class="btn btn-primary mr-4"
+                            (click)="edit(category)"
+                          >
+                            <i class="mdi mdi-pencil-box"></i> Edit
+                          </button>
+
+                          <button
+                            class="btn btn-danger"
+                            (click)="delete(category.CategoryToSkillLevelMaster_ID)"
+                          >
+                            <i class="mdi mdi-delete"></i> Delete
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p-dialog
+          [contentStyle]="{'overflow':'scroll'}"
+          header="Category Master"
+          [(visible)]="displayBasic"
+          [style]="{width: '80vw'}"
+          [baseZIndex]="10000"
+          [closable]="false"
+        >
+          <p-toast key="t2"></p-toast>
+          <p-confirmDialog
+            [style]="{width: '30vw'}"
+            [baseZIndex]="10000"
+          ></p-confirmDialog>
+          <div class="row justify-content-center">
+            <div class="co1-12 col-8">
+              <form class="forms-sample" [formGroup]="categorySkillMasterForm">
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label">Category Master</label>
+                  <div class="col-sm-6">
+                    <select
+                      class="form-control"
+                      formControlName="CategoryToSkillLevelMaster_categorymaster_id"
+                    >
+                      <option value="" selected
+                        >Select Category Master..</option
+                      >
+                      <option
+                        *ngFor="let category of categoryMasterDropdown"
+                        [value]="category.category_id"
+                        >{{category.category_name}}</option
+                      >
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label">Title</label>
+                  <div class="col-sm-6">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Title"
+                      formControlName="CategoryToSkillLevelMaster_title"
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label"
+                    >Passing Percentage</label
+                  >
+                  <div class="col-sm-6">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Passing Percentage"
+                      formControlName="CategoryToSkillLevelMaster_passingpercentage"
+                    />
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="row justify-content-around">
+            <button class="btn btn-outline-primary" (click)="save()">
+              <i class="fas fa-save"></i> Save
+            </button>
+            <button
+              class="btn btn-outline-dark"
+              (click)="categorySkillMasterForm.reset()"
+            >
+              <i class="fas fa-save"></i> Reset
+            </button>
+            <button class="btn btn-outline-danger" (click)="cancel()">
+              <i class="fas fa-save"></i> Cancel
+            </button>
+          </div>
+        </p-dialog>
+        <app-footer></app-footer>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,125 @@
+<div class="container-scroller">
+  <app-header></app-header>
+  <div class="container-fluid page-body-wrapper">
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <p-toast position="bottom-center" key="t1"></p-toast>
+        <p-confirmDialog
+          [style]="{width: '30vw'}"
+          [baseZIndex]="10000"
+          key="c1"
+        ></p-confirmDialog>
+        <div class="row mt-4 mb-4">
+          <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Process Master Table</h4>
+                <button class="btn btn-primary float-right" (click)="add()">
+                  <i class="mdi mdi-plus-circle-multiple-outline"></i> Add
+                  Process Master
+                </button>
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr class="text-center">
+                        <th>Process Name</th>
+                        <th>Process Applicable to</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        *ngFor="let process of processMaster"
+                        class="text-center"
+                      >
+                        <td>{{process.process_name}}</td>
+                        <td>{{process.process_applicable_to}}</td>
+                        <td>
+                          <button
+                            class="btn btn-primary mr-4"
+                            (click)="edit(process)"
+                          >
+                            <i class="mdi mdi-pencil-box"></i> Edit
+                          </button>
+
+                          <button
+                            class="btn btn-danger"
+                            (click)="delete(process.process_id)"
+                          >
+                            <i class="mdi mdi-delete"></i> Delete
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p-dialog
+          [contentStyle]="{'overflow':'scroll'}"
+          header="Category Master"
+          [(visible)]="displayBasic"
+          [style]="{width: '80vw'}"
+          [baseZIndex]="10000"
+          [closable]="false"
+        >
+          <p-toast key="t2"></p-toast>
+          <p-confirmDialog
+            [style]="{width: '30vw'}"
+            [baseZIndex]="10000"
+          ></p-confirmDialog>
+          <div class="row justify-content-center">
+            <div class="co1-12 col-8">
+              <form class="forms-sample" [formGroup]="processMasterForm">
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label">Process Name</label>
+                  <div class="col-sm-6">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="process Name"
+                      formControlName="process_name"
+                    />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label"
+                    >Process Applicable To</label
+                  >
+                  <div class="col-sm-6">
+                    <select
+                      class="form-control"
+                      formControlName="process_applicable_to"
+                    >
+                      <option value="">Select Process Applicable to..</option>
+                      <option value="1">Staff</option>
+                      <option value="2">Workers</option>
+                      <option value="3">Management</option>
+                    </select>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="row justify-content-around">
+            <button class="btn btn-outline-primary" (click)="save()">
+              <i class="fas fa-save"></i> Save
+            </button>
+            <button
+              class="btn btn-outline-dark"
+              (click)="processMasterForm.reset()"
+            >
+              <i class="fas fa-save"></i> Reset
+            </button>
+            <button class="btn btn-outline-danger" (click)="cancel()">
+              <i class="fas fa-save"></i> Cancel
+            </button>
+          </div>
+        </p-dialog>
+        <app-footer></app-footer>
+      </div>
+    </div>
+  </div>
+</div>
