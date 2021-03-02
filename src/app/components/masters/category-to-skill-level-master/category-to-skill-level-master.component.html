@@ -14,27 +14,78 @@
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title">Category To Skill Level Table</h4>
-                <button
-                  class="btn btn-primary float-right"
-                  (click)="addCategory()"
-                >
-                  <i class="mdi mdi-plus-circle-multiple-outline"></i> Add
-                  Category Master
-                </button>
                 <div class="table-responsive">
-                  <table class="table table-striped">
-                    <thead>
+                  <p-table
+                    #dt
+                    [value]="categorySkillMaster"
+                    [rows]="10"
+                    [paginator]="true"
+                    [loading]="loading"
+                    [globalFilterFields]="['CategoryToSkillLevelMaster_title','CategoryToSkillLevelMaster_passingpercentage']"
+                    [rowsPerPageOptions]="[10,25,50]"
+                  >
+                    <ng-template pTemplate="caption">
+                      <div class="row justify-content-between">
+                        <div class="col-md-3">
+                          <button
+                            class="btn btn-primary"
+                            (click)="addCategory()"
+                          >
+                            Add Category to Skill Master
+                            <i class="mdi mdi-plus-circle-multiple-outline"></i>
+                          </button>
+                        </div>
+                        <div class="col-md-3">
+                          <!-- <button
+                      type="button"
+                      class="btn btn-success"
+                      (click)="exportExcel()"
+                      pTooltip="CSV"
+                      tooltipPosition="bottom"
+                    >
+                      <i class="fas fa-file-excel"></i> Export Excel
+                    </button> -->
+                        </div>
+                        <div class="col-md-3"></div>
+                        <div class="col-md-3">
+                          <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input
+                              pInputText
+                              type="text"
+                              (input)="dt.filterGlobal($event.target.value, 'contains')"
+                              placeholder="Search..."
+                            />
+                          </span>
+                        </div>
+                      </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
                       <tr class="text-center">
-                        <th>Title</th>
-                        <th>Passing Percentage</th>
+                        <th pSortableColumn="CategoryToSkillLevelMaster_title">
+                          Title
+                          <p-sortIcon field="CategoryToSkillLevelMaster_title">
+                          </p-sortIcon>
+                        </th>
+                        <th
+                          pSortableColumn="CategoryToSkillLevelMaster_passingpercentage"
+                        >
+                          Passing Percentage
+                          <p-sortIcon
+                            field="CategoryToSkillLevelMaster_passingpercentage"
+                          >
+                          </p-sortIcon>
+                        </th>
+
                         <th>Action</th>
                       </tr>
-                    </thead>
-                    <tbody>
-                      <tr
-                        *ngFor="let category of categorySkillMaster"
-                        class="text-center"
-                      >
+                    </ng-template>
+                    <ng-template
+                      pTemplate="body"
+                      let-category
+                      let-ri="rowIndex"
+                    >
+                      <tr>
                         <td>{{category.CategoryToSkillLevelMaster_title}}</td>
                         <td>
                           {{category.CategoryToSkillLevelMaster_passingpercentage}}
@@ -56,8 +107,15 @@
                           </button>
                         </td>
                       </tr>
-                    </tbody>
-                  </table>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                      <tr>
+                        <td colspan="3" style="text-align: center;">
+                          <h4>No Records Found.</h4>
+                        </td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
                 </div>
               </div>
             </div>

@@ -14,28 +14,96 @@
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title">Training Program Master Table</h4>
-                <button class="btn btn-primary float-right" (click)="add()">
-                  <i class="mdi mdi-plus-circle-multiple-outline"></i> Add
-                  Training Program Master
-                </button>
+
                 <div class="table-responsive">
-                  <table class="table table-striped">
-                    <thead>
+                  <p-table
+                    #dt
+                    [value]="trainingMaster"
+                    [rows]="10"
+                    [paginator]="true"
+                    [loading]="loading"
+                    [globalFilterFields]="['TrainingProgramMaster_title','TrainingProgramMaster_duration','TrainingProgramMaster_location','TrainingProgramMaster_modeOfTraining','TrainingProgramMaster_evalfrom','TrainingProgramMaster_evalto']"
+                    [rowsPerPageOptions]="[10,25,50]"
+                  >
+                    <ng-template pTemplate="caption">
+                      <div class="row justify-content-between">
+                        <div class="col-md-3">
+                          <button class="btn btn-primary" (click)="add()">
+                            Add Training Program Master
+                            <i class="mdi mdi-plus-circle-multiple-outline"></i>
+                          </button>
+                        </div>
+                        <div class="col-md-3">
+                          <!-- <button
+              type="button"
+              class="btn btn-success"
+              (click)="exportExcel()"
+              pTooltip="CSV"
+              tooltipPosition="bottom"
+            >
+              <i class="fas fa-file-excel"></i> Export Excel
+            </button> -->
+                        </div>
+                        <div class="col-md-3"></div>
+                        <div class="col-md-3">
+                          <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input
+                              pInputText
+                              type="text"
+                              (input)="dt.filterGlobal($event.target.value, 'contains')"
+                              placeholder="Search..."
+                            />
+                          </span>
+                        </div>
+                      </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
                       <tr class="text-center">
-                        <th>Title</th>
-                        <th>Duration</th>
-                        <th>Location</th>
-                        <th>Mode of Training</th>
-                        <th>Evaluation From</th>
-                        <th>Evaluation To</th>
+                        <th pSortableColumn="TrainingProgramMaster_title">
+                          Title
+                          <p-sortIcon field="TrainingProgramMaster_title">
+                          </p-sortIcon>
+                        </th>
+                        <th pSortableColumn="TrainingProgramMaster_duration">
+                          Duration
+                          <p-sortIcon field="TrainingProgramMaster_duration">
+                          </p-sortIcon>
+                        </th>
+                        <th pSortableColumn="TrainingProgramMaster_location">
+                          Location
+                          <p-sortIcon field="TrainingProgramMaster_location">
+                          </p-sortIcon>
+                        </th>
+                        <th
+                          pSortableColumn="TrainingProgramMaster_modeOfTraining"
+                        >
+                          Mode of Training
+                          <p-sortIcon
+                            field="TrainingProgramMaster_modeOfTraining"
+                          >
+                          </p-sortIcon>
+                        </th>
+                        <th pSortableColumn="TrainingProgramMaster_evalfrom">
+                          Evaluation From
+                          <p-sortIcon field="TrainingProgramMaster_evalfrom">
+                          </p-sortIcon>
+                        </th>
+                        <th pSortableColumn="TrainingProgramMaster_evalto">
+                          Evaluation To
+                          <p-sortIcon field="TrainingProgramMaster_evalto">
+                          </p-sortIcon>
+                        </th>
+
                         <th>Action</th>
                       </tr>
-                    </thead>
-                    <tbody>
-                      <tr
-                        *ngFor="let training of trainingMaster"
-                        class="text-center"
-                      >
+                    </ng-template>
+                    <ng-template
+                      pTemplate="body"
+                      let-training
+                      let-ri="rowIndex"
+                    >
+                      <tr>
                         <td>{{training.TrainingProgramMaster_title}}</td>
                         <td>{{training.TrainingProgramMaster_duration}}</td>
 
@@ -58,19 +126,26 @@
                             class="btn btn-primary mr-4"
                             (click)="edit(training)"
                           >
-                            <i class="mdi mdi-pencil-box"></i> Edit
+                            <i class="mdi mdi-pencil-box"></i>
                           </button>
 
                           <button
                             class="btn btn-danger"
                             (click)="delete(training.TrainingProgramMaster_ID)"
                           >
-                            <i class="mdi mdi-delete"></i> Delete
+                            <i class="mdi mdi-delete"></i>
                           </button>
                         </td>
                       </tr>
-                    </tbody>
-                  </table>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                      <tr>
+                        <td colspan="3" style="text-align: center;">
+                          <h4>No Records Found.</h4>
+                        </td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
                 </div>
               </div>
             </div>

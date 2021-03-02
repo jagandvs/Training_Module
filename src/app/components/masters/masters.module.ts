@@ -14,6 +14,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { DialogModule } from "primeng/dialog";
 import { DropdownModule } from "primeng/dropdown";
 import { ToastModule } from "primeng/toast";
+import { TableModule } from "primeng/table";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { MastersService } from "./masters.service";
 import { ConfirmationService, MessageService } from "primeng/api";
@@ -51,6 +52,7 @@ const routes: Routes = [
     DialogModule,
     DropdownModule,
     ToastModule,
+    TableModule,
     ConfirmDialogModule,
     RouterModule.forChild(routes),
   ],

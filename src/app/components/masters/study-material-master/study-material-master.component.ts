@@ -67,6 +67,7 @@ export class StudyMaterialMasterComponent implements OnInit {
     return this.materialMasterForm.controls;
   }
   getMaterialMaster() {
+    this.loading = true;
     this.materialMaster = [];
     this.commonService
       .getTableResponse("*", "StudyMaterialMaster", "es_delete=0")
@@ -82,8 +83,7 @@ export class StudyMaterialMasterComponent implements OnInit {
               material.StudyMaterialMaster_skilllevelid,
           });
         });
-
-        console.log(data);
+        this.loading = false;
       });
   }
   add() {

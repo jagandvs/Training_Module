@@ -38,6 +38,7 @@ export class CategoryMasterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loading = true;
     this.getCategoryMaster();
     var companyID = JSON.parse(localStorage.getItem("companyDetails"));
     this.comp_id = companyID.CM_ID;
@@ -56,9 +57,10 @@ export class CategoryMasterComponent implements OnInit {
   }
 
   getCategoryMaster() {
+    this.loading = true;
     this.categoryMaster = [];
     this.commonService
-      .getTableResponse("*", "CATEGORY_MASTER", "ES_DELETE=0")
+      .getTableResponse("*", "CATEGORY_MASTER", "es_delete=0")
       .subscribe((data) => {
         data.map((category) => {
           let cateogry_applicable_to = "";
@@ -77,12 +79,12 @@ export class CategoryMasterComponent implements OnInit {
             cateogry_applicable_to: cateogry_applicable_to,
           });
         });
-
-        console.log(data);
+        this.loading = false;
       });
   }
   save() {
     if (this.categoryMasterForm.valid) {
+      this.loading = true;
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
       this.confirmationService.confirm({
         message: "Are you sure that you want to save?",
@@ -112,6 +114,7 @@ export class CategoryMasterComponent implements OnInit {
     return;
   }
   edit(category) {
+    console.log(category);
     this.commonService
       .setResetModify(
         "CATEGORY_MASTER",
@@ -139,10 +142,10 @@ export class CategoryMasterComponent implements OnInit {
                 category.category_id_CM_COMP_ID
               );
               this.f["category_name"].setValue(category.category_name);
-              category.category_type === "Technical"
-                ? this.f["category_type"].setValue(true)
-                : this.f["category_type"].setValue(false);
-              this.f["category_type"].setValue(category.category_type);
+              category.category_type == "Technical"
+                ? this.f["category_type"].setValue("true")
+                : this.f["category_type"].setValue("false");
+
               if (category.cateogry_applicable_to === "Staff") {
                 this.f["cateogry_applicable_to"].setValue(1);
               } else if (category.cateogry_applicable_to === "Workers") {
@@ -200,7 +203,7 @@ export class CategoryMasterComponent implements OnInit {
             categoryCode,
             "category_id",
             "1",
-            "ES_DELETE",
+            "es_delete",
             "CATEGORY_MASTER"
           )
           .subscribe(

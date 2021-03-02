@@ -14,24 +14,64 @@
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title">Department Master Table</h4>
-                <button class="btn btn-primary float-right" (click)="add()">
-                  <i class="mdi mdi-plus-circle-multiple-outline"></i> Add
-                  Department Master
-                </button>
                 <div class="table-responsive">
-                  <table class="table table-striped">
-                    <thead>
+                  <p-table
+                    #dt
+                    [value]="departmentMaster"
+                    [rows]="10"
+                    [paginator]="true"
+                    [loading]="loading"
+                    [globalFilterFields]="['department_name']"
+                    [rowsPerPageOptions]="[10,25,50]"
+                  >
+                    <ng-template pTemplate="caption">
+                      <div class="row justify-content-between">
+                        <div class="col-md-3">
+                          <button class="btn btn-primary" (click)="add()">
+                            Add Department Master
+                            <i class="mdi mdi-plus-circle-multiple-outline"></i>
+                          </button>
+                        </div>
+                        <div class="col-md-3">
+                          <!-- <button
+                  type="button"
+                  class="btn btn-success"
+                  (click)="exportExcel()"
+                  pTooltip="CSV"
+                  tooltipPosition="bottom"
+                >
+                  <i class="fas fa-file-excel"></i> Export Excel
+                </button> -->
+                        </div>
+                        <div class="col-md-3"></div>
+                        <div class="col-md-3">
+                          <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input
+                              pInputText
+                              type="text"
+                              (input)="dt.filterGlobal($event.target.value, 'contains')"
+                              placeholder="Search..."
+                            />
+                          </span>
+                        </div>
+                      </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
                       <tr class="text-center">
-                        <th>Department Name</th>
-
+                        <th pSortableColumn="department_name">
+                          Department Name
+                          <p-sortIcon field="department_name"> </p-sortIcon>
+                        </th>
                         <th>Action</th>
                       </tr>
-                    </thead>
-                    <tbody>
-                      <tr
-                        *ngFor="let department of departmentMaster"
-                        class="text-center"
-                      >
+                    </ng-template>
+                    <ng-template
+                      pTemplate="body"
+                      let-department
+                      let-ri="rowIndex"
+                    >
+                      <tr>
                         <td>{{department.department_name}}</td>
 
                         <td>
@@ -50,59 +90,68 @@
                           </button>
                         </td>
                       </tr>
-                    </tbody>
-                  </table>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                      <tr>
+                        <td colspan="3" style="text-align: center;">
+                          <h4>No Records Found.</h4>
+                        </td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <p-dialog
-          [contentStyle]="{'overflow':'scroll'}"
-          header="Category Master"
-          [(visible)]="displayBasic"
-          [style]="{width: '80vw'}"
-          [baseZIndex]="10000"
-          [closable]="false"
-        >
-          <p-toast key="t2"></p-toast>
-          <p-confirmDialog
-            [style]="{width: '30vw'}"
+          <p-dialog
+            [contentStyle]="{'overflow':'scroll'}"
+            header="Category Master"
+            [(visible)]="displayBasic"
+            [style]="{width: '80vw'}"
             [baseZIndex]="10000"
-          ></p-confirmDialog>
-          <div class="row justify-content-center">
-            <div class="co1-12 col-8">
-              <form class="forms-sample" [formGroup]="departmentMasterForm">
-                <div class="form-group row">
-                  <label class="col-sm-6 col-form-label">Department Name</label>
-                  <div class="col-sm-6">
-                    <input
-                      type="text"
-                      class="form-control"
-                      placeholder="Department Name"
-                      formControlName="department_name"
-                    />
+            [closable]="false"
+          >
+            <p-toast key="t2"></p-toast>
+            <p-confirmDialog
+              [style]="{width: '30vw'}"
+              [baseZIndex]="10000"
+            ></p-confirmDialog>
+            <div class="row justify-content-center">
+              <div class="co1-12 col-8">
+                <form class="forms-sample" [formGroup]="departmentMasterForm">
+                  <div class="form-group row">
+                    <label class="col-sm-6 col-form-label"
+                      >Department Name</label
+                    >
+                    <div class="col-sm-6">
+                      <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Department Name"
+                        formControlName="department_name"
+                      />
+                    </div>
                   </div>
-                </div>
-              </form>
+                </form>
+              </div>
             </div>
-          </div>
-          <div class="row justify-content-around">
-            <button class="btn btn-outline-primary" (click)="save()">
-              <i class="fas fa-save"></i> Save
-            </button>
-            <button
-              class="btn btn-outline-dark"
-              (click)="departmentMasterForm.reset()"
-            >
-              <i class="fas fa-save"></i> Reset
-            </button>
-            <button class="btn btn-outline-danger" (click)="cancel()">
-              <i class="fas fa-save"></i> Cancel
-            </button>
-          </div>
-        </p-dialog>
-        <app-footer></app-footer>
+            <div class="row justify-content-around">
+              <button class="btn btn-outline-primary" (click)="save()">
+                <i class="fas fa-save"></i> Save
+              </button>
+              <button
+                class="btn btn-outline-dark"
+                (click)="departmentMasterForm.reset()"
+              >
+                <i class="fas fa-save"></i> Reset
+              </button>
+              <button class="btn btn-outline-danger" (click)="cancel()">
+                <i class="fas fa-save"></i> Cancel
+              </button>
+            </div>
+          </p-dialog>
+          <app-footer></app-footer>
+        </div>
       </div>
     </div>
   </div>

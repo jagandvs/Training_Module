@@ -14,26 +14,78 @@
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title">Customer Master Table</h4>
-                <button class="btn btn-primary float-right" (click)="add()">
-                  <i class="mdi mdi-plus-circle-multiple-outline"></i> Add
-                  Customer Master
-                </button>
                 <div class="table-responsive">
-                  <table class="table table-striped">
-                    <thead>
+                  <p-table
+                    #dt
+                    [value]="customerMaster"
+                    [rows]="10"
+                    [paginator]="true"
+                    [loading]="loading"
+                    [globalFilterFields]="['customer_name','customer_category', 'customer_titleofprogram', 'customer_expectedskills']"
+                    [rowsPerPageOptions]="[10,25,50]"
+                  >
+                    <ng-template pTemplate="caption">
+                      <div class="row justify-content-between">
+                        <div class="col-md-3">
+                          <button class="btn btn-primary" (click)="add()">
+                            Add Customer Master
+                            <i class="mdi mdi-plus-circle-multiple-outline"></i>
+                          </button>
+                        </div>
+                        <div class="col-md-3">
+                          <!-- <button
+                    type="button"
+                    class="btn btn-success"
+                    (click)="exportExcel()"
+                    pTooltip="CSV"
+                    tooltipPosition="bottom"
+                  >
+                    <i class="fas fa-file-excel"></i> Export Excel
+                  </button> -->
+                        </div>
+                        <div class="col-md-3"></div>
+                        <div class="col-md-3">
+                          <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input
+                              pInputText
+                              type="text"
+                              (input)="dt.filterGlobal($event.target.value, 'contains')"
+                              placeholder="Search..."
+                            />
+                          </span>
+                        </div>
+                      </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
                       <tr class="text-center">
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Progran Title</th>
-                        <th>Expected Skills</th>
+                        <th pSortableColumn="customer_name">
+                          Customer Name
+                          <p-sortIcon field="customer_name"> </p-sortIcon>
+                        </th>
+                        <th pSortableColumn="customer_category">
+                          Category
+                          <p-sortIcon field="customer_category"> </p-sortIcon>
+                        </th>
+                        <th pSortableColumn="customer_titleofprogram">
+                          Progran Title
+                          <p-sortIcon field="customer_titleofprogram">
+                          </p-sortIcon>
+                        </th>
+                        <th pSortableColumn="customer_expectedskills">
+                          Expected Skills
+                          <p-sortIcon field="customer_expectedskills">
+                          </p-sortIcon>
+                        </th>
                         <th>Action</th>
                       </tr>
-                    </thead>
-                    <tbody>
-                      <tr
-                        *ngFor="let customer of customerMaster"
-                        class="text-center"
-                      >
+                    </ng-template>
+                    <ng-template
+                      pTemplate="body"
+                      let-customer
+                      let-ri="rowIndex"
+                    >
+                      <tr>
                         <td>{{customer.customer_name}}</td>
                         <td>
                           {{customer.customer_category}}
@@ -46,7 +98,7 @@
                         </td>
                         <td>
                           <button
-                            class="btn btn-primary mr-4"
+                            class="btn btn-primary mr-2"
                             (click)="edit(customer)"
                           >
                             <i class="mdi mdi-pencil-box"></i> Edit
@@ -60,8 +112,15 @@
                           </button>
                         </td>
                       </tr>
-                    </tbody>
-                  </table>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                      <tr>
+                        <td colspan="3" style="text-align: center;">
+                          <h4>No Records Found.</h4>
+                        </td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
                 </div>
               </div>
             </div>

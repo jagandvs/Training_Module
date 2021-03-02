@@ -54,6 +54,7 @@ export class CustomerMasterComponent implements OnInit {
   }
 
   getCustomerMaster() {
+    this.loading = true;
     this.customerMaster = [];
     this.commonService
       .getTableResponse("*", "customer_master", "es_delete=0")
@@ -71,7 +72,7 @@ export class CustomerMasterComponent implements OnInit {
           });
         });
 
-        console.log(data);
+        this.loading = false;
       });
   }
   add() {

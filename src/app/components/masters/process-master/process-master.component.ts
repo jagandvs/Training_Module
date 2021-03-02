@@ -53,6 +53,7 @@ export class ProcessMasterComponent implements OnInit {
   }
 
   getProcessMaster() {
+    this.loading = true;
     this.processMaster = [];
     this.commonService
       .getTableResponse("*", "process_master", "es_delete=0")
@@ -74,7 +75,7 @@ export class ProcessMasterComponent implements OnInit {
           });
         });
 
-        console.log(data);
+        this.loading = false;
       });
   }
   add() {

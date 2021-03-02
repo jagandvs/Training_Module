@@ -97,6 +97,7 @@ export class TrainingProgramMasterComponent implements OnInit {
   }
 
   getTrainingMaster() {
+    this.loading = true;
     this.trainingMaster = [];
     this.commonService
       .getTableResponse("*", "TrainingProgramMaster", "es_delete=0")
@@ -127,7 +128,7 @@ export class TrainingProgramMasterComponent implements OnInit {
           });
         });
 
-        console.log(data);
+        this.loading = false;
       });
   }
 

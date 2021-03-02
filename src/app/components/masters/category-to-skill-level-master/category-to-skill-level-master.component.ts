@@ -68,6 +68,7 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
   }
 
   getCategorySkillMaster() {
+    this.loading = true;
     this.categorySkillMaster = [];
     this.commonService
       .getTableResponse("*", "CategoryToSkillLevel_Master", "ES_DELETE=0")
@@ -87,7 +88,7 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
           });
         });
 
-        console.log(data);
+        this.loading = false;
       });
   }
   addCategory() {
