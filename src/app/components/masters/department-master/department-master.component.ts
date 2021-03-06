@@ -1,6 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ConfirmationService, MessageService } from "primeng/api";
+import { Department } from "src/app/_helper/SM_CODE";
+import { UM_CODE } from "src/app/_helper/variables";
 import { CommonService } from "src/app/_services/common.service";
 import { MastersService } from "../masters.service";
 
@@ -37,14 +39,29 @@ export class DepartmentMasterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.getdepartmentMaster();
-    var companyID = JSON.parse(localStorage.getItem("companyDetails"));
-    this.comp_id = companyID.CM_ID;
-    this.departmentMasterForm = this.fb.group({
-      department_id: [""],
-      department_CM_COMP_ID: [this.comp_id],
-      department_name: ["", Validators.required],
-    });
+    this.commonService
+      .checkRight(UM_CODE, Department, "checkRight")
+      .subscribe((data) => {
+        for (let access of data) {
+          this.menuAccess = access.MENU;
+          this.addAccess = access.ADD;
+          this.deleteAccess = access.DELETE;
+          this.viewAccess = access.VIEW;
+          this.printAccess = access.PRINT;
+          this.backDateAccess = access.BACK_DATE;
+          this.updateAccess = access.UPDATE;
+        }
+      });
+    if (this.menuAccess) {
+      this.getdepartmentMaster();
+      var companyID = JSON.parse(localStorage.getItem("companyDetails"));
+      this.comp_id = companyID.CM_ID;
+      this.departmentMasterForm = this.fb.group({
+        department_id: [""],
+        department_CM_COMP_ID: [this.comp_id],
+        department_name: ["", Validators.required],
+      });
+    }
   }
   get f() {
     return this.departmentMasterForm.controls;
@@ -97,84 +114,133 @@ export class DepartmentMasterComponent implements OnInit {
     return;
   }
   add() {
-    this.displayBasic = true;
-    this.newItem = true;
-    this.submitted = false;
+    if (this.addAccess) {
+      this.displayBasic = true;
+      this.newItem = true;
+      this.submitted = false;
+      this.departmentMasterForm.reset();
+    } else {
+      this.messageService.add({
+        key: "t1",
+        severity: "warn",
+        summary: "Warning",
+        detail: "Sorry!! You dont have access to add",
+      });
+    }
   }
   delete(code) {
-    this.confirmationService.confirm({
-      message: "Are you sure that you want to delete?",
-      header: "Delete Confirmation",
-      icon: "fas fa-trash",
-      key: "c1",
-      accept: () => {
-        this.commonService
-          .deleteRow(
-            code,
-            "department_id",
-            "1",
-            "es_delete",
-            "department_master"
-          )
-          .subscribe(
-            (data) => {
-              this.getdepartmentMaster();
-              this.messageService.add({
-                key: "t1",
-                severity: "success",
-                summary: "Success",
-                detail: "Deleted Successfully",
-              });
-            },
-            (error) => {
-              console.log(error);
-            }
-          );
-      },
-    });
+    if (this.deleteAccess) {
+      this.commonService
+        .setResetModify(
+          "department_master",
+          "es_modify",
+          "department_id",
+          code,
+          0,
+          "check"
+        )
+        .subscribe((data) => {
+          console.log(data);
+          if (data == 0) {
+            this.confirmationService.confirm({
+              message: "Are you sure that you want to delete?",
+              header: "Delete Confirmation",
+              icon: "fas fa-trash",
+              key: "c1",
+              accept: () => {
+                this.commonService
+                  .deleteRow(
+                    code,
+                    "department_id",
+                    "1",
+                    "es_delete",
+                    "department_master"
+                  )
+                  .subscribe(
+                    (data) => {
+                      this.getdepartmentMaster();
+                      this.messageService.add({
+                        key: "t1",
+                        severity: "success",
+                        summary: "Success",
+                        detail: "Deleted Successfully",
+                      });
+                    },
+                    (error) => {
+                      console.log(error);
+                    }
+                  );
+              },
+            });
+          } else {
+            this.messageService.add({
+              key: "t1",
+              severity: "warn",
+              summary: "Warning",
+              detail: "Sorry!! You dont have access to edit",
+            });
+          }
+        });
+    } else {
+      this.messageService.add({
+        key: "t1",
+        severity: "warn",
+        summary: "Warning",
+        detail: "Sorry!! You dont have access to Delete Item",
+      });
+    }
   }
   edit(department) {
-    this.commonService
-      .setResetModify(
-        "department_master",
-        "es_modify",
-        "department_id",
-        department.department_id,
-        0,
-        "check"
-      )
-      .subscribe((data) => {
-        console.log(data);
-        if (data == 0) {
-          this.commonService
-            .setResetModify(
-              "department_master",
-              "es_modify",
-              "department_id",
-              department.department_id,
-              1,
-              "setLock"
-            )
-            .subscribe((data) => {
-              this.f["department_id"].setValue(department.department_id);
-              this.f["department_CM_COMP_ID"].setValue(
-                department.department_CM_COMP_ID
-              );
-              this.f["department_name"].setValue(department.department_name);
+    if (this.updateAccess) {
+      this.commonService
+        .setResetModify(
+          "department_master",
+          "es_modify",
+          "department_id",
+          department.department_id,
+          0,
+          "check"
+        )
+        .subscribe((data) => {
+          console.log(data);
+          if (data == 0) {
+            this.commonService
+              .setResetModify(
+                "department_master",
+                "es_modify",
+                "department_id",
+                department.department_id,
+                1,
+                "setLock"
+              )
+              .subscribe((data) => {
+                this.f["department_id"].setValue(department.department_id);
+                this.f["department_CM_COMP_ID"].setValue(
+                  department.department_CM_COMP_ID
+                );
+                this.f["department_name"].setValue(department.department_name);
 
-              this.displayBasic = true;
-              this.newItem = false;
-              this.submitted = false;
+                this.displayBasic = true;
+                this.newItem = false;
+                this.submitted = false;
+              });
+          } else {
+            this.messageService.add({
+              key: "t1",
+              severity: "info",
+              summary: "Success",
+              detail: "Someone Editing the Item/ Item is locked",
             });
-        } else {
-          this.messageService.add({
-            key: "t1",
-            severity: "info",
-            summary: "Success",
-            detail: "Someone Editing the Item/ Item is locked",
-          });
-        }
+          }
+        });
+    } else {
+      this.messageService.add({
+        key: "t1",
+        severity: "warn",
+        summary: "Warning",
+        detail: "Sorry!! You dont have access to edit",
       });
+    }
   }
   cancel() {
     this.commonService

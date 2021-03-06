@@ -17,10 +17,10 @@
               href="#"
               data-toggle="dropdown"
               id="profileDropdown"
+              role="button"
             >
               <span class="nav-profile-name">{{user}}</span>
               <span class="online-status"></span>
-              <!-- <img src="images/faces/face28.png" alt="profile" /> -->
             </a>
             <div
               class="dropdown-menu dropdown-menu-right navbar-dropdown"
@@ -60,7 +60,10 @@
             <span class="menu-title">Dashboard</span></a
           >
         </li>
-        <li class="nav-item">
+        <li
+          (click)="toggleSubmenuMasters()"
+          [ngClass]="{'show-submenu' : submenuMasters, 'nav-item': true}"
+        >
           <a class="nav-link">
             <i class="mdi mdi-source-branch menu-icon"></i>
             <span class="menu-title">Masters</span>
@@ -121,8 +124,11 @@
           </div>
         </li>
 
-        <li class="nav-item">
-          <a href="#" class="nav-link">
+        <li
+          (click)="toggleSubmenuTransactions()"
+          [ngClass]="{'show-submenu' : submenuTransactions, 'nav-item': true}"
+        >
+          <a class="nav-link">
             <i class="mdi mdi-bulletin-board menu-icon"></i>
             <span class="menu-title">Transactions</span>
             <i class="menu-arrow"></i>
@@ -130,13 +136,25 @@
           <div class="submenu">
             <ul class="submenu-item">
               <li class="nav-item">
-                <a class="nav-link" href="#">Transaction 1</a>
+                <a
+                  class="nav-link"
+                  (click)="router.navigate(['transactions/questionBank'])"
+                  >Question Bank</a
+                >
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Transaction 2</a>
+                <a
+                  class="nav-link"
+                  (click)="router.navigate(['transactions/employeeMaster'])"
+                  >Employee Master</a
+                >
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Transaction 3</a>
+                <a
+                  class="nav-link"
+                  (click)="router.navigate(['transactions/trainingNeed'])"
+                  >Training Need</a
+                >
               </li>
             </ul>
           </div>

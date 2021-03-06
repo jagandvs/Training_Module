@@ -352,6 +352,7 @@ export class UserRightsComponent implements OnInit {
           severity: "success",
           summary: "Success Message",
           detail: "User Rights Saved Successfully",
+          key: "t1",
         });
       });
     } else {

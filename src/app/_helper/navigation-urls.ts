@@ -22,7 +22,19 @@ export const insertUserRights = ApiURL + "administrator/insertUserRights";
 
 export const UPSERT_USER_MASTER = ApiURL + "administrator/UPSERT_USER_MASTER";
 
+// Masters
+
 export const MASTERS = ApiURL + "masters/";
+
+// Transactions
+
+export const TRANSACTIONS = ApiURL + "transactions/";
+export const INSERT_QUESTION_BANK =
+  ApiURL + "transactions/INSERT_UPSERT_QuestionBank";
+export const INSERT_EMPLOYEE_MASTER =
+  ApiURL + "transactions/INSERT_UPSERT_EmployeeMaster";
+export const INSERT_TRAINING_NEEDS =
+  ApiURL + "transactions/INSERT_UPSERT_TrainingNeedsMaster";
 
 // common routes
 export const setResetModify = ApiURL + "common/setResetModify";

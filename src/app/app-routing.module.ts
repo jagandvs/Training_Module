@@ -7,7 +7,6 @@ import { AuthGuard } from "./_guards/auth.guard";
 const routes: Routes = [
   { path: "", component: LoginComponent },
   { path: "login", component: LoginComponent },
-
   {
     path: "dashboard",
     component: DashboardComponent,
@@ -29,11 +28,19 @@ const routes: Routes = [
       ),
     canActivate: [AuthGuard],
   },
+  {
+    path: "transactions",
+    loadChildren: () =>
+      import("./components/transactions/transactions.module").then(
+        (mod) => mod.TransactionsModule
+      ),
+    canActivate: [AuthGuard],
+  },
   { path: "**", redirectTo: "login" },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { relativeLinkResolution: "legacy" })],
+  imports: [RouterModule.forRoot(routes, { useHash: true })],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

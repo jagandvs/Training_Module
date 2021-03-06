@@ -23233,13 +23233,11 @@ dl li {
 }
 
 @media (max-width: 767px) {
-  .horizontal-menu
-    .top-navbar
-    .navbar-menu-wrapper
-    .navbar-nav
-    .nav-item.nav-profile
-    .nav-profile-name {
+  .horizontal-menu .top-navbar .navbar-menu-wrapper .navbar-nav {
     display: none;
+  }
+  .nav-item.nav-profile {
+    padding-left: 60%;
   }
 }
 
@@ -23848,7 +23846,7 @@ dl li {
   -ms-transform: rotate(0deg);
   -webkit-transform: rotate(0deg);
   transform: rotate(0deg);
-  moz-transform-origin: center;
+  -moz-transform-origin: center;
   -o-transform-origin: center;
   -ms-transform-origin: center;
   -webkit-transform-origin: center;
@@ -23918,7 +23916,7 @@ dl li {
     -ms-transform: rotate(-180deg);
     -webkit-transform: rotate(-180deg);
     transform: rotate(-180deg);
-    moz-transform-origin: center;
+    -moz-transform-origin: center;
     -o-transform-origin: center;
     -ms-transform-origin: center;
     -webkit-transform-origin: center;
@@ -23971,7 +23969,7 @@ dl li {
     -ms-transform: rotate(-180deg);
     -webkit-transform: rotate(-180deg);
     transform: rotate(-180deg);
-    moz-transform-origin: center;
+    -moz-transform-origin: center;
     -o-transform-origin: center;
     -ms-transform-origin: center;
     -webkit-transform-origin: center;

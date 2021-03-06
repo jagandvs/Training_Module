@@ -4,6 +4,8 @@ import { ConfirmationService, MessageService } from "primeng/api";
 import { CommonService } from "src/app/_services/common.service";
 import { MastersService } from "../masters.service";
 import { formatDate } from "@angular/common";
+import { UM_CODE } from "src/app/_helper/variables";
+import { Training_Program } from "src/app/_helper/SM_CODE";
 @Component({
   selector: "app-training-program-master",
   templateUrl: "./training-program-master.component.html",
@@ -97,45 +99,69 @@ export class TrainingProgramMasterComponent implements OnInit {
   }
 
   getTrainingMaster() {
-    this.loading = true;
-    this.trainingMaster = [];
     this.commonService
-      .getTableResponse("*", "TrainingProgramMaster", "es_delete=0")
+      .checkRight(UM_CODE, Training_Program, "checkRight")
       .subscribe((data) => {
-        data.map((process) => {
-          this.trainingMaster.push({
-            TrainingProgramMaster_ID: process.TrainingProgramMaster_ID,
-            TrainingProgramMaster_CM_COMP_ID:
-              process.TrainingProgramMaster_CM_COMP_ID,
-            TrainingProgramMaster_processMasterid:
-              process.TrainingProgramMaster_processMasterid,
-            TrainingProgramMaster_categoryid:
-              process.TrainingProgramMaster_categoryid,
-            TrainingProgramMaster_skilllevelid:
-              process.TrainingProgramMaster_skilllevelid,
-            TrainingProgramMaster_title: process.TrainingProgramMaster_title,
-            TrainingProgramMaster_duration:
-              process.TrainingProgramMaster_duration,
-            TrainingProgramMaster_location:
-              process.TrainingProgramMaster_location,
-            TrainingProgramMaster_modeOfTraining:
-              process.TrainingProgramMaster_modeOfTraining,
-            TrainingProgramMaster_iscustomerend:
-              process.TrainingProgramMaster_iscustomerend,
-            TrainingProgramMaster_evalfrom:
-              process.TrainingProgramMaster_evalfrom,
-            TrainingProgramMaster_evalto: process.TrainingProgramMaster_evalto,
-          });
-        });
-
-        this.loading = false;
+        for (let access of data) {
+          this.menuAccess = access.MENU;
+          this.addAccess = access.ADD;
+          this.deleteAccess = access.DELETE;
+          this.viewAccess = access.VIEW;
+          this.printAccess = access.PRINT;
+          this.backDateAccess = access.BACK_DATE;
+          this.updateAccess = access.UPDATE;
+        }
       });
+    if (this.menuAccess) {
+      this.trainingMaster = [];
+      this.commonService
+        .getTableResponse("*", "TrainingProgramMaster", "es_delete=0")
+        .subscribe((data) => {
+          data.map((process) => {
+            this.trainingMaster.push({
+              TrainingProgramMaster_ID: process.TrainingProgramMaster_ID,
+              TrainingProgramMaster_CM_COMP_ID:
+                process.TrainingProgramMaster_CM_COMP_ID,
+              TrainingProgramMaster_processMasterid:
+                process.TrainingProgramMaster_processMasterid,
+              TrainingProgramMaster_categoryid:
+                process.TrainingProgramMaster_categoryid,
+              TrainingProgramMaster_skilllevelid:
+                process.TrainingProgramMaster_skilllevelid,
+              TrainingProgramMaster_title: process.TrainingProgramMaster_title,
+              TrainingProgramMaster_duration:
+                process.TrainingProgramMaster_duration,
+              TrainingProgramMaster_location:
+                process.TrainingProgramMaster_location,
+              TrainingProgramMaster_modeOfTraining:
+                process.TrainingProgramMaster_modeOfTraining,
+              TrainingProgramMaster_iscustomerend:
+                process.TrainingProgramMaster_iscustomerend,
+              TrainingProgramMaster_evalfrom:
+                process.TrainingProgramMaster_evalfrom,
+              TrainingProgramMaster_evalto:
+                process.TrainingProgramMaster_evalto,
+            });
+          });
+
+          this.loading = false;
+        });
+    }
   }
 
   add() {
-    this.displayBasic = true;
-    this.newItem = true;
-    this.submitted = false;
+    if (this.addAccess) {
+      this.displayBasic = true;
+      this.newItem = true;
+      this.submitted = false;
+    } else {
+      this.messageService.add({
+        key: "t1",
+        severity: "warn",
+        summary: "Warning",
+        detail: "Sorry!! You dont have access to add",
+      });
+    }
   }
   save() {
     if (this.trainingMasterForm.valid) {
@@ -185,117 +211,156 @@ export class TrainingProgramMasterComponent implements OnInit {
       });
   }
   delete(code) {
-    this.confirmationService.confirm({
-      message: "Are you sure that you want to delete?",
-      header: "Delete Confirmation",
-      icon: "fas fa-trash",
-      key: "c1",
-      accept: () => {
-        this.commonService
-          .deleteRow(
-            code,
-            "TrainingProgramMaster_ID",
-            "1",
-            "es_delete",
-            "TrainingProgramMaster"
-          )
-          .subscribe(
-            (data) => {
-              this.getTrainingMaster();
-              this.messageService.add({
-                key: "t1",
-                severity: "success",
-                summary: "Success",
-                detail: "Deleted Successfully",
-              });
-            },
-            (error) => {
-              console.log(error);
-            }
-          );
-      },
-    });
+    if (this.deleteAccess) {
+      this.commonService
+        .setResetModify(
+          "TrainingProgramMaster",
+          "es_modify",
+          "TrainingProgramMaster_ID",
+          code,
+          0,
+          "check"
+        )
+        .subscribe((data) => {
+          console.log(data);
+          if (data == 0) {
+            this.confirmationService.confirm({
+              message: "Are you sure that you want to delete?",
+              header: "Delete Confirmation",
+              icon: "fas fa-trash",
+              key: "c1",
+              accept: () => {
+                this.commonService
+                  .deleteRow(
+                    code,
+                    "TrainingProgramMaster_ID",
+                    "1",
+                    "es_delete",
+                    "TrainingProgramMaster"
+                  )
+                  .subscribe(
+                    (data) => {
+                      this.getTrainingMaster();
+                      this.messageService.add({
+                        key: "t1",
+                        severity: "success",
+                        summary: "Success",
+                        detail: "Deleted Successfully",
+                      });
+                    },
+                    (error) => {
+                      console.log(error);
+                    }
+                  );
+              },
+            });
+          } else {
+            this.messageService.add({
+              key: "t1",
+              severity: "warn",
+              summary: "Warning",
+              detail: "Sorry!! You dont have access to edit",
+            });
+          }
+        });
+    } else {
+      this.messageService.add({
+        key: "t1",
+        severity: "warn",
+        summary: "Warning",
+        detail: "Sorry!! You dont have access to Delete Item",
+      });
+    }
   }
   edit(training) {
-    console.log(training);
-    this.commonService
-      .setResetModify(
-        "TrainingProgramMaster",
-        "es_modify",
-        "TrainingProgramMaster_ID",
-        training.TrainingProgramMaster_ID,
-        0,
-        "check"
-      )
-      .subscribe((data) => {
-        console.log(data);
-        if (data == 0) {
-          this.commonService
-            .setResetModify(
-              "TrainingProgramMaster",
-              "es_modify",
-              "TrainingProgramMaster_ID",
-              training.TrainingProgramMaster_ID,
-              1,
-              "setLock"
-            )
-            .subscribe((data) => {
-              this.f["TrainingProgramMaster_ID"].setValue(
-                training.TrainingProgramMaster_ID
-              );
-              this.f["TrainingProgramMaster_CM_COMP_ID"].setValue(
-                training.TrainingProgramMaster_CM_COMP_ID
-              );
-              this.f["TrainingProgramMaster_processMasterid"].setValue(
-                training.TrainingProgramMaster_processMasterid
-              );
-              this.f["TrainingProgramMaster_categoryid"].setValue(
-                training.TrainingProgramMaster_categoryid
-              );
-              this.f["TrainingProgramMaster_skilllevelid"].setValue(
-                training.TrainingProgramMaster_skilllevelid
-              );
-              this.f["TrainingProgramMaster_title"].setValue(
-                training.TrainingProgramMaster_title
-              );
-              this.f["TrainingProgramMaster_duration"].setValue(
-                training.TrainingProgramMaster_duration
-              );
-              this.f["TrainingProgramMaster_location"].setValue(
-                training.TrainingProgramMaster_location
-              );
-              this.f["TrainingProgramMaster_modeOfTraining"].setValue(
-                training.TrainingProgramMaster_modeOfTraining
-              );
-              this.f["TrainingProgramMaster_iscustomerend"].setValue(
-                training.TrainingProgramMaster_iscustomerend
-              );
-              this.f["TrainingProgramMaster_evalfrom"].setValue(
-                formatDate(
-                  training.TrainingProgramMaster_evalfrom,
-                  "yyyy-MM-dd",
-                  "en"
-                )
-              );
-              this.f["TrainingProgramMaster_evalto"].setValue(
-                formatDate(
-                  training.TrainingProgramMaster_evalto,
-                  "yyyy-MM-dd",
-                  "en"
-                )
-              );
-              this.displayBasic = true;
-              this.newItem = false;
-              this.submitted = false;
+    if (this.updateAccess) {
+      console.log(training);
+      this.commonService
+        .setResetModify(
+          "TrainingProgramMaster",
+          "es_modify",
+          "TrainingProgramMaster_ID",
+          training.TrainingProgramMaster_ID,
+          0,
+          "check"
+        )
+        .subscribe((data) => {
+          console.log(data);
+          if (data == 0) {
+            this.commonService
+              .setResetModify(
+                "TrainingProgramMaster",
+                "es_modify",
+                "TrainingProgramMaster_ID",
+                training.TrainingProgramMaster_ID,
+                1,
+                "setLock"
+              )
+              .subscribe((data) => {
+                this.f["TrainingProgramMaster_ID"].setValue(
+                  training.TrainingProgramMaster_ID
+                );
+                this.f["TrainingProgramMaster_CM_COMP_ID"].setValue(
+                  training.TrainingProgramMaster_CM_COMP_ID
+                );
+                this.f["TrainingProgramMaster_processMasterid"].setValue(
+                  training.TrainingProgramMaster_processMasterid
+                );
+                this.f["TrainingProgramMaster_categoryid"].setValue(
+                  training.TrainingProgramMaster_categoryid
+                );
+                this.f["TrainingProgramMaster_skilllevelid"].setValue(
+                  training.TrainingProgramMaster_skilllevelid
+                );
+                this.f["TrainingProgramMaster_title"].setValue(
+                  training.TrainingProgramMaster_title
+                );
+                this.f["TrainingProgramMaster_duration"].setValue(
+                  training.TrainingProgramMaster_duration
+                );
+                this.f["TrainingProgramMaster_location"].setValue(
+                  training.TrainingProgramMaster_location
+                );
+                this.f["TrainingProgramMaster_modeOfTraining"].setValue(
+                  training.TrainingProgramMaster_modeOfTraining
+                );
+                this.f["TrainingProgramMaster_iscustomerend"].setValue(
+                  training.TrainingProgramMaster_iscustomerend
+                );
+                this.f["TrainingProgramMaster_evalfrom"].setValue(
+                  formatDate(
+                    training.TrainingProgramMaster_evalfrom,
+                    "yyyy-MM-dd",
+                    "en"
+                  )
+                );
+                this.f["TrainingProgramMaster_evalto"].setValue(
+                  formatDate(
+                    training.TrainingProgramMaster_evalto,
+                    "yyyy-MM-dd",
+                    "en"
+                  )
+                );
+                this.displayBasic = true;
+                this.newItem = false;
+                this.submitted = false;
+              });
+          } else {
+            this.messageService.add({
+              key: "t1",
+              severity: "info",
+              summary: "Success",
+              detail: "Someone Editing the Item/ Item is locked",
             });
-        } else {
-          this.messageService.add({
-            key: "t1",
-            severity: "info",
-            summary: "Success",
-            detail: "Someone Editing the Item/ Item is locked",
-          });
-        }
+          }
+        });
+    } else {
+      this.messageService.add({
+        key: "t1",
+        severity: "warn",
+        summary: "Warning",
+        detail: "Sorry!! You dont have access to edit",
       });
+    }
   }
 }

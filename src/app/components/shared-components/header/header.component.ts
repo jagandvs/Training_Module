@@ -10,6 +10,8 @@ import { AuthenticationService } from "src/app/_services/authentication.service"
 export class HeaderComponent implements OnInit {
   public user: string;
   public collapsed = false;
+  public submenuMasters = false;
+  public submenuTransactions = false;
 
   constructor(
     public router: Router,
@@ -28,5 +30,11 @@ export class HeaderComponent implements OnInit {
   }
   toggleCollapsed(): void {
     this.collapsed = !this.collapsed;
+  }
+  toggleSubmenuMasters() {
+    this.submenuMasters = !this.submenuMasters;
+  }
+  toggleSubmenuTransactions() {
+    this.submenuTransactions = !this.submenuTransactions;
   }
 }

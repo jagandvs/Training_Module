@@ -14,7 +14,7 @@
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title">Department Master Table</h4>
-                <div class="table-responsive">
+                <div class="table-responsive" *ngIf="menuAccess">
                   <p-table
                     #dt
                     [value]="departmentMaster"
@@ -99,6 +99,12 @@
                       </tr>
                     </ng-template>
                   </p-table>
+                </div>
+                <div class="container align-item-center" *ngIf="!menuAccess">
+                  <h1 class="text-center" style="padding: 80px 20px;">
+                    OOPS!!! You don't have access to this Page...
+                  </h1>
+                  <p class="text-center">Please Contact Administrator</p>
                 </div>
               </div>
             </div>

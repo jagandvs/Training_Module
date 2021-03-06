@@ -1,0 +1,349 @@
+<div class="container-scroller">
+  <app-header></app-header>
+  <div class="container-fluid page-body-wrapper">
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <p-toast position="bottom-center" key="t1"></p-toast>
+        <p-confirmDialog
+          [style]="{width: '30vw'}"
+          [baseZIndex]="10000"
+          key="c1"
+        ></p-confirmDialog>
+        <div class="row mt-4 mb-4">
+          <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Question Bank Table</h4>
+                <div class="table-responsive" *ngIf="menuAccess">
+                  <p-table
+                    #dt
+                    [value]="questionBankTable"
+                    [rows]="10"
+                    [paginator]="true"
+                    [loading]="loading"
+                    [globalFilterFields]="['CategoryToSkillLevel','QuestionBankMaster_questiontype', 'QuestionBankMaster_questionTitle']"
+                    [rowsPerPageOptions]="[10,25,50]"
+                  >
+                    <ng-template pTemplate="caption">
+                      <div class="row justify-content-between">
+                        <div class="col-md-3">
+                          <button class="btn btn-primary" (click)="add()">
+                            Add Question Bank
+                            <i class="mdi mdi-plus-circle-multiple-outline"></i>
+                          </button>
+                        </div>
+                        <div class="col-md-3">
+                          <!-- <button
+                      type="button"
+                      class="btn btn-success"
+                      (click)="exportExcel()"
+                      pTooltip="CSV"
+                      tooltipPosition="bottom"
+                    >
+                      <i class="fas fa-file-excel"></i> Export Excel
+                    </button> -->
+                        </div>
+                        <div class="col-md-3"></div>
+                        <div class="col-md-3">
+                          <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input
+                              pInputText
+                              type="text"
+                              (input)="dt.filterGlobal($event.target.value, 'contains')"
+                              placeholder="Search..."
+                            />
+                          </span>
+                        </div>
+                      </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                      <tr class="text-center">
+                        <th pSortableColumn="CategoryToSkillLevel">
+                          Skill Level
+                          <p-sortIcon field="CategoryToSkillLevel">
+                          </p-sortIcon>
+                        </th>
+                        <th pSortableColumn="QuestionBankMaster_questiontype">
+                          Question Type
+                          <p-sortIcon field="QuestionBankMaster_questiontype">
+                          </p-sortIcon>
+                        </th>
+                        <th pSortableColumn="QuestionBankMaster_questionTitle">
+                          Question Title
+                          <p-sortIcon field="QuestionBankMaster_questionTitle">
+                          </p-sortIcon>
+                        </th>
+                        <th>Action</th>
+                      </tr>
+                    </ng-template>
+                    <ng-template
+                      pTemplate="body"
+                      let-question
+                      let-ri="rowIndex"
+                    >
+                      <tr>
+                        <td>{{question.CategoryToSkillLevel}}</td>
+                        <td>{{question.QuestionBankMaster_questiontype}}</td>
+                        <td>{{question.QuestionBankMaster_questionTitle}}</td>
+                        <td>
+                          <button
+                            class="btn btn-primary mr-4"
+                            (click)="edit(question.QuestionBankMaster_ID)"
+                          >
+                            <i class="mdi mdi-pencil-box"></i> Edit
+                          </button>
+
+                          <button
+                            class="btn btn-danger"
+                            (click)="delete(question.QuestionBankMaster_ID)"
+                          >
+                            <i class="mdi mdi-delete"></i> Delete
+                          </button>
+                        </td>
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                      <tr>
+                        <td colspan="3" style="text-align: center;">
+                          <h4>No Records Found.</h4>
+                        </td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+                </div>
+                <div class="container align-item-center" *ngIf="!menuAccess">
+                  <h1 class="text-center" style="padding: 80px 20px;">
+                    OOPS!!! You don't have access to this Page...
+                  </h1>
+                  <p class="text-center">Please Contact Administrator</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p-dialog
+          header="Question Bank"
+          [(visible)]="displayBasic"
+          [style]="{width: '90vw'}"
+          [baseZIndex]="10000"
+          [closable]="false"
+        >
+          <p-toast key="t2"></p-toast>
+          <p-confirmDialog
+            [style]="{width: '30vw'}"
+            [baseZIndex]="10000"
+          ></p-confirmDialog>
+          <ng-template pTemplate="content">
+            <div class="container">
+              <form focusInvalidInput [formGroup]="questionBankMasterForm">
+                <div class="p-fluid p-formgrid p-grid">
+                  <div class="p-field p-col-12">
+                    <label for="categorySkillLevel"
+                      >Category to Skill level</label
+                    >
+                    <p-dropdown
+                      [optionLabel]="label"
+                      [options]="categotySkillDropdown"
+                      [filter]="true"
+                      [showClear]="true"
+                      placeholder="Select Category to skill level"
+                      [resetFilterOnHide]="true"
+                      [virtualScroll]="true"
+                      itemSize="10"
+                      [autofocus]="true"
+                      formControlName="QUESTIONBANKMASTER_CATEGORYTOSKILLLEVELID"
+                    >
+                    </p-dropdown>
+                    <div
+                      *ngIf="submitted && f.QUESTIONBANKMASTER_CATEGORYTOSKILLLEVELID.errors"
+                      class="alert alert-danger"
+                    >
+                      <div
+                        *ngIf="f.QUESTIONBANKMASTER_CATEGORYTOSKILLLEVELID.errors.required"
+                      >
+                        Category to Skill level is required
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-field p-col-12">
+                    <label for="questionTitle">Question Title</label>
+                    <input
+                      type="text"
+                      inputId="questionTitle"
+                      pInputText
+                      placeholder="Question Title"
+                      formControlName="QUESTIONBANKMASTER_QUESTIONTITLE"
+                    />
+                    <div
+                      *ngIf="submitted && f.QUESTIONBANKMASTER_QUESTIONTITLE.errors"
+                      class="alert alert-danger"
+                    >
+                      <div
+                        *ngIf="f.QUESTIONBANKMASTER_QUESTIONTITLE.errors.required"
+                      >
+                        Question Title is required
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-field p-col-6">
+                    <label>Question Type</label>
+                  </div>
+                  <div class="p-field p-col-12 p-md-6">
+                    <div class="form-check form-check-inline">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        formControlName="QUESTIONBANKMASTER_QUESTIONTYPE"
+                        id="single"
+                        value="false"
+                      />
+                      <label
+                        class="form-check-label d-inline-block"
+                        for="single"
+                        >Single</label
+                      >
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        formControlName="QUESTIONBANKMASTER_QUESTIONTYPE"
+                        id="multiple"
+                        value="true"
+                      />
+                      <label
+                        class="form-check-label d-inline-block"
+                        for="multiple"
+                        >Multiple</label
+                      >
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="container">
+              <form focusInvalidInput [formGroup]="questionBankDetailForm">
+                <div class="p-fluid p-formgrid p-grid">
+                  <div class="p-field p-col-12">
+                    <label for="answer">Answer</label>
+                    <input
+                      type="text"
+                      inputId="answer"
+                      pInputText
+                      placeholder="Answer"
+                      formControlName="QUESTIONBANKDETAIL_ANSWER"
+                    />
+                    <div
+                      *ngIf="submitted && g.QUESTIONBANKDETAIL_ANSWER.errors"
+                      class="alert alert-danger"
+                    >
+                      <div *ngIf="g.QUESTIONBANKDETAIL_ANSWER.errors.required">
+                        Answer is required
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-field p-col-12 p-md-6">
+                    <label for="answer">Marks</label>
+                    <input
+                      type="number"
+                      inputId="marks"
+                      pInputText
+                      placeholder="Marks"
+                      formControlName="QUESTIONBANKDETAIL_MARKS"
+                    />
+                    <div
+                      *ngIf="submitted && g.QUESTIONBANKDETAIL_MARKS.errors"
+                      class="alert alert-danger"
+                    >
+                      <div *ngIf="g.QUESTIONBANKDETAIL_MARKS.errors.required">
+                        Marks is required
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-field p-col-12 p-md-6">
+                    <label for="weightage">Weightage</label>
+                    <input
+                      type="number"
+                      inputId="weightage"
+                      pInputText
+                      placeholder="Weightage"
+                      formControlName="QUESTIONBANKDETAIL_WEIGHTAGE"
+                    />
+                    <div
+                      *ngIf="submitted && g.QUESTIONBANKDETAIL_WEIGHTAGE.errors"
+                      class="alert alert-danger"
+                    >
+                      <div
+                        *ngIf="g.QUESTIONBANKDETAIL_WEIGHTAGE.errors.required"
+                      >
+                        Weightage is required
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row justify-content-end">
+                  <button class="btn btn-primary" (click)="insertIntoTable()">
+                    Insert
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div class="table table-responsive">
+              <table class="table table-bordered" id="dataTable">
+                <thead>
+                  <tr>
+                    <th>Answer</th>
+                    <th>
+                      Marks
+                    </th>
+                    <th>
+                      Weightage
+                    </th>
+                    <th>
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let detail of questionDetailTable; let i=index ">
+                    <td>{{detail.QUESTIONBANKDETAIL_ANSWER}}</td>
+                    <td>{{detail.QUESTIONBANKDETAIL_MARKS}}</td>
+                    <td>{{detail.QUESTIONBANKDETAIL_WEIGHTAGE}}</td>
+                    <td>
+                      <button
+                        class="btn btn-danger mr-1 round"
+                        (click)="deleteQuestionBankDetail(i)"
+                      >
+                        <i class="mdi mdi-delete"></i>
+                      </button>
+                      <button
+                        class="btn btn-warning mr-1 round"
+                        (click)="editQuestionBankDetail(i)"
+                      >
+                        <i class="mdi mdi-pencil-box"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <div class="row justify-content-center">
+              <button class="btn btn-outline-primary" (click)="save();">
+                <i class="fas fa-save"></i> Save
+              </button>
+              <button class="btn btn-outline-secondary" (click)="resetForm()">
+                <i class="fas fa-undo"></i> Reset
+              </button>
+              <button class="btn btn-outline-danger" (click)="cancel()">
+                <i class="fas fa-times"></i> Cancel
+              </button>
+            </div>
+          </ng-template>
+        </p-dialog>
+      </div>
+    </div>
+  </div>
+</div>
