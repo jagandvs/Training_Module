@@ -1,6 +1,7 @@
+import { HttpErrorResponse } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { ConfirmationService, MessageService } from "primeng/api";
+import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
 import { Process } from "src/app/_helper/SM_CODE";
 import { UM_CODE } from "src/app/_helper/variables";
 import { CommonService } from "src/app/_services/common.service";
@@ -22,11 +23,17 @@ export class ProcessMasterComponent implements OnInit {
   public deleteAccess: boolean = true;
   public printAccess: boolean = true;
   public backDateAccess: boolean = true;
+  public duplicateProcessNameError: boolean = false;
+  public saveLoading: boolean = false;
+  public cancelLoading: boolean = false;
 
   public loading: boolean = false;
   public submitted: boolean = false;
   public newItem: boolean = false;
   public displayBasic: Boolean = false;
+  public editingPKCode: number;
+
+  public processApplicableToDropdown: SelectItem[] = [];
 
   public process: string;
   public comp_id: string;
@@ -53,6 +60,20 @@ export class ProcessMasterComponent implements OnInit {
         }
       });
     if (this.menuAccess) {
+      this.processApplicableToDropdown = [
+        {
+          label: "Staff",
+          value: 1,
+        },
+        {
+          label: "Workers",
+          value: 2,
+        },
+        {
+          label: "Management",
+          value: 3,
+        },
+      ];
       this.getProcessMaster();
       var companyID = JSON.parse(localStorage.getItem("companyDetails"));
       this.comp_id = companyID.CM_ID;
@@ -158,7 +179,7 @@ export class ProcessMasterComponent implements OnInit {
               key: "t1",
               severity: "warn",
               summary: "Warning",
-              detail: "Sorry!! You dont have access to edit",
+              detail: "Someone Editing the Item/ Item is locked",
             });
           }
         });
@@ -172,24 +193,75 @@ export class ProcessMasterComponent implements OnInit {
     }
   }
   cancel() {
+    this.cancelLoading = true;
+
     this.commonService
       .setResetModify(
         "process_master",
         "es_modify",
         "process_id",
-        this.f["process_id"].value,
+        this.editingPKCode,
         0,
         "setLock"
       )
-      .subscribe((data) => {
-        this.newItem = false;
-        this.displayBasic = false;
-        this.submitted = false;
-        this.processMasterForm.reset();
-      });
+      .subscribe(
+        (data) => {
+          this.newItem = false;
+          this.displayBasic = false;
+          this.submitted = false;
+          this.processMasterForm.reset();
+          this.cancelLoading = false;
+        },
+        (error: HttpErrorResponse) => {
+          console.log(error);
+          this.cancelLoading = false;
+        }
+      );
   }
   save() {
+    this.submitted = true;
+    this.duplicateProcessNameError = false;
+
+    if (this.f["process_name"].value != "") {
+      if (this.newItem) {
+        var arr = this.processMaster.filter((master) => {
+          if (
+            master.process_name.toLowerCase() ==
+            this.f["process_name"].value.toLowerCase()
+          ) {
+            return master;
+          }
+        });
+        if (arr.length > 0) {
+          this.duplicateProcessNameError = true;
+          return;
+        } else {
+          this.duplicateProcessNameError = false;
+        }
+      } else {
+        var arr = this.processMaster.filter((master) => {
+          if (
+            master.process_name.toLowerCase() ==
+              this.f["process_name"].value.toLowerCase() &&
+            master.process_id != this.f["process_id"].value
+          ) {
+            return master;
+          }
+        });
+        console.log(arr);
+        if (arr.length > 0) {
+          this.duplicateProcessNameError = true;
+          return;
+        } else {
+          this.duplicateProcessNameError = false;
+        }
+      }
+    }
+
     if (this.processMasterForm.valid) {
+      this.loading = true;
+      this.saveLoading = true;
+
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
       this.confirmationService.confirm({
         message: "Are you sure that you want to save?",
@@ -202,13 +274,22 @@ export class ProcessMasterComponent implements OnInit {
               this.processMasterForm.value,
               this.process
             )
-            .subscribe((data) => {
-              this.displayBasic = false;
-              this.getProcessMaster();
-            });
+            .subscribe(
+              (data) => {
+                this.displayBasic = false;
+                this.saveLoading = false;
+                this.processMasterForm.reset();
+                this.getProcessMaster();
+              },
+              (error: HttpErrorResponse) => {
+                console.log(error);
+              }
+            );
         },
       });
     } else {
+      this.saveLoading = false;
+
       this.messageService.add({
         key: "t2",
         severity: "error",
@@ -219,13 +300,14 @@ export class ProcessMasterComponent implements OnInit {
     return;
   }
   edit(process) {
+    this.editingPKCode = process.process_id;
     if (this.updateAccess) {
       this.commonService
         .setResetModify(
           "process_master",
           "es_modify",
           "process_id",
-          process.process_id,
+          this.editingPKCode,
           0,
           "check"
         )
@@ -237,7 +319,7 @@ export class ProcessMasterComponent implements OnInit {
                 "process_master",
                 "es_modify",
                 "process_id",
-                process.process_id,
+                this.editingPKCode,
                 1,
                 "setLock"
               )

@@ -1,6 +1,8 @@
+import { HttpErrorResponse } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { ConfirmationService, MessageService } from "primeng/api";
+
+import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
 import { Customer } from "src/app/_helper/SM_CODE";
 import { UM_CODE } from "src/app/_helper/variables";
 import { CommonService } from "src/app/_services/common.service";
@@ -27,9 +29,14 @@ export class CustomerMasterComponent implements OnInit {
   public submitted: boolean = false;
   public newItem: boolean = false;
   public displayBasic: Boolean = false;
+  public duplicateCustomerNameError: boolean = false;
+  public saveLoading: boolean = false;
+  public cancelLoading: boolean = false;
 
+  public categoryTypeDropdown: SelectItem[] = [];
   public process: string;
   public comp_id: string;
+  public editPKCode: number;
   constructor(
     private commonService: CommonService,
     private fb: FormBuilder,
@@ -54,6 +61,16 @@ export class CustomerMasterComponent implements OnInit {
         }
       });
     if (this.menuAccess) {
+      this.categoryTypeDropdown = [
+        {
+          label: "Technical",
+          value: "true",
+        },
+        {
+          label: "Commercial",
+          value: "false",
+        },
+      ];
       this.getCustomerMaster();
       var companyID = JSON.parse(localStorage.getItem("companyDetails"));
       this.comp_id = companyID.CM_ID;
@@ -98,7 +115,7 @@ export class CustomerMasterComponent implements OnInit {
       this.displayBasic = true;
       this.newItem = true;
       this.submitted = false;
-      this.customerMasterForm.reset();
+      this.reset();
     } else {
       this.messageService.add({
         key: "t1",
@@ -171,13 +188,14 @@ export class CustomerMasterComponent implements OnInit {
     }
   }
   edit(customer) {
+    this.editPKCode = customer.customer_id;
     if (this.updateAccess) {
       this.commonService
         .setResetModify(
           "customer_master",
           "es_modify",
           "customer_id",
-          customer.customer_id,
+          this.editPKCode,
           0,
           "check"
         )
@@ -189,7 +207,7 @@ export class CustomerMasterComponent implements OnInit {
                 "customer_master",
                 "es_modify",
                 "customer_id",
-                customer.customer_id,
+                this.editPKCode,
                 1,
                 "setLock"
               )
@@ -206,8 +224,8 @@ export class CustomerMasterComponent implements OnInit {
                   customer.customer_expectedskills
                 );
                 customer.customer_category === "Technical"
-                  ? this.f["customer_category"].setValue(true)
-                  : this.f["customer_category"].setValue(false);
+                  ? this.f["customer_category"].setValue("true")
+                  : this.f["customer_category"].setValue("false");
 
                 this.displayBasic = true;
                 this.newItem = false;
@@ -232,6 +250,8 @@ export class CustomerMasterComponent implements OnInit {
     }
   }
   cancel() {
+    this.cancelLoading = true;
+
     this.commonService
       .setResetModify(
         "customer_master",
@@ -241,14 +261,64 @@ export class CustomerMasterComponent implements OnInit {
         0,
         "setLock"
       )
-      .subscribe((data) => {
-        this.newItem = false;
-        this.displayBasic = false;
-        this.submitted = false;
-        this.customerMasterForm.reset();
-      });
+      .subscribe(
+        (data) => {
+          this.newItem = false;
+          this.displayBasic = false;
+          this.submitted = false;
+          this.reset();
+          this.cancelLoading = false;
+        },
+        (error: HttpErrorResponse) => {
+          console.log(error);
+          this.cancelLoading = false;
+        }
+      );
+  }
+  reset() {
+    this.duplicateCustomerNameError = false;
+    this.submitted = false;
+    this.customerMasterForm.reset();
   }
   save() {
+    this.submitted = true;
+    this.duplicateCustomerNameError = false;
+
+    if (this.f["customer_name"].value != "") {
+      if (this.newItem) {
+        var arr = this.customerMaster.filter((master) => {
+          if (
+            master.customer_name.toLowerCase() ==
+            this.f["customer_name"].value.toLowerCase()
+          ) {
+            return master;
+          }
+        });
+        if (arr.length > 0) {
+          this.duplicateCustomerNameError = true;
+          return;
+        } else {
+          this.duplicateCustomerNameError = false;
+        }
+      } else {
+        var arr = this.customerMaster.filter((master) => {
+          if (
+            master.customer_name.toLowerCase() ==
+              this.f["customer_name"].value.toLowerCase() &&
+            master.customer_id != this.f["customer_id"].value
+          ) {
+            return master;
+          }
+        });
+        console.log(arr);
+        if (arr.length > 0) {
+          this.duplicateCustomerNameError = true;
+          return;
+        } else {
+          this.duplicateCustomerNameError = false;
+        }
+      }
+    }
     if (this.customerMasterForm.valid) {
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
       this.confirmationService.confirm({
@@ -256,6 +326,8 @@ export class CustomerMasterComponent implements OnInit {
         header: "Save Confirmation",
         icon: "fas fa-save",
         accept: () => {
+          this.saveLoading = true;
+
           this.service
             .CRUDMasters(
               "UPSERT_customer_master",
@@ -265,10 +337,16 @@ export class CustomerMasterComponent implements OnInit {
             .subscribe((data) => {
               this.displayBasic = false;
               this.getCustomerMaster();
+              this.saveLoading = false;
             });
+        },
+        reject: () => {
+          this.saveLoading = false;
         },
       });
     } else {
+      this.saveLoading = false;
+
       this.messageService.add({
         key: "t2",
         severity: "error",
@@ -276,6 +354,5 @@ export class CustomerMasterComponent implements OnInit {
         detail: "Please Fill all required fields",
       });
     }
-    return;
   }
 }

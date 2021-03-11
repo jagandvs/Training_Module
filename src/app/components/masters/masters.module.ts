@@ -19,6 +19,10 @@ import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { MastersService } from "./masters.service";
 import { ConfirmationService, MessageService } from "primeng/api";
 import { JwtInterceptor } from "src/app/_helper/JwtInterceptor";
+import { InputTextModule } from "primeng/inputtext";
+import { EmployeeMasterComponent } from "./employee-master/employee-master.component";
+import { ButtonModule } from "primeng/button";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 const routes: Routes = [
   { path: "categoryMaster", component: CategoryMasterComponent },
@@ -28,6 +32,8 @@ const routes: Routes = [
   },
   { path: "CustomerMaster", component: CustomerMasterComponent },
   { path: "DepartmentMaster", component: DepartmentMasterComponent },
+  { path: "employeeMaster", component: EmployeeMasterComponent },
+
   { path: "StudyMaterialMaster", component: StudyMaterialMasterComponent },
   { path: "ProcessMaster", component: ProcessMasterComponent },
   { path: "TrainingProgramMaster", component: TrainingProgramMasterComponent },
@@ -42,6 +48,7 @@ const routes: Routes = [
     ProcessMasterComponent,
     StudyMaterialMasterComponent,
     TrainingProgramMasterComponent,
+    EmployeeMasterComponent,
   ],
   imports: [
     CommonModule,
@@ -51,8 +58,10 @@ const routes: Routes = [
     ReactiveFormsModule,
     DialogModule,
     DropdownModule,
+    ButtonModule,
     ToastModule,
     TableModule,
+    InputTextModule,
     ConfirmDialogModule,
     RouterModule.forChild(routes),
   ],

@@ -12,7 +12,7 @@ import { MastersService } from "../masters.service";
   styleUrls: ["./department-master.component.css"],
 })
 export class DepartmentMasterComponent implements OnInit {
-  public departmentMaster: any[] = [];
+  public departmentMaster: any[];
   public departmentMasterForm: FormGroup;
 
   public menuAccess: boolean = true;
@@ -27,7 +27,11 @@ export class DepartmentMasterComponent implements OnInit {
   public submitted: boolean = false;
   public newItem: boolean = false;
   public displayBasic: Boolean = false;
+  public duplicatedepartmentNameError: boolean = false;
+  public saveLoading: boolean = false;
+  public cancelLoading: boolean = false;
 
+  public editingPKCode: number;
   public process: string;
   public comp_id: string;
   constructor(
@@ -39,6 +43,7 @@ export class DepartmentMasterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loading = true;
     this.commonService
       .checkRight(UM_CODE, Department, "checkRight")
       .subscribe((data) => {
@@ -68,11 +73,13 @@ export class DepartmentMasterComponent implements OnInit {
   }
 
   getdepartmentMaster() {
+    this.loading = true;
     this.departmentMaster = [];
     this.commonService
       .getTableResponse("*", "department_master", "es_delete=0")
       .subscribe((data) => {
         data.map((department) => {
+          console.log(this.departmentMaster.length);
           this.departmentMaster.push({
             department_id: department.department_id,
             department_CM_COMP_ID: department.department_CM_COMP_ID,
@@ -80,11 +87,52 @@ export class DepartmentMasterComponent implements OnInit {
           });
         });
 
-        console.log(data);
+        this.loading = false;
       });
   }
   save() {
+    this.submitted = true;
+    this.duplicatedepartmentNameError = false;
+
+    if (this.f["department_name"].value != "") {
+      if (this.newItem) {
+        var arr = this.departmentMaster.filter((master) => {
+          if (
+            master.department_name.toLowerCase() ==
+            this.f["department_name"].value.toLowerCase()
+          ) {
+            return master;
+          }
+        });
+        if (arr.length > 0) {
+          this.duplicatedepartmentNameError = true;
+          return;
+        } else {
+          this.duplicatedepartmentNameError = false;
+        }
+      } else {
+        var arr = this.departmentMaster.filter((master) => {
+          if (
+            master.department_name.toLowerCase() ==
+              this.f["department_name"].value.toLowerCase() &&
+            master.department_id != this.f["department_id"].value
+          ) {
+            return master;
+          }
+        });
+        console.log(arr);
+        if (arr.length > 0) {
+          this.duplicatedepartmentNameError = true;
+          return;
+        } else {
+          this.duplicatedepartmentNameError = false;
+        }
+      }
+    }
+
     if (this.departmentMasterForm.valid) {
+      this.saveLoading = true;
+
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
       this.confirmationService.confirm({
         message: "Are you sure that you want to save?",
@@ -99,11 +147,18 @@ export class DepartmentMasterComponent implements OnInit {
             )
             .subscribe((data) => {
               this.displayBasic = false;
+              this.saveLoading = false;
+
               this.getdepartmentMaster();
             });
         },
+        reject: () => {
+          this.saveLoading = false;
+        },
       });
     } else {
+      this.saveLoading = false;
+
       this.messageService.add({
         key: "t2",
         severity: "error",
@@ -177,7 +232,7 @@ export class DepartmentMasterComponent implements OnInit {
               key: "t1",
               severity: "warn",
               summary: "Warning",
-              detail: "Sorry!! You dont have access to edit",
+              detail: "Someone Editing the Item/ Item is locked",
             });
           }
         });
@@ -191,6 +246,7 @@ export class DepartmentMasterComponent implements OnInit {
     }
   }
   edit(department) {
+    this.editingPKCode = department.department_id;
     if (this.updateAccess) {
       this.commonService
         .setResetModify(
@@ -243,12 +299,13 @@ export class DepartmentMasterComponent implements OnInit {
     }
   }
   cancel() {
+    this.cancelLoading = true;
     this.commonService
       .setResetModify(
         "department_master",
         "es_modify",
         "department_id",
-        this.f["department_id"].value,
+        this.editingPKCode,
         0,
         "setLock"
       )
@@ -256,7 +313,13 @@ export class DepartmentMasterComponent implements OnInit {
         this.newItem = false;
         this.displayBasic = false;
         this.submitted = false;
-        this.departmentMasterForm.reset();
+        this.reset();
+        this.cancelLoading = false;
       });
+  }
+  reset() {
+    this.departmentMasterForm.reset();
+    this.duplicatedepartmentNameError = false;
+    this.submitted = false;
   }
 }

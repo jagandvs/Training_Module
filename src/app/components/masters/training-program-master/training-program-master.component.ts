@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { ConfirmationService, MessageService } from "primeng/api";
+import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
 import { CommonService } from "src/app/_services/common.service";
 import { MastersService } from "../masters.service";
 import { formatDate } from "@angular/common";
@@ -14,9 +14,9 @@ import { Training_Program } from "src/app/_helper/SM_CODE";
 export class TrainingProgramMasterComponent implements OnInit {
   public trainingMaster: any[] = [];
   public trainingMasterForm: FormGroup;
-  public processMasterDropdown: any[] = [];
-  public categoryMasterDropdown: any[] = [];
-  public skillMasterDropdown: any[] = [];
+  public processMasterDropdown: SelectItem[] = [];
+  public categoryMasterDropdown: SelectItem[] = [];
+  public skillMasterDropdown: SelectItem[] = [];
 
   public menuAccess: boolean = true;
   public addAccess: boolean = true;
@@ -60,24 +60,38 @@ export class TrainingProgramMasterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loading = true;
+
     this.getTrainingMaster();
     var companyID = JSON.parse(localStorage.getItem("companyDetails"));
     this.comp_id = companyID.CM_ID;
     this.commonService
       .FillCombo(this.PROCESS_MASTER_QUERY)
       .subscribe((data) => {
-        this.processMasterDropdown = data;
-        console.log(data);
+        for (let value of data) {
+          this.processMasterDropdown.push({
+            label: value.process_name,
+            value: value.process_id,
+          });
+        }
       });
     this.commonService
       .FillCombo(this.CATEGORY_MASTER_QUERY)
       .subscribe((data) => {
-        this.categoryMasterDropdown = data;
-        console.log(data);
+        for (let value of data) {
+          this.categoryMasterDropdown.push({
+            label: value.category_name,
+            value: value.category_id,
+          });
+        }
       });
     this.commonService.FillCombo(this.SKILL_MASTER_QUERY).subscribe((data) => {
-      this.skillMasterDropdown = data;
-      console.log(data);
+      for (let value of data) {
+        this.skillMasterDropdown.push({
+          label: value.CategoryToSkillLevelMaster_title,
+          value: value.CategoryToSkillLevelMaster_ID,
+        });
+      }
     });
     this.trainingMasterForm = this.fb.group({
       TrainingProgramMaster_ID: [""],
@@ -99,6 +113,7 @@ export class TrainingProgramMasterComponent implements OnInit {
   }
 
   getTrainingMaster() {
+    this.loading = true;
     this.commonService
       .checkRight(UM_CODE, Training_Program, "checkRight")
       .subscribe((data) => {

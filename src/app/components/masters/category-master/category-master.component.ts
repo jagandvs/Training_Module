@@ -1,6 +1,7 @@
+import { HttpErrorResponse } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { ConfirmationService, MessageService } from "primeng/api";
+import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
 import { Category, Training_Need } from "src/app/_helper/SM_CODE";
 import { UM_CODE } from "src/app/_helper/variables";
 import { CommonService } from "src/app/_services/common.service";
@@ -13,7 +14,7 @@ import { MastersService } from "../masters.service";
   styleUrls: ["./category-master.component.css"],
 })
 export class CategoryMasterComponent implements OnInit {
-  public categoryMaster: any[] = [];
+  public categoryMaster: any[];
   public categoryMasterForm: FormGroup;
 
   public menuAccess: boolean = true;
@@ -25,12 +26,21 @@ export class CategoryMasterComponent implements OnInit {
   public backDateAccess: boolean = true;
 
   public loading: boolean = false;
+  public saveLoading: boolean = false;
+  public cancelLoading: boolean = false;
+
   public submitted: boolean = false;
   public newItem: boolean = false;
   public displayBasic: Boolean = false;
 
+  public categoryApplicableToDropdown: SelectItem[] = [];
+  public categoryTypeDropdown: SelectItem[] = [];
+
   public process: string;
   public comp_id: string;
+  public editPKCode: number;
+
+  public duplicateCategoryNameError: boolean = false;
   constructor(
     private commonService: CommonService,
     private fb: FormBuilder,
@@ -55,6 +65,30 @@ export class CategoryMasterComponent implements OnInit {
         }
       });
     if (this.menuAccess) {
+      this.categoryTypeDropdown = [
+        {
+          label: "Technical",
+          value: "true",
+        },
+        {
+          label: "Commercial",
+          value: "false",
+        },
+      ];
+      this.categoryApplicableToDropdown = [
+        {
+          label: "Staff",
+          value: 1,
+        },
+        {
+          label: "Workers",
+          value: 2,
+        },
+        {
+          label: "Management",
+          value: 3,
+        },
+      ];
       this.getCategoryMaster();
       var companyID = JSON.parse(localStorage.getItem("companyDetails"));
       this.comp_id = companyID.CM_ID;
@@ -100,27 +134,81 @@ export class CategoryMasterComponent implements OnInit {
       });
   }
   save() {
+    this.submitted = true;
+
+    this.duplicateCategoryNameError = false;
+    if (this.f["category_name"].value != "") {
+      if (this.newItem) {
+        var arr = this.categoryMaster.filter((master) => {
+          if (
+            master.category_name.toLowerCase() ==
+            this.f["category_name"].value.toLowerCase()
+          ) {
+            return master;
+          }
+        });
+        if (arr.length > 0) {
+          this.duplicateCategoryNameError = true;
+          return;
+        } else {
+          this.duplicateCategoryNameError = false;
+        }
+      } else {
+        console.log(this.f["category_id"].value);
+        var arr = this.categoryMaster.filter((master) => {
+          if (
+            master.category_name.toLowerCase() ==
+              this.f["category_name"].value.toLowerCase() &&
+            master.category_id != this.f["category_id"].value
+          ) {
+            return master;
+          }
+        });
+        console.log(arr);
+        if (arr.length > 0) {
+          this.duplicateCategoryNameError = true;
+          return;
+        } else {
+          this.duplicateCategoryNameError = false;
+        }
+      }
+    }
+
     if (this.categoryMasterForm.valid) {
-      this.loading = true;
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
       this.confirmationService.confirm({
         message: "Are you sure that you want to save?",
         header: "Save Confirmation",
         icon: "fas fa-save",
         accept: () => {
+          this.saveLoading = true;
+          this.loading = true;
+
           this.service
             .CRUDMasters(
               "UPSERT_category_master",
               this.categoryMasterForm.value,
               this.process
             )
-            .subscribe((data) => {
-              this.displayBasic = false;
-              this.getCategoryMaster();
-            });
+            .subscribe(
+              (data) => {
+                this.displayBasic = false;
+                this.getCategoryMaster();
+                this.saveLoading = false;
+                this.reset();
+              },
+              (error: HttpErrorResponse) => {
+                console.log(error);
+              }
+            );
+        },
+        reject: () => {
+          this.saveLoading = false;
+          this.loading = false;
         },
       });
     } else {
+      this.saveLoading = false;
       this.messageService.add({
         key: "t2",
         severity: "error",
@@ -130,7 +218,13 @@ export class CategoryMasterComponent implements OnInit {
     }
     return;
   }
+  reset() {
+    this.duplicateCategoryNameError = false;
+    this.submitted = false;
+    this.categoryMasterForm.reset();
+  }
   edit(category) {
+    this.editPKCode = category.category_id;
     if (this.updateAccess) {
       console.log(category);
       this.commonService
@@ -138,7 +232,7 @@ export class CategoryMasterComponent implements OnInit {
           "CATEGORY_MASTER",
           "ES_MODIFY",
           "category_id",
-          category.category_id,
+          this.editPKCode,
           0,
           "check"
         )
@@ -150,7 +244,7 @@ export class CategoryMasterComponent implements OnInit {
                 "CATEGORY_MASTER",
                 "ES_MODIFY",
                 "category_id",
-                category.category_id,
+                this.editPKCode,
                 1,
                 "setLock"
               )
@@ -190,26 +284,34 @@ export class CategoryMasterComponent implements OnInit {
         key: "t1",
         severity: "warn",
         summary: "Warning",
-        detail: "Sorry!! You dont have access to Category Master",
+        detail: "Sorry!! You dont have access to edit",
       });
     }
   }
   cancel() {
+    this.cancelLoading = true;
     this.commonService
       .setResetModify(
         "CATEGORY_MASTER",
         "ES_MODIFY",
         "category_id",
-        this.f["category_id"].value,
+        this.editPKCode,
         0,
         "setLock"
       )
-      .subscribe((data) => {
-        this.newItem = false;
-        this.displayBasic = false;
-        this.submitted = false;
-        this.categoryMasterForm.reset();
-      });
+      .subscribe(
+        (data) => {
+          this.newItem = false;
+          this.displayBasic = false;
+          this.submitted = false;
+          this.categoryMasterForm.reset();
+          this.cancelLoading = false;
+        },
+        (error: HttpErrorResponse) => {
+          console.log(error);
+          this.cancelLoading = false;
+        }
+      );
   }
   addCategory() {
     if (this.addAccess) {
@@ -221,7 +323,7 @@ export class CategoryMasterComponent implements OnInit {
         key: "t1",
         severity: "warn",
         summary: "Warning",
-        detail: "Sorry!! You dont have access to add Category Master",
+        detail: "Sorry!! You dont have access to add",
       });
     }
   }
@@ -275,7 +377,7 @@ export class CategoryMasterComponent implements OnInit {
               key: "t1",
               severity: "warn",
               summary: "Warning",
-              detail: "Sorry!! You dont have access to edit",
+              detail: "Someone Editing the Item/ Item is locked",
             });
           }
         });

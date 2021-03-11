@@ -5,7 +5,8 @@ import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
 import { Employee } from "src/app/_helper/SM_CODE";
 import { UM_CODE } from "src/app/_helper/variables";
 import { CommonService } from "src/app/_services/common.service";
-import { TransactionsService } from "../transactions.service";
+import { TransactionsService } from "../../transactions/transactions.service";
+import { MastersService } from "../masters.service";
 
 @Component({
   selector: "app-employee-master",
@@ -44,6 +45,7 @@ export class EmployeeMasterComponent implements OnInit {
   public employeeType: SelectItem[] = [];
   public categoryToSkillDropdown: SelectItem[] = [];
   public categoryDropdown: SelectItem[] = [];
+  public employeeDropdown: SelectItem[] = [];
 
   public DEPARTMENT_MASTER_QUERY = {
     TableNames: "department_master",
@@ -68,10 +70,15 @@ export class EmployeeMasterComponent implements OnInit {
     fieldNames: "category_id,category_name",
     condition: "ES_DELETE=0",
   };
+  public EMPLOYEE_MASTER_QUERY = {
+    TableNames: "EmployeeMaster",
+    fieldNames: "EMP_MASTER_ID,EMP_MASTER_NAME",
+    condition: "ES_DELETE=0",
+  };
   constructor(
     private commonService: CommonService,
     private fb: FormBuilder,
-    private service: TransactionsService,
+    private service: MastersService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService
   ) {}
@@ -113,6 +120,16 @@ export class EmployeeMasterComponent implements OnInit {
             });
           }
         });
+      this.commonService
+        .FillCombo(this.EMPLOYEE_MASTER_QUERY)
+        .subscribe((data) => {
+          for (let item of data) {
+            this.employeeDropdown.push({
+              label: item.EMP_MASTER_NAME,
+              value: item.EMP_MASTER_ID,
+            });
+          }
+        });
       this.employeeType = [
         {
           label: "Staff",
@@ -151,9 +168,9 @@ export class EmployeeMasterComponent implements OnInit {
         EMP_MASTER_NUMBER: ["", Validators.required],
         EMP_MASTER_NAME: ["", Validators.required],
         EMP_MASTER_DEPARTMENT_ID: ["", Validators.required],
-        EMP_MASTER_REPORTING_TO: [""],
-        EMP_MASTER_PROCESS_ID: [""],
-        EMP_MASTER_EMP_TYPE: [""],
+        EMP_MASTER_REPORTING_TO: ["", Validators.required],
+        EMP_MASTER_PROCESS_ID: ["", Validators.required],
+        EMP_MASTER_EMP_TYPE: ["", Validators.required],
         EMP_MASTER_IS_HOD: [""],
       });
       this.employeeDetailForm = this.fb.group({
@@ -162,6 +179,7 @@ export class EmployeeMasterComponent implements OnInit {
         EMP_MASTER_SKILLS_PRESENT_SKILLS_LEVEL: ["", Validators.required],
         EMP_MASTER_SKILLS_NEXT_SKILLS_LEVEL: ["", Validators.required],
       });
+      console.log(this.employeeMasterForm.value);
     }
   }
   getEmployeeMasterTable() {
@@ -452,7 +470,7 @@ export class EmployeeMasterComponent implements OnInit {
             this.messageService.add({
               key: "t1",
               severity: "info",
-              summary: "Success",
+              summary: "Warming",
               detail: "Someone Editing the Item/ Item is locked",
             });
           }

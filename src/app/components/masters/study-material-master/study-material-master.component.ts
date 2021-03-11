@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { ConfirmationService, MessageService } from "primeng/api";
+import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
 import { Study_Material } from "src/app/_helper/SM_CODE";
 import { UM_CODE } from "src/app/_helper/variables";
 import { CommonService } from "src/app/_services/common.service";
@@ -14,7 +14,7 @@ import { MastersService } from "../masters.service";
 export class StudyMaterialMasterComponent implements OnInit {
   public materialMaster: any[] = [];
   public materialMasterForm: FormGroup;
-  public skillLevelDropdown: any[] = [];
+  public skillLevelDropdown: SelectItem[] = [];
 
   public menuAccess: boolean = true;
   public addAccess: boolean = true;
@@ -23,15 +23,20 @@ export class StudyMaterialMasterComponent implements OnInit {
   public deleteAccess: boolean = true;
   public printAccess: boolean = true;
   public backDateAccess: boolean = true;
+  public saveLoading: boolean = false;
+  public cancelLoading: boolean = false;
 
   public loading: boolean = false;
   public submitted: boolean = false;
   public newItem: boolean = false;
   public displayBasic: Boolean = false;
+  public duplicateError: boolean = false;
 
   public material: string;
   public comp_id: string;
   public process: string;
+  public editPKCode: number;
+
   public MATERIAL_MASTER_QUERY;
   constructor(
     private commonService: CommonService,
@@ -68,8 +73,12 @@ export class StudyMaterialMasterComponent implements OnInit {
       this.commonService
         .FillCombo(this.MATERIAL_MASTER_QUERY)
         .subscribe((data) => {
-          this.skillLevelDropdown = data;
-          console.log(data);
+          for (let value of data) {
+            this.skillLevelDropdown.push({
+              label: value.CategoryToSkillLevelMaster_title,
+              value: value.CategoryToSkillLevelMaster_ID,
+            });
+          }
         });
       this.materialMasterForm = this.fb.group({
         StudyMaterialMaster_id: [""],
@@ -119,12 +128,14 @@ export class StudyMaterialMasterComponent implements OnInit {
     }
   }
   cancel() {
+    this.cancelLoading = true;
+
     this.commonService
       .setResetModify(
         "StudyMaterialMaster",
         "es_modify",
         "StudyMaterialMaster_id",
-        this.f["StudyMaterialMaster_id"].value,
+        this.editPKCode,
         0,
         "setLock"
       )
@@ -133,6 +144,7 @@ export class StudyMaterialMasterComponent implements OnInit {
         this.displayBasic = false;
         this.submitted = false;
         this.materialMasterForm.reset();
+        this.cancelLoading = false;
       });
   }
   delete(code) {
@@ -184,7 +196,7 @@ export class StudyMaterialMasterComponent implements OnInit {
               key: "t1",
               severity: "warn",
               summary: "Warning",
-              detail: "Sorry!! You dont have access to edit",
+              detail: "Someone Editing the Item/ Item is locked",
             });
           }
         });
@@ -197,14 +209,58 @@ export class StudyMaterialMasterComponent implements OnInit {
       });
     }
   }
+  reset() {
+    this.materialMasterForm.reset();
+  }
   save() {
+    this.submitted = true;
+    if (this.f["StudyMaterialMaster_filetype"].value != "") {
+      if (this.newItem) {
+        var arr = this.materialMaster.filter((master) => {
+          if (
+            master.StudyMaterialMaster_filetype.toLowerCase() ==
+            this.f["StudyMaterialMaster_filetype"].value.toLowerCase()
+          ) {
+            return master;
+          }
+        });
+        if (arr.length > 0) {
+          this.duplicateError = true;
+          return;
+        } else {
+          this.duplicateError = false;
+        }
+      } else {
+        var arr = this.materialMaster.filter((master) => {
+          if (
+            master.StudyMaterialMaster_filetype.toLowerCase() ==
+              this.f["StudyMaterialMaster_filetype"].value.toLowerCase() &&
+            master.StudyMaterialMaster_id !=
+              this.f["StudyMaterialMaster_id"].value
+          ) {
+            return master;
+          }
+        });
+        console.log(arr);
+        if (arr.length > 0) {
+          this.duplicateError = true;
+          return;
+        } else {
+          this.duplicateError = false;
+        }
+      }
+    }
     if (this.materialMasterForm.valid) {
+      this.saveLoading = true;
+
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
       this.confirmationService.confirm({
         message: "Are you sure that you want to save?",
         header: "Save Confirmation",
         icon: "fas fa-save",
         accept: () => {
+          this.saveLoading = true;
+
           this.service
             .CRUDMasters(
               "UPSERT_StudyMaterialMaster",
@@ -213,11 +269,18 @@ export class StudyMaterialMasterComponent implements OnInit {
             )
             .subscribe((data) => {
               this.displayBasic = false;
+              this.saveLoading = false;
               this.getMaterialMaster();
+              this.saveLoading = false;
             });
+        },
+        reject: () => {
+          this.saveLoading = false;
         },
       });
     } else {
+      this.saveLoading = false;
+
       this.messageService.add({
         key: "t2",
         severity: "error",
@@ -227,14 +290,16 @@ export class StudyMaterialMasterComponent implements OnInit {
     }
     return;
   }
+
   edit(material) {
+    this.editPKCode = material.StudyMaterialMaster_id;
     if (this.updateAccess) {
       this.commonService
         .setResetModify(
           "StudyMaterialMaster",
           "es_modify",
           "StudyMaterialMaster_id",
-          material.StudyMaterialMaster_id,
+          this.editPKCode,
           0,
           "check"
         )
@@ -246,7 +311,7 @@ export class StudyMaterialMasterComponent implements OnInit {
                 "StudyMaterialMaster",
                 "es_modify",
                 "StudyMaterialMaster_id",
-                material.StudyMaterialMaster_id,
+                this.editPKCode,
                 1,
                 "setLock"
               )

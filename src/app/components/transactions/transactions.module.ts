@@ -14,24 +14,34 @@ import { TransactionsService } from "./transactions.service";
 import { ConfirmationService, MessageService } from "primeng/api";
 import { JwtInterceptor } from "src/app/_helper/JwtInterceptor";
 import { InputTextModule } from "primeng/inputtext";
-import { EmployeeMasterComponent } from "./employee-master/employee-master.component";
 import { TrainingNeedComponent } from "./training-need/training-need.component";
+import { TrainingScheduleComponent } from "./training-schedule/training-schedule.component";
+import { DashboardComponent } from "../dashboard/dashboard.component";
+import { TrainingApprovalComponent } from "./training-approval/training-approval.component";
+import { AttendanceApprovalComponent } from "./attendance-approval/attendance-approval.component";
 
 const routes: Routes = [
   { path: "questionBank", component: QuestionBankComponent },
-  { path: "employeeMaster", component: EmployeeMasterComponent },
   { path: "trainingNeed", component: TrainingNeedComponent },
+  { path: "trainingSchedule", component: TrainingScheduleComponent },
+  { path: "trainingApproval", component: TrainingApprovalComponent },
+  {
+    path: "trainingAttendanceApproval",
+    component: AttendanceApprovalComponent,
+  },
+  { path: "**", redirectTo: "DashboardComponent" },
 ];
 
 @NgModule({
   declarations: [
     QuestionBankComponent,
-    EmployeeMasterComponent,
     TrainingNeedComponent,
+    TrainingScheduleComponent,
+    TrainingApprovalComponent,
+    AttendanceApprovalComponent,
   ],
   imports: [
     CommonModule,
-
     SharedModule,
     HttpClientModule,
     FormsModule,

@@ -100,11 +100,17 @@
                 <a href="#" class="auth-link text-black">Forgot password?</a>
               </div>
               <div class="my-3">
-                <a
+                <button
                   class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn"
                   (click)="onSubmit();"
-                  >LOGIN</a
+                  [disabled]="isLoading"
                 >
+                  <i
+                    class="fa"
+                    [ngClass]="{'fa-spin fa-spinner': isLoading, 'fa-check': !isLoading}"
+                  ></i>
+                  {{button}}
+                </button>
               </div>
               <!-- <div class="mb-2 d-flex">
                   <button

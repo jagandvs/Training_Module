@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ConfirmationService, MessageService } from "primeng/api";
@@ -24,6 +25,9 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
   public printAccess: boolean = true;
   public backDateAccess: boolean = true;
 
+  public percentageError: boolean = false;
+  public titleError: boolean = false;
+
   public loading: boolean = false;
   public submitted: boolean = false;
   public newItem: boolean = false;
@@ -31,6 +35,9 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
 
   public process: string;
   public comp_id: string;
+  public editPKCode: number;
+  public saveLoading: boolean = false;
+  public cancelLoading: boolean = false;
 
   public CATEGORY_MASTER_QUERY: any;
   constructor(
@@ -68,7 +75,12 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
       this.commonService
         .FillCombo(this.CATEGORY_MASTER_QUERY)
         .subscribe((data) => {
-          this.categoryMasterDropdown = data;
+          for (let value of data) {
+            this.categoryMasterDropdown.push({
+              label: value.category_name,
+              value: value.category_id,
+            });
+          }
         });
 
       this.categorySkillMasterForm = this.fb.group({
@@ -83,6 +95,15 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
 
   get f() {
     return this.categorySkillMasterForm.controls;
+  }
+
+  checkPassingPercentage(value) {
+    console.log(value);
+    if (value > 100 || value < 0) {
+      this.percentageError = true;
+    } else {
+      this.percentageError = false;
+    }
   }
 
   getCategorySkillMaster() {
@@ -124,44 +145,105 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
     }
   }
   save() {
-    console.log(this.categorySkillMasterForm.value);
-    if (this.categorySkillMasterForm.valid) {
+    this.submitted = true;
+    this.titleError = false;
+
+    if (this.f["CategoryToSkillLevelMaster_title"].value != "") {
+      if (this.newItem) {
+        var arr = this.categorySkillMaster.filter((master) => {
+          if (
+            master.CategoryToSkillLevelMaster_title.toLowerCase() ==
+            this.f["CategoryToSkillLevelMaster_title"].value.toLowerCase()
+          ) {
+            return master;
+          }
+        });
+        if (arr.length > 0) {
+          this.titleError = true;
+          return;
+        } else {
+          this.titleError = false;
+        }
+      } else {
+        var arr = this.categorySkillMaster.filter((master) => {
+          if (
+            master.CategoryToSkillLevelMaster_title.toLowerCase() ==
+              this.f["CategoryToSkillLevelMaster_title"].value.toLowerCase() &&
+            master.CategoryToSkillLevelMaster_ID !=
+              this.f["CategoryToSkillLevelMaster_ID"].value
+          ) {
+            return master;
+          }
+        });
+        console.log(arr);
+        if (arr.length > 0) {
+          this.titleError = true;
+          return;
+        } else {
+          this.titleError = false;
+        }
+      }
+    }
+
+    if (this.categorySkillMasterForm.valid && !this.percentageError) {
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
       this.confirmationService.confirm({
         message: "Are you sure that you want to save?",
         header: "Save Confirmation",
         icon: "fas fa-save",
         accept: () => {
+          this.saveLoading = true;
+
           this.service
             .CRUDMasters(
               "UPSERT_CategoryToSkillLevel_Master",
               this.categorySkillMasterForm.value,
               this.process
             )
-            .subscribe((data) => {
-              this.displayBasic = false;
-              this.getCategorySkillMaster();
-            });
+            .subscribe(
+              (data) => {
+                this.displayBasic = false;
+                this.getCategorySkillMaster();
+                this.saveLoading = false;
+                this.reset();
+              },
+              (error: HttpErrorResponse) => {
+                console.log(error);
+              }
+            );
+        },
+        reject: () => {
+          this.saveLoading = false;
         },
       });
     } else {
+      this.saveLoading = false;
+
       this.messageService.add({
         key: "t2",
         severity: "error",
         summary: "Error",
-        detail: "Please Fill all required fields",
+        detail: "Please Fill all required fields correctly",
       });
     }
     return;
   }
+
+  reset() {
+    this.titleError = false;
+    this.percentageError = false;
+    this.submitted = false;
+    this.categorySkillMasterForm.reset();
+  }
   edit(category) {
+    this.editPKCode = category.CategoryToSkillLevelMaster_ID;
     if (this.updateAccess) {
       this.commonService
         .setResetModify(
           "CategoryToSkillLevel_Master",
           "es_modify",
           "CategoryToSkillLevelMaster_ID",
-          category.CategoryToSkillLevelMaster_ID,
+          this.editPKCode,
           0,
           "check"
         )
@@ -173,7 +255,7 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
                 "CategoryToSkillLevel_Master",
                 "es_modify",
                 "CategoryToSkillLevelMaster_ID",
-                category.CategoryToSkillLevelMaster_ID,
+                this.editPKCode,
                 1,
                 "setLock"
               )
@@ -268,7 +350,7 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
               key: "t1",
               severity: "warn",
               summary: "Warning",
-              detail: "Sorry!! You dont have access to edit",
+              detail: "Someone Editing the Item/ Item is locked",
             });
           }
         });
@@ -282,20 +364,29 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
     }
   }
   cancel() {
+    this.cancelLoading = true;
+
     this.commonService
       .setResetModify(
         "CategoryToSkillLevel_Master",
         "es_modify",
         "CategoryToSkillLevelMaster_ID",
-        this.f["CategoryToSkillLevelMaster_ID"].value,
+        this.editPKCode,
         0,
         "setLock"
       )
-      .subscribe((data) => {
-        this.newItem = false;
-        this.displayBasic = false;
-        this.submitted = false;
-        this.categorySkillMasterForm.reset();
-      });
+      .subscribe(
+        (data) => {
+          this.newItem = false;
+          this.displayBasic = false;
+          this.submitted = false;
+          this.reset();
+          this.cancelLoading = false;
+        },
+        (error: HttpErrorResponse) => {
+          console.log(error);
+          this.cancelLoading = false;
+        }
+      );
   }
 }

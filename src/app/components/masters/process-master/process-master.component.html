@@ -13,7 +13,7 @@
           <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
               <div class="card-body">
-                <h4 class="card-title">Process Master Table</h4>
+                <h4 class="card-title">Process Master</h4>
                 <div class="table-responsive" *ngIf="menuAccess">
                   <p-table
                     #dt
@@ -28,7 +28,7 @@
                       <div class="row justify-content-between">
                         <div class="col-md-3">
                           <button class="btn btn-primary" (click)="add()">
-                            Add Process Master
+                            Add New
                             <i class="mdi mdi-plus-circle-multiple-outline"></i>
                           </button>
                         </div>
@@ -78,17 +78,17 @@
                         <td>{{process.process_applicable_to}}</td>
                         <td>
                           <button
-                            class="btn btn-primary mr-4"
+                            class="btn btn-warning mr-4"
                             (click)="edit(process)"
                           >
-                            <i class="mdi mdi-pencil-box"></i> Edit
+                            <i class="mdi mdi-pencil-box"></i>
                           </button>
 
                           <button
                             class="btn btn-danger"
                             (click)="delete(process.process_id)"
                           >
-                            <i class="mdi mdi-delete"></i> Delete
+                            <i class="mdi mdi-delete"></i>
                           </button>
                         </td>
                       </tr>
@@ -113,12 +113,13 @@
           </div>
         </div>
         <p-dialog
-          [contentStyle]="{'overflow':'scroll'}"
-          header="Category Master"
+          [contentStyle]="{'overflow':'visible'}"
+          header="Process Master"
           [(visible)]="displayBasic"
           [style]="{width: '80vw'}"
           [baseZIndex]="10000"
           [closable]="false"
+          [maximizable]="true"
         >
           <p-toast key="t2"></p-toast>
           <p-confirmDialog
@@ -133,10 +134,25 @@
                   <div class="col-sm-6">
                     <input
                       type="text"
+                      pInputText
                       class="form-control"
-                      placeholder="process Name"
+                      placeholder="Process Name"
                       formControlName="process_name"
                     />
+                    <div
+                      *ngIf="submitted && f.process_name.errors"
+                      class="alert alert-danger"
+                    >
+                      <div *ngIf="f.process_name.errors.required">
+                        Process Name is required
+                      </div>
+                    </div>
+                    <div
+                      class="alert alert-danger"
+                      *ngIf="duplicateProcessNameError"
+                    >
+                      Process Name already exist
+                    </div>
                   </div>
                 </div>
                 <div class="form-group row">
@@ -144,32 +160,54 @@
                     >Process Applicable To</label
                   >
                   <div class="col-sm-6">
-                    <select
-                      class="form-control"
+                    <p-dropdown
+                      [options]="processApplicableToDropdown"
+                      [filter]="true"
+                      [showClear]="true"
+                      placeholder="Select Process Applicable To"
+                      [resetFilterOnHide]="true"
                       formControlName="process_applicable_to"
                     >
-                      <option value="">Select Process Applicable to..</option>
-                      <option value="1">Staff</option>
-                      <option value="2">Workers</option>
-                      <option value="3">Management</option>
-                    </select>
+                    </p-dropdown>
+                    <div
+                      *ngIf="submitted && f.process_applicable_to.errors"
+                      class="alert alert-danger"
+                    >
+                      <div *ngIf="f.process_applicable_to.errors.required">
+                        Process Applicable to is required
+                      </div>
+                    </div>
                   </div>
                 </div>
               </form>
             </div>
           </div>
           <div class="row justify-content-around">
-            <button class="btn btn-outline-primary" (click)="save()">
-              <i class="fas fa-save"></i> Save
+            <button
+              class="btn btn-outline-primary"
+              (click)="save()"
+              [disabled]="saveLoading"
+            >
+              <i
+                [ngClass]="{'fa fa-spin fa-spinner': saveLoading, 'fas fa-save': !saveLoading}"
+              ></i>
+              Save
             </button>
             <button
               class="btn btn-outline-dark"
               (click)="processMasterForm.reset()"
             >
-              <i class="fas fa-save"></i> Reset
+              <i class="fas fa-undo"></i> Reset
             </button>
-            <button class="btn btn-outline-danger" (click)="cancel()">
-              <i class="fas fa-save"></i> Cancel
+            <button
+              class="btn btn-outline-danger"
+              (click)="cancel()"
+              [disabled]="cancelLoading"
+            >
+              <i
+                [ngClass]="{'fa fa-spin fa-spinner': cancelLoading, 'far fa-times-circle': !cancelLoading}"
+              ></i>
+              Cancel
             </button>
           </div>
         </p-dialog>

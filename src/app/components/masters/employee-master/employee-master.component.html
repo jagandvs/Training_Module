@@ -13,7 +13,7 @@
           <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
               <div class="card-body">
-                <h4 class="card-title">Question Bank Table</h4>
+                <h4 class="card-title">Employee Master</h4>
                 <div class="table-responsive" *ngIf="menuAccess">
                   <p-table
                     #dt
@@ -28,7 +28,7 @@
                       <div class="row justify-content-between">
                         <div class="col-md-3">
                           <button class="btn btn-primary" (click)="add()">
-                            Add Employee Master
+                            Add New
                             <i class="mdi mdi-plus-circle-multiple-outline"></i>
                           </button>
                         </div>
@@ -60,11 +60,11 @@
                     <ng-template pTemplate="header">
                       <tr class="text-center">
                         <th pSortableColumn="EMP_MASTER_NUMBER">
-                          Employee Master Number
+                          Employee Number
                           <p-sortIcon field="EMP_MASTER_NUMBER"> </p-sortIcon>
                         </th>
                         <th pSortableColumn="EMP_MASTER_NAME">
-                          Employee Master Name
+                          Employee Name
                           <p-sortIcon field="EMP_MASTER_NAME"> </p-sortIcon>
                         </th>
 
@@ -127,6 +127,7 @@
           [style]="{width: '90vw'}"
           [baseZIndex]="10000"
           [closable]="false"
+          [maximizable]="true"
         >
           <p-toast key="t2"></p-toast>
           <p-confirmDialog
@@ -138,12 +139,12 @@
               <form focusInvalidInput [formGroup]="employeeMasterForm">
                 <div class="p-fluid p-formgrid p-grid">
                   <div class="p-field p-col-12 p-md-6">
-                    <label for="number">Employee Master Number</label>
+                    <label for="number">Employee Number</label>
                     <input
                       type="text"
                       inputId="number"
                       pInputText
-                      placeholder="Employee Master Number"
+                      placeholder="Employee Number"
                       formControlName="EMP_MASTER_NUMBER"
                     />
                     <div
@@ -156,12 +157,12 @@
                     </div>
                   </div>
                   <div class="p-field p-col-12 p-md-6">
-                    <label for="name">Employee Master Name</label>
+                    <label for="name">Employee Name</label>
                     <input
                       type="text"
                       inputId="name"
                       pInputText
-                      placeholder="Employee Master Number"
+                      placeholder="Employee Name"
                       formControlName="EMP_MASTER_NAME"
                     />
                     <div
@@ -169,13 +170,13 @@
                       class="alert alert-danger"
                     >
                       <div *ngIf="f.EMP_MASTER_NAME.errors.required">
-                        Employee Master Number is required
+                        Employee Name is required
                       </div>
                     </div>
                   </div>
 
                   <div class="p-field p-col-12 p-md-6">
-                    <label for="categorySkillLevel">Department</label>
+                    <label for="categorySkillLevel">Department Name</label>
                     <p-dropdown
                       [optionLabel]="label"
                       [options]="departmentDropdown"
@@ -185,7 +186,6 @@
                       [resetFilterOnHide]="true"
                       [virtualScroll]="true"
                       itemSize="10"
-                      [autofocus]="true"
                       formControlName="EMP_MASTER_DEPARTMENT_ID"
                     >
                     </p-dropdown>
@@ -199,25 +199,28 @@
                     </div>
                   </div>
                   <div class="p-field p-col-12 p-md-6">
-                    <label for="reportingto">Employee Reporting To</label>
-                    <input
-                      type="number"
-                      inputId="reportingto"
-                      pInputText
-                      placeholder="Employee Reporting To"
+                    <label for="reportingto">Reporting To</label>
+                    <p-dropdown
+                      [optionLabel]="label"
+                      [options]="employeeDropdown"
+                      [filter]="true"
+                      [showClear]="true"
+                      placeholder="Select Reporting To"
+                      [resetFilterOnHide]="true"
                       formControlName="EMP_MASTER_REPORTING_TO"
-                    />
+                    >
+                    </p-dropdown>
                     <div
                       *ngIf="submitted && f.EMP_MASTER_REPORTING_TO.errors"
                       class="alert alert-danger"
                     >
                       <div *ngIf="f.EMP_MASTER_REPORTING_TO.errors.required">
-                        Employee Reporting To is required
+                        Reporting To is required
                       </div>
                     </div>
                   </div>
                   <div class="p-field p-col-12 p-md-6">
-                    <label for="process">Process</label>
+                    <label for="process">Process Name</label>
                     <p-dropdown
                       [optionLabel]="label"
                       [options]="processDropdown"
@@ -225,9 +228,6 @@
                       [showClear]="true"
                       placeholder="Select Process"
                       [resetFilterOnHide]="true"
-                      [virtualScroll]="true"
-                      itemSize="10"
-                      [autofocus]="true"
                       formControlName="EMP_MASTER_PROCESS_ID"
                     >
                     </p-dropdown>
@@ -249,9 +249,6 @@
                       [showClear]="true"
                       placeholder="Select Employee Type"
                       [resetFilterOnHide]="true"
-                      [virtualScroll]="true"
-                      itemSize="10"
-                      [autofocus]="true"
                       formControlName="EMP_MASTER_EMP_TYPE"
                     >
                     </p-dropdown>
@@ -285,8 +282,8 @@
             <div class="container">
               <form focusInvalidInput [formGroup]="employeeDetailForm">
                 <div class="p-fluid p-formgrid p-grid">
-                  <div class="p-field p-col-12">
-                    <label for="categorySkillLevel">Category</label>
+                  <div class="p-field p-col-12 p-md-4">
+                    <label for="categorySkillLevel">Category Name</label>
                     <p-dropdown
                       [optionLabel]="label"
                       [options]="categoryDropdown"
@@ -294,9 +291,6 @@
                       [showClear]="true"
                       placeholder="Select Category"
                       [resetFilterOnHide]="true"
-                      [virtualScroll]="true"
-                      itemSize="10"
-                      [autofocus]="true"
                       formControlName="EMP_MASTER_SKILLS_CATEGORY_ID"
                     >
                     </p-dropdown>
@@ -311,8 +305,8 @@
                       </div>
                     </div>
                   </div>
-                  <div class="p-field p-col-12">
-                    <label for="categorySkillLevel">Category</label>
+                  <div class="p-field p-col-12 p-md-4">
+                    <label for="categorySkillLevel">Present Skill</label>
                     <p-dropdown
                       [optionLabel]="label"
                       [options]="categoryToSkillDropdown"
@@ -320,9 +314,6 @@
                       [showClear]="true"
                       placeholder="Select Present Skills"
                       [resetFilterOnHide]="true"
-                      [virtualScroll]="true"
-                      itemSize="10"
-                      [autofocus]="true"
                       formControlName="EMP_MASTER_SKILLS_PRESENT_SKILLS_LEVEL"
                     >
                     </p-dropdown>
@@ -337,8 +328,8 @@
                       </div>
                     </div>
                   </div>
-                  <div class="p-field p-col-12">
-                    <label for="categorySkillLevel">Category</label>
+                  <div class="p-field p-col-12 p-md-4">
+                    <label for="categorySkillLevel">Next Skill</label>
                     <p-dropdown
                       [optionLabel]="label"
                       [options]="categoryToSkillDropdown"
@@ -346,9 +337,6 @@
                       [showClear]="true"
                       placeholder="Select Next Skills"
                       [resetFilterOnHide]="true"
-                      [virtualScroll]="true"
-                      itemSize="10"
-                      [autofocus]="true"
                       formControlName="EMP_MASTER_SKILLS_NEXT_SKILLS_LEVEL"
                     >
                     </p-dropdown>

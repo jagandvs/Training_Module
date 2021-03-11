@@ -21,6 +21,7 @@ import { DepartmentMasterComponent } from "./components/masters/department-maste
 import { ProcessMasterComponent } from "./components/masters/process-master/process-master.component";
 import { StudyMaterialMasterComponent } from "./components/masters/study-material-master/study-material-master.component";
 import { TrainingProgramMasterComponent } from "./components/masters/training-program-master/training-program-master.component";
+import { NgxSpinnerModule } from "ngx-spinner";
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { TrainingProgramMasterComponent } from "./components/masters/training-pr
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
+    NgxSpinnerModule,
   ],
   providers: [
     AuthenticationService,

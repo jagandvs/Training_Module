@@ -4,6 +4,7 @@
 
 export const environment = {
   production: false,
+  // baseUrl: "https://training-module-api.herokuapp.com/api/",
   baseUrl: "http://localhost:3000/api/",
 };
 

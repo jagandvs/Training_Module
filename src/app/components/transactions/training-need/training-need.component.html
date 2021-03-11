@@ -13,7 +13,7 @@
           <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
               <div class="card-body">
-                <h4 class="card-title">Training Need Table</h4>
+                <h4 class="card-title">Training Need Master</h4>
                 <div class="table-responsive" *ngIf="menuAccess">
                   <p-table
                     #dt
@@ -146,9 +146,6 @@
                       [showClear]="true"
                       placeholder="Select Employee Name"
                       [resetFilterOnHide]="true"
-                      [virtualScroll]="true"
-                      itemSize="10"
-                      [autofocus]="true"
                       formControlName="TRAINING_NEED_EMP_CODE"
                     >
                     </p-dropdown>
@@ -192,9 +189,6 @@
                       [showClear]="true"
                       placeholder="Select Training Program"
                       [resetFilterOnHide]="true"
-                      [virtualScroll]="true"
-                      itemSize="10"
-                      [autofocus]="true"
                       formControlName="TRAINING_NEED_PROGRAM_CODE"
                     >
                     </p-dropdown>

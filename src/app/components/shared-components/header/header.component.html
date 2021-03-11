@@ -102,6 +102,13 @@
               <li class="nav-item">
                 <a
                   class="nav-link"
+                  (click)="router.navigate(['masters/employeeMaster'])"
+                  >Employee Master</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
                   (click)="router.navigate(['masters/StudyMaterialMaster'])"
                   >Study Material</a
                 >
@@ -142,25 +149,33 @@
                   >Question Bank</a
                 >
               </li>
+
               <li class="nav-item">
                 <a
                   class="nav-link"
-                  (click)="router.navigate(['transactions/employeeMaster'])"
-                  >Employee Master</a
+                  (click)="router.navigate(['transactions/trainingSchedule'])"
+                  >Training Schedule</a
                 >
               </li>
               <li class="nav-item">
                 <a
                   class="nav-link"
-                  (click)="router.navigate(['transactions/trainingNeed'])"
-                  >Training Need</a
+                  (click)="router.navigate(['transactions/trainingApproval'])"
+                  >Training Approval</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  (click)="router.navigate(['transactions/trainingAttendanceApproval'])"
+                  >Training Attendance Approval</a
                 >
               </li>
             </ul>
           </div>
         </li>
         <li class="nav-item">
-          <a href="#" class="nav-link">
+          <a class="nav-link">
             <i class="mdi mdi-file-document-box-outline menu-icon"></i>
             <span class="menu-title">Reports</span></a
           >

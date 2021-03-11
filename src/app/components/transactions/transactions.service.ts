@@ -7,6 +7,12 @@ import {
   TRANSACTIONS,
   INSERT_EMPLOYEE_MASTER,
   INSERT_TRAINING_NEEDS,
+  INSERT_UPSERT_TRAININGPROGRAM_MASTER,
+  getEmployeeList,
+  getEmployeeListForApproval,
+  UpdateApproval,
+  getEmployeeListForAttendance,
+  UpdateAttendance,
 } from "src/app/_helper/navigation-urls";
 import { CommonService } from "src/app/_services/common.service";
 
@@ -15,6 +21,8 @@ import { CommonService } from "src/app/_services/common.service";
 })
 export class TransactionsService {
   constructor(private http: HttpClient, private commonService: CommonService) {}
+
+  // HTTP API REQUEST FOR QUESTION BANK
 
   UPSERT_QuestionBank(
     url: string,
@@ -42,32 +50,6 @@ export class TransactionsService {
       )
     );
   }
-  UPSERT_EmployeeMaster(
-    url: string,
-    process: string,
-    EMP_MASTER_ID: number
-  ): Observable<any[]> {
-    let body = {
-      process: process,
-      EMP_MASTER_ID: EMP_MASTER_ID,
-    };
-    return this.http.post<any[]>(TRANSACTIONS + url, body, httpOptions);
-  }
-
-  INSERT_UPSERT_EmployeeMaster(masterForm, detailForm, process) {
-    let body = [masterForm, detailForm, { process: process }];
-    return this.http.post<any>(
-      INSERT_EMPLOYEE_MASTER,
-      body,
-      this.commonService.logger(
-        "Employee Master",
-        process,
-        "Employee Master",
-        "",
-        ""
-      )
-    );
-  }
 
   UPSERT_TrainingNeedsMaster(
     url: string,
@@ -90,6 +72,82 @@ export class TransactionsService {
         "Training Need Master",
         process,
         "Training Need Master",
+        "",
+        ""
+      )
+    );
+  }
+
+  UPSERT_TRAININGPROGRAM_MASTER(
+    url: string,
+    process: string,
+    TRAININGPROGRAM_ID: number
+  ): Observable<any[]> {
+    let body = {
+      process: process,
+      TRAININGPROGRAM_ID: TRAININGPROGRAM_ID,
+    };
+    return this.http.post<any[]>(TRANSACTIONS + url, body, httpOptions);
+  }
+
+  INSERT_UPSERT_TRAININGPROGRAM_MASTER(masterForm, detailForm, process) {
+    let body = [masterForm, detailForm, { process: process }];
+    return this.http.post<any>(
+      INSERT_UPSERT_TRAININGPROGRAM_MASTER,
+      body,
+      this.commonService.logger(
+        "Training Master",
+        process,
+        "Training Master",
+        "",
+        ""
+      )
+    );
+  }
+
+  getEmployeeList(Trainingmaster_id): Observable<any[]> {
+    return this.http.get<any[]>(
+      getEmployeeList + "?Trainingmaster_id=" + Trainingmaster_id
+    );
+  }
+
+  getEmployeeListForApproval(EMP_ID: number, COMPANY_ID: number) {
+    return this.http.get<any[]>(
+      getEmployeeListForApproval +
+        "?EMP_ID=" +
+        EMP_ID +
+        "&COMPANY_ID=" +
+        COMPANY_ID
+    );
+  }
+
+  updateApproval(approvalList) {
+    return this.http.post<any>(
+      UpdateApproval,
+      approvalList,
+      this.commonService.logger(
+        "Training Program Approval",
+        "approval",
+        "Training Program Approval",
+        "",
+        ""
+      )
+    );
+  }
+
+  getEmployeeListForAttendance(Training_ID): Observable<any[]> {
+    return this.http.get<any[]>(
+      getEmployeeListForAttendance + "?Training_ID=" + Training_ID
+    );
+  }
+  updateAttendance(approvalList) {
+    return this.http.post<any>(
+      UpdateAttendance,
+      approvalList,
+      this.commonService.logger(
+        "Training attendance Approval",
+        "approval",
+        "Training Program Approval",
         "",
         ""
       )

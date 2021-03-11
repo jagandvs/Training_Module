@@ -13,7 +13,7 @@
           <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
               <div class="card-body">
-                <h4 class="card-title">Category Master Table</h4>
+                <h4 class="card-title">Category Master</h4>
                 <div class="table-responsive" *ngIf="menuAccess">
                   <p-table
                     #dt
@@ -25,41 +25,31 @@
                     [rowsPerPageOptions]="[10,25,50]"
                   >
                     <ng-template pTemplate="caption">
-                      <div class="row justify-content-between">
+                      <div class="row d-flex justify-content-between">
                         <div class="col-md-3">
                           <button
                             class="btn btn-primary"
                             (click)="addCategory()"
                           >
-                            Add Category Master
+                            Add New
                             <i class="mdi mdi-plus-circle-multiple-outline"></i>
                           </button>
                         </div>
+
                         <div class="col-md-3">
-                          <!-- <button
-                        type="button"
-                        class="btn btn-success"
-                        (click)="exportExcel()"
-                        pTooltip="CSV"
-                        tooltipPosition="bottom"
-                      >
-                        <i class="fas fa-file-excel"></i> Export Excel
-                      </button> -->
-                        </div>
-                        <div class="col-md-3"></div>
-                        <div class="col-md-3">
-                          <span class="p-input-icon-left">
+                          <span class="p-input-icon-left p-ml-auto">
                             <i class="pi pi-search"></i>
                             <input
                               pInputText
                               type="text"
                               (input)="dt.filterGlobal($event.target.value, 'contains')"
-                              placeholder="Search..."
+                              placeholder="search..."
                             />
                           </span>
                         </div>
                       </div>
                     </ng-template>
+
                     <ng-template pTemplate="header">
                       <tr class="text-center">
                         <th pSortableColumn="category_name">
@@ -89,17 +79,17 @@
                         <td>{{category.cateogry_applicable_to}}</td>
                         <td>
                           <button
-                            class="btn btn-primary mr-4"
+                            class="btn btn-warning mr-4"
                             (click)="edit(category)"
                           >
-                            <i class="mdi mdi-pencil-box"></i> Edit
+                            <i class="mdi mdi-pencil-box"></i>
                           </button>
 
                           <button
                             class="btn btn-danger"
                             (click)="deleteUser(category.category_id)"
                           >
-                            <i class="mdi mdi-delete"></i> Delete
+                            <i class="mdi mdi-delete"></i>
                           </button>
                         </td>
                       </tr>
@@ -124,12 +114,13 @@
           </div>
         </div>
         <p-dialog
-          [contentStyle]="{'overflow':'scroll'}"
+          [contentStyle]="{'overflow':'visible'}"
           header="Category Master"
           [(visible)]="displayBasic"
           [style]="{width: '80vw'}"
           [baseZIndex]="10000"
           [closable]="false"
+          [maximizable]="true"
         >
           <p-toast key="t2"></p-toast>
           <p-confirmDialog
@@ -145,22 +136,46 @@
                     <input
                       type="text"
                       class="form-control"
+                      pInputText
                       placeholder="Category Name"
                       formControlName="category_name"
                     />
+                    <div
+                      *ngIf="submitted && f.category_name.errors"
+                      class="alert alert-danger"
+                    >
+                      <div *ngIf="f.category_name.errors.required">
+                        Category Name is required
+                      </div>
+                    </div>
+                    <div
+                      class="alert alert-danger"
+                      *ngIf="duplicateCategoryNameError"
+                    >
+                      Category Name already exist
+                    </div>
                   </div>
                 </div>
                 <div class="form-group row">
                   <label class="col-sm-6 col-form-label">Category Type</label>
                   <div class="col-sm-6">
-                    <select
-                      class="form-control"
+                    <p-dropdown
+                      [options]="categoryTypeDropdown"
+                      [filter]="true"
+                      [showClear]="true"
+                      placeholder="Select Category Type"
+                      [resetFilterOnHide]="true"
                       formControlName="category_type"
                     >
-                      <option value="">Select Category Type..</option>
-                      <option value="true">Technical</option>
-                      <option value="false">Commercial</option>
-                    </select>
+                    </p-dropdown>
+                    <div
+                      *ngIf="submitted && f.category_type.errors"
+                      class="alert alert-danger"
+                    >
+                      <div *ngIf="f.category_type.errors.required">
+                        Category type is required
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="form-group row">
@@ -168,29 +183,51 @@
                     >Category Applicable To</label
                   >
                   <div class="col-sm-6">
-                    <select
-                      class="form-control"
+                    <p-dropdown
+                      [options]="categoryApplicableToDropdown"
+                      [filter]="true"
+                      [showClear]="true"
+                      placeholder="Select Category Applicable To"
+                      [resetFilterOnHide]="true"
                       formControlName="cateogry_applicable_to"
                     >
-                      <option value="">Select Category Applicable to..</option>
-                      <option value="1">Staff</option>
-                      <option value="2">Workers</option>
-                      <option value="3">Management</option>
-                    </select>
+                    </p-dropdown>
+                    <div
+                      *ngIf="submitted && f.cateogry_applicable_to.errors"
+                      class="alert alert-danger"
+                    >
+                      <div *ngIf="f.cateogry_applicable_to.errors.required">
+                        Category Applicable to is required
+                      </div>
+                    </div>
                   </div>
                 </div>
               </form>
             </div>
           </div>
           <div class="row justify-content-around">
-            <button class="btn btn-outline-primary" (click)="save()">
-              <i class="fas fa-save"></i> Save
+            <button
+              class="btn btn-outline-primary"
+              (click)="save()"
+              [disabled]="saveLoading"
+            >
+              <i
+                [ngClass]="{'fa fa-spin fa-spinner': saveLoading, 'fas fa-save': !saveLoading}"
+              ></i>
+              Save
             </button>
-            <button class="btn btn-outline-dark">
-              <i class="fas fa-save"></i> Reset
+            <button class="btn btn-outline-dark" (click)="reset()">
+              <i class="fas fa-undo"></i> Reset
             </button>
-            <button class="btn btn-outline-danger" (click)="cancel()">
-              <i class="fas fa-save"></i> Cancel
+            <button
+              class="btn btn-outline-danger"
+              (click)="cancel()"
+              [disabled]="cancelLoading"
+            >
+              <i
+                [ngClass]="{'fa fa-spin fa-spinner': cancelLoading, 'far fa-times-circle': !cancelLoading}"
+              ></i>
+              Cancel
             </button>
           </div>
         </p-dialog>

@@ -13,7 +13,7 @@
           <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
               <div class="card-body">
-                <h4 class="card-title">Customer Master Table</h4>
+                <h4 class="card-title">Customer Master</h4>
                 <div class="table-responsive" *ngIf="menuAccess">
                   <p-table
                     #dt
@@ -28,7 +28,7 @@
                       <div class="row justify-content-between">
                         <div class="col-md-3">
                           <button class="btn btn-primary" (click)="add()">
-                            Add Customer Master
+                            Add New
                             <i class="mdi mdi-plus-circle-multiple-outline"></i>
                           </button>
                         </div>
@@ -64,7 +64,7 @@
                           <p-sortIcon field="customer_name"> </p-sortIcon>
                         </th>
                         <th pSortableColumn="customer_category">
-                          Category
+                          Category Name
                           <p-sortIcon field="customer_category"> </p-sortIcon>
                         </th>
                         <th pSortableColumn="customer_titleofprogram">
@@ -98,17 +98,17 @@
                         </td>
                         <td>
                           <button
-                            class="btn btn-primary mr-2"
+                            class="btn btn-warning mr-2"
                             (click)="edit(customer)"
                           >
-                            <i class="mdi mdi-pencil-box"></i> Edit
+                            <i class="mdi mdi-pencil-box"></i>
                           </button>
 
                           <button
                             class="btn btn-danger"
                             (click)="delete(customer.customer_id)"
                           >
-                            <i class="mdi mdi-delete"></i> Delete
+                            <i class="mdi mdi-delete"></i>
                           </button>
                         </td>
                       </tr>
@@ -134,11 +134,12 @@
         </div>
         <p-dialog
           [contentStyle]="{'overflow':'scroll'}"
-          header="Category Master"
+          header="Customer Master"
           [(visible)]="displayBasic"
           [style]="{width: '80vw'}"
           [baseZIndex]="10000"
           [closable]="false"
+          [maximizable]="true"
         >
           <p-toast key="t2"></p-toast>
           <p-confirmDialog
@@ -153,10 +154,25 @@
                   <div class="col-sm-6">
                     <input
                       type="text"
+                      pInputText
                       class="form-control"
                       placeholder="Customer Name"
                       formControlName="customer_name"
                     />
+                    <div
+                      *ngIf="submitted && f.customer_name.errors"
+                      class="alert alert-danger"
+                    >
+                      <div *ngIf="f.customer_name.errors.required">
+                        Customer Name is required
+                      </div>
+                    </div>
+                    <div
+                      class="alert alert-danger"
+                      *ngIf="duplicateCustomerNameError"
+                    >
+                      Customer Name already exist
+                    </div>
                   </div>
                 </div>
                 <div class="form-group row">
@@ -164,14 +180,23 @@
                     >Customer Category</label
                   >
                   <div class="col-sm-6">
-                    <select
-                      class="form-control"
+                    <p-dropdown
+                      [options]="categoryTypeDropdown"
+                      [filter]="true"
+                      [showClear]="true"
+                      placeholder="Select Customer Category"
+                      [resetFilterOnHide]="true"
                       formControlName="customer_category"
                     >
-                      <option value="">Select Category Type..</option>
-                      <option value="true">Technical</option>
-                      <option value="false">Commercial</option>
-                    </select>
+                    </p-dropdown>
+                    <div
+                      *ngIf="submitted && f.customer_category.errors"
+                      class="alert alert-danger"
+                    >
+                      <div *ngIf="f.customer_category.errors.required">
+                        Customer Category is required
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="form-group row">
@@ -181,10 +206,19 @@
                   <div class="col-sm-6">
                     <input
                       type="text"
+                      pInputText
                       class="form-control"
                       placeholder="Title of Program"
                       formControlName="customer_titleofprogram"
                     />
+                    <div
+                      *ngIf="submitted && f.customer_titleofprogram.errors"
+                      class="alert alert-danger"
+                    >
+                      <div *ngIf="f.customer_titleofprogram.errors.required">
+                        Title is required
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="form-group row">
@@ -192,27 +226,47 @@
                   <div class="col-sm-6">
                     <input
                       type="text"
+                      pInputText
                       class="form-control"
                       placeholder="Expected Skills"
                       formControlName="customer_expectedskills"
                     />
+                    <div
+                      *ngIf="submitted && f.customer_expectedskills.errors"
+                      class="alert alert-danger"
+                    >
+                      <div *ngIf="f.customer_expectedskills.errors.required">
+                        Expected Skill is required
+                      </div>
+                    </div>
                   </div>
                 </div>
               </form>
             </div>
           </div>
           <div class="row justify-content-around">
-            <button class="btn btn-outline-primary" (click)="save()">
-              <i class="fas fa-save"></i> Save
+            <button
+              class="btn btn-outline-primary"
+              (click)="save()"
+              [disabled]="saveLoading"
+            >
+              <i
+                [ngClass]="{'fa fa-spin fa-spinner': saveLoading, 'fas fa-save': !saveLoading}"
+              ></i>
+              Save
+            </button>
+            <button class="btn btn-outline-dark" (click)="reset()">
+              <i class="fas fa-undo"></i> Reset
             </button>
             <button
-              class="btn btn-outline-dark"
-              (click)="customerMasterForm.reset()"
+              class="btn btn-outline-danger"
+              (click)="cancel()"
+              [disabled]="cancelLoading"
             >
-              <i class="fas fa-save"></i> Reset
-            </button>
-            <button class="btn btn-outline-danger" (click)="cancel()">
-              <i class="fas fa-save"></i> Cancel
+              <i
+                [ngClass]="{'fa fa-spin fa-spinner': cancelLoading, 'far fa-times-circle': !cancelLoading}"
+              ></i>
+              Cancel
             </button>
           </div>
         </p-dialog>

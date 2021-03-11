@@ -35,7 +35,20 @@ export const INSERT_EMPLOYEE_MASTER =
   ApiURL + "transactions/INSERT_UPSERT_EmployeeMaster";
 export const INSERT_TRAINING_NEEDS =
   ApiURL + "transactions/INSERT_UPSERT_TrainingNeedsMaster";
+export const INSERT_UPSERT_TRAININGPROGRAM_MASTER =
+  ApiURL + "transactions/INSERT_UPSERT_TRAININGPROGRAM_MASTER";
 
+export const getEmployeeList = ApiURL + "transactions/getEmployeeList";
+
+export const getEmployeeListForApproval =
+  ApiURL + "transactions/getEmployeeListForApproval";
+
+export const UpdateApproval = ApiURL + "transactions/UpdateApproval";
+
+export const getEmployeeListForAttendance =
+  ApiURL + "transactions/getEmployeeListForAttendance";
+
+export const UpdateAttendance = ApiURL + "transactions/UpdateAttendance";
 // common routes
 export const setResetModify = ApiURL + "common/setResetModify";
 export const deleteRow = ApiURL + "common/deleteRow";
@@ -45,3 +58,4 @@ export const TableResponse = ApiURL + "common/TableResponse";
 // Login Routes
 export const getCompanyDetails = ApiURL + "auth/getCompanyDetails";
 export const login = ApiURL + "auth/signin";
+export const getUserEmployeeCode = ApiURL + "auth/getUserEmployeeCode";

@@ -80,6 +80,7 @@ export class TrainingNeedComponent implements OnInit {
       this.commonService
         .FillCombo(this.EMPLOYEE_MASTER_QUERY)
         .subscribe((data) => {
+          console.log(data);
           for (let item of data) {
             this.employeeMasterDropdown.push({
               label: item.EMP_MASTER_NAME,

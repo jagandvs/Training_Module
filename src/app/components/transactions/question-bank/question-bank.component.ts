@@ -72,6 +72,7 @@ export class QuestionBankComponent implements OnInit {
       this.commonService
         .FillCombo(this.CATEGORY_TO_SKILL_QUERY)
         .subscribe((data) => {
+          console.log(data);
           for (let item of data) {
             this.categorySkillDropdown.push({
               label: item.CategoryToSkillLevelMaster_title,
@@ -105,7 +106,6 @@ export class QuestionBankComponent implements OnInit {
     this.service
       .UPSERT_QuestionBank("UPSERT_QuestionBank", "selectAll", 0)
       .subscribe((data) => {
-        console.log(data);
         for (let questionBank of data) {
           let CategoryToSkillLevel = this.getCategorySkillLevel(
             questionBank.QuestionBankMaster_CategoryToSkillLevelid
@@ -143,7 +143,7 @@ export class QuestionBankComponent implements OnInit {
   add() {
     if (this.addAccess) {
       this.displayBasic = true;
-      this.questionBankTable = [];
+      this.questionDetailTable = [];
       this.newItem = true;
     } else {
       this.messageService.add({
@@ -345,7 +345,6 @@ export class QuestionBankComponent implements OnInit {
         "QuestionBank_Master",
         "ES_MODIFY",
         "QUESTIONBANKMASTER_ID",
-
         this.editingPKCODE,
         0,
         "setLock"

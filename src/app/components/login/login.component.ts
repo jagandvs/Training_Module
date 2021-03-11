@@ -14,8 +14,11 @@ import { HttpErrorResponse } from "@angular/common/http";
 })
 export class LoginComponent implements OnInit {
   public loginForm: FormGroup;
-  public loading: boolean = false;
   public submitted: boolean = false;
+  public isLoading: boolean = false;
+
+  public button: string = "LOGIN";
+
   public returnUrl: string = "";
   public errorMessage: string = "";
   public currentUser: USER_MASTER;
@@ -71,9 +74,13 @@ export class LoginComponent implements OnInit {
   //  Handle form submission
   onSubmit() {
     this.submitted = true;
+    this.isLoading = true;
+    this.button = "Please Wait..";
     this.errorMessage = "";
     if (this.loginForm.invalid) {
       this.errorMessage = "Please fill all details";
+      this.button = "Login";
+      this.isLoading = false;
       return;
     }
     this.authenticationService
@@ -92,7 +99,8 @@ export class LoginComponent implements OnInit {
         },
         (error: HttpErrorResponse) => {
           this.errorMessage = error.error.error;
-          this.loading = false;
+          this.isLoading = false;
+          this.button = "Login";
         }
       );
   }
