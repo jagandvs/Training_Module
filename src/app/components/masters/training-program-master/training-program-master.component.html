@@ -123,7 +123,7 @@
 
                         <td>
                           <button
-                            class="btn btn-primary mr-4"
+                            class="btn btn-warning mr-4"
                             (click)="edit(training)"
                           >
                             <i class="mdi mdi-pencil-box"></i>
@@ -177,33 +177,49 @@
                 <div class="form-group row">
                   <label class="col-sm-6 col-form-label">Process Name</label>
                   <div class="col-sm-6">
-                    <select
-                      class="form-control"
+                    <p-dropdown
+                      [options]="processMasterDropdown"
+                      [filter]="true"
+                      [showClear]="true"
+                      placeholder="Select Process Name"
+                      [resetFilterOnHide]="true"
                       formControlName="TrainingProgramMaster_processMasterid"
                     >
-                      <option value="" selected>Select Process Name..</option>
-                      <option
-                        *ngFor="let process of processMasterDropdown"
-                        [value]="process.process_id"
-                        >{{process.process_name}}</option
+                    </p-dropdown>
+                    <div
+                      *ngIf="submitted && f.TrainingProgramMaster_processMasterid.errors"
+                      class="alert alert-danger"
+                    >
+                      <div
+                        *ngIf="f.TrainingProgramMaster_processMasterid.errors.required"
                       >
-                    </select>
+                        Process Master is required
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="form-group row">
                   <label class="col-sm-6 col-form-label">Category Name</label>
                   <div class="col-sm-6">
-                    <select
-                      class="form-control"
+                    <p-dropdown
+                      [options]="categoryMasterDropdown"
+                      [filter]="true"
+                      [showClear]="true"
+                      placeholder="Select Category Name"
+                      [resetFilterOnHide]="true"
                       formControlName="TrainingProgramMaster_categoryid"
                     >
-                      <option value="" selected>Select Category Name..</option>
-                      <option
-                        *ngFor="let category of categoryMasterDropdown"
-                        [value]="category.category_id"
-                        >{{category.category_name}}</option
+                    </p-dropdown>
+                    <div
+                      *ngIf="submitted && f.TrainingProgramMaster_categoryid.errors"
+                      class="alert alert-danger"
+                    >
+                      <div
+                        *ngIf="f.TrainingProgramMaster_categoryid.errors.required"
                       >
-                    </select>
+                        Category Name is required
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="form-group row">
@@ -211,19 +227,25 @@
                     >Skill Level Master Title</label
                   >
                   <div class="col-sm-6">
-                    <select
-                      class="form-control"
+                    <p-dropdown
+                      [options]="skillMasterDropdown"
+                      [filter]="true"
+                      [showClear]="true"
+                      placeholder="Select Skill Level Master"
+                      [resetFilterOnHide]="true"
                       formControlName="TrainingProgramMaster_skilllevelid"
                     >
-                      <option value="" selected
-                        >Select Skill Level Master..</option
+                    </p-dropdown>
+                    <div
+                      *ngIf="submitted && f.TrainingProgramMaster_skilllevelid.errors"
+                      class="alert alert-danger"
+                    >
+                      <div
+                        *ngIf="f.TrainingProgramMaster_skilllevelid.errors.required"
                       >
-                      <option
-                        *ngFor="let skill of skillMasterDropdown"
-                        [value]="skill.CategoryToSkillLevelMaster_ID"
-                        >{{skill.CategoryToSkillLevelMaster_title}}</option
-                      >
-                    </select>
+                        Skill Level Master is required
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="form-group row">
@@ -231,10 +253,24 @@
                   <div class="col-sm-6">
                     <input
                       type="text"
+                      pInputText
                       class="form-control"
                       placeholder="Title"
                       formControlName="TrainingProgramMaster_title"
                     />
+                    <div
+                      *ngIf="submitted && f.TrainingProgramMaster_title.errors"
+                      class="alert alert-danger"
+                    >
+                      <div
+                        *ngIf="f.TrainingProgramMaster_title.errors.required"
+                      >
+                        Title is required
+                      </div>
+                    </div>
+                    <div class="alert alert-danger" *ngIf="duplicateError">
+                      Title already exist
+                    </div>
                   </div>
                 </div>
                 <div class="form-group row">
@@ -242,10 +278,21 @@
                   <div class="col-sm-6">
                     <input
                       type="number"
+                      pInputText
                       class="form-control"
                       placeholder="Duration"
                       formControlName="TrainingProgramMaster_duration"
                     />
+                    <div
+                      *ngIf="submitted && f.TrainingProgramMaster_duration.errors"
+                      class="alert alert-danger"
+                    >
+                      <div
+                        *ngIf="f.TrainingProgramMaster_duration.errors.required"
+                      >
+                        Duration is required
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="form-group row">
@@ -253,10 +300,21 @@
                   <div class="col-sm-6">
                     <input
                       type="text"
+                      pInputText
                       class="form-control"
                       placeholder="Location"
                       formControlName="TrainingProgramMaster_location"
                     />
+                    <div
+                      *ngIf="submitted && f.TrainingProgramMaster_location.errors"
+                      class="alert alert-danger"
+                    >
+                      <div
+                        *ngIf="f.TrainingProgramMaster_location.errors.required"
+                      >
+                        Location is required
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="form-group row">
@@ -266,34 +324,24 @@
                   <div class="col-sm-6">
                     <input
                       type="text"
+                      pInputText
                       class="form-control"
                       placeholder="Mode Of Training"
                       formControlName="TrainingProgramMaster_modeOfTraining"
                     />
+                    <div
+                      *ngIf="submitted && f.TrainingProgramMaster_modeOfTraining.errors"
+                      class="alert alert-danger"
+                    >
+                      <div
+                        *ngIf="f.TrainingProgramMaster_modeOfTraining.errors.required"
+                      >
+                        Mode of Training is required
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div class="form-group row">
-                  <label class="col-sm-6 col-form-label"
-                    >Evaluation From
-                  </label>
-                  <div class="col-sm-6">
-                    <input
-                      type="date"
-                      class="form-control"
-                      formControlName="TrainingProgramMaster_evalfrom"
-                    />
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <label class="col-sm-6 col-form-label">Evaluation To </label>
-                  <div class="col-sm-6">
-                    <input
-                      type="date"
-                      class="form-control"
-                      formControlName="TrainingProgramMaster_evalto"
-                    />
-                  </div>
-                </div>
+
                 <div class="form-group row justify-content-center">
                   <div class="form-check">
                     <input
@@ -311,17 +359,28 @@
             </div>
           </div>
           <div class="row justify-content-around">
-            <button class="btn btn-outline-primary" (click)="save()">
-              <i class="fas fa-save"></i> Save
+            <button
+              class="btn btn-outline-primary"
+              (click)="save()"
+              [disabled]="saveLoading"
+            >
+              <i
+                [ngClass]="{'fa fa-spin fa-spinner': saveLoading, 'fas fa-save': !saveLoading}"
+              ></i>
+              Save
             </button>
             <button
               class="btn btn-outline-dark"
               (click)="trainingMasterForm.reset()"
+              [disabled]="cancelLoading"
             >
-              <i class="fas fa-save"></i> Reset
+              <i class="fas fa-undo"></i> Reset
             </button>
             <button class="btn btn-outline-danger" (click)="cancel()">
-              <i class="fas fa-save"></i> Cancel
+              <i
+                [ngClass]="{'fa fa-spin fa-spinner': cancelLoading, 'far fa-times-circle': !cancelLoading}"
+              ></i>
+              Cancel
             </button>
           </div>
         </p-dialog>

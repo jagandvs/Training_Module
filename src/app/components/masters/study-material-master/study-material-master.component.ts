@@ -271,7 +271,7 @@ export class StudyMaterialMasterComponent implements OnInit {
               this.displayBasic = false;
               this.saveLoading = false;
               this.getMaterialMaster();
-              this.saveLoading = false;
+              this.submitted = false;
             });
         },
         reject: () => {

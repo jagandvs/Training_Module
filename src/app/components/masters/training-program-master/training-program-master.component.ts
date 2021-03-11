@@ -30,9 +30,13 @@ export class TrainingProgramMasterComponent implements OnInit {
   public submitted: boolean = false;
   public newItem: boolean = false;
   public displayBasic: Boolean = false;
+  public duplicateError: boolean = false;
+  public saveLoading: boolean = false;
+  public cancelLoading: boolean = false;
 
   public process: string;
   public comp_id: string;
+  public editingPKCode: number;
 
   public CATEGORY_MASTER_QUERY: any = {
     TableNames: "category_master",
@@ -104,8 +108,8 @@ export class TrainingProgramMasterComponent implements OnInit {
       TrainingProgramMaster_location: ["", Validators.required],
       TrainingProgramMaster_modeOfTraining: ["", Validators.required],
       TrainingProgramMaster_iscustomerend: [""],
-      TrainingProgramMaster_evalfrom: ["", Validators.required],
-      TrainingProgramMaster_evalto: ["", Validators.required],
+      TrainingProgramMaster_evalfrom: [new Date(), Validators.required],
+      TrainingProgramMaster_evalto: [new Date(), Validators.required],
     });
   }
   get f() {
@@ -179,6 +183,43 @@ export class TrainingProgramMasterComponent implements OnInit {
     }
   }
   save() {
+    this.submitted = true;
+    if (this.f["TrainingProgramMaster_title"].value != "") {
+      if (this.newItem) {
+        var arr = this.trainingMaster.filter((master) => {
+          if (
+            master.TrainingProgramMaster_title.toLowerCase() ==
+            this.f["TrainingProgramMaster_title"].value.toLowerCase()
+          ) {
+            return master;
+          }
+        });
+        if (arr.length > 0) {
+          this.duplicateError = true;
+          return;
+        } else {
+          this.duplicateError = false;
+        }
+      } else {
+        var arr = this.trainingMaster.filter((master) => {
+          if (
+            master.TrainingProgramMaster_title.toLowerCase() ==
+              this.f["TrainingProgramMaster_title"].value.toLowerCase() &&
+            master.TrainingProgramMaster_ID !=
+              this.f["TrainingProgramMaster_ID"].value
+          ) {
+            return master;
+          }
+        });
+        console.log(arr);
+        if (arr.length > 0) {
+          this.duplicateError = true;
+          return;
+        } else {
+          this.duplicateError = false;
+        }
+      }
+    }
     if (this.trainingMasterForm.valid) {
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
       this.confirmationService.confirm({
@@ -186,6 +227,8 @@ export class TrainingProgramMasterComponent implements OnInit {
         header: "Save Confirmation",
         icon: "fas fa-save",
         accept: () => {
+          this.saveLoading = true;
+
           this.service
             .CRUDMasters(
               "UPSERT_TrainingProgramMaster",
@@ -195,10 +238,17 @@ export class TrainingProgramMasterComponent implements OnInit {
             .subscribe((data) => {
               this.displayBasic = false;
               this.getTrainingMaster();
+              this.saveLoading = false;
+              this.submitted = false;
             });
+        },
+        reject: () => {
+          this.saveLoading = false;
         },
       });
     } else {
+      this.saveLoading = false;
+
       this.messageService.add({
         key: "t2",
         severity: "error",
@@ -209,12 +259,14 @@ export class TrainingProgramMasterComponent implements OnInit {
     return;
   }
   cancel() {
+    this.cancelLoading = true;
+
     this.commonService
       .setResetModify(
         "TrainingProgramMaster",
         "es_modify",
         "TrainingProgramMaster_ID",
-        this.f["TrainingProgramMaster_ID"].value,
+        this.editingPKCode,
         0,
         "setLock"
       )
@@ -222,6 +274,8 @@ export class TrainingProgramMasterComponent implements OnInit {
         this.newItem = false;
         this.displayBasic = false;
         this.submitted = false;
+        this.cancelLoading = false;
+
         this.trainingMasterForm.reset();
       });
   }
@@ -274,7 +328,7 @@ export class TrainingProgramMasterComponent implements OnInit {
               key: "t1",
               severity: "warn",
               summary: "Warning",
-              detail: "Sorry!! You dont have access to edit",
+              detail: "Someone Editing the Item/ Item is locked",
             });
           }
         });
@@ -288,6 +342,7 @@ export class TrainingProgramMasterComponent implements OnInit {
     }
   }
   edit(training) {
+    this.editingPKCode = training.TrainingProgramMaster_ID;
     if (this.updateAccess) {
       console.log(training);
       this.commonService
@@ -295,7 +350,7 @@ export class TrainingProgramMasterComponent implements OnInit {
           "TrainingProgramMaster",
           "es_modify",
           "TrainingProgramMaster_ID",
-          training.TrainingProgramMaster_ID,
+          this.editingPKCode,
           0,
           "check"
         )
@@ -307,7 +362,7 @@ export class TrainingProgramMasterComponent implements OnInit {
                 "TrainingProgramMaster",
                 "es_modify",
                 "TrainingProgramMaster_ID",
-                training.TrainingProgramMaster_ID,
+                this.editingPKCode,
                 1,
                 "setLock"
               )
