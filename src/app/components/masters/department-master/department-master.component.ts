@@ -34,6 +34,7 @@ export class DepartmentMasterComponent implements OnInit {
   public editingPKCode: number;
   public process: string;
   public comp_id: string;
+  public totalRecords = 0;
   constructor(
     private commonService: CommonService,
     private fb: FormBuilder,
@@ -88,6 +89,7 @@ export class DepartmentMasterComponent implements OnInit {
         });
 
         this.loading = false;
+        this.totalRecords = this.departmentMaster.length;
       });
   }
   save() {

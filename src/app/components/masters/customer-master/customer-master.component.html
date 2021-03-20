@@ -14,7 +14,7 @@
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title">Customer Master</h4>
-                <div class="table-responsive" *ngIf="menuAccess">
+                <div *ngIf="menuAccess">
                   <p-table
                     #dt
                     [value]="customerMaster"
@@ -23,6 +23,9 @@
                     [loading]="loading"
                     [globalFilterFields]="['customer_name','customer_category', 'customer_titleofprogram', 'customer_expectedskills']"
                     [rowsPerPageOptions]="[10,25,50]"
+                    [showCurrentPageReport]="true"
+                    [totalRecords]="totalRecords"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                   >
                     <ng-template pTemplate="caption">
                       <div class="row justify-content-between">
@@ -177,14 +180,14 @@
                 </div>
                 <div class="form-group row">
                   <label class="col-sm-6 col-form-label"
-                    >Customer Category</label
+                    >Program Category</label
                   >
                   <div class="col-sm-6">
                     <p-dropdown
                       [options]="categoryTypeDropdown"
                       [filter]="true"
                       [showClear]="true"
-                      placeholder="Select Customer Category"
+                      placeholder="Select Program Category"
                       [resetFilterOnHide]="true"
                       formControlName="customer_category"
                     >

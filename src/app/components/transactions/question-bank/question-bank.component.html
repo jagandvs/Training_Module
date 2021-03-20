@@ -14,7 +14,7 @@
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title">Question Bank</h4>
-                <div class="table-responsive" *ngIf="menuAccess">
+                <div *ngIf="menuAccess">
                   <p-table
                     #dt
                     [value]="questionBankTable"
@@ -23,6 +23,9 @@
                     [loading]="loading"
                     [globalFilterFields]="['CategoryToSkillLevel','QuestionBankMaster_questiontype', 'QuestionBankMaster_questionTitle']"
                     [rowsPerPageOptions]="[10,25,50]"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    [totalRecords]="totalRecords"
+                    [showCurrentPageReport]="true"
                   >
                     <ng-template pTemplate="caption">
                       <div class="row justify-content-between">
@@ -136,10 +139,60 @@
             [baseZIndex]="10000"
           ></p-confirmDialog>
           <ng-template pTemplate="content">
-            <div class="container">
+            <div class="container shadow">
               <form focusInvalidInput [formGroup]="questionBankMasterForm">
+                <h2 class="heading font-weight-bold">Master</h2>
+
                 <div class="p-fluid p-formgrid p-grid">
-                  <div class="p-field p-col-12">
+                  <div class="p-field p-col-12 p-md-6">
+                    <label for="categorySkillLevel">Training Program</label>
+                    <p-dropdown
+                      [optionLabel]="label"
+                      [options]="trainingProgramDropdown"
+                      [filter]="true"
+                      [showClear]="true"
+                      placeholder="Select Training Program"
+                      [resetFilterOnHide]="true"
+                      [autofocus]="true"
+                      formControlName="QUESTIONBANKMASTER_TRAININGMASTERID"
+                    >
+                    </p-dropdown>
+                    <div
+                      *ngIf="submitted && f.QUESTIONBANKMASTER_TRAININGMASTERID.errors"
+                      class="alert alert-danger"
+                    >
+                      <div
+                        *ngIf="f.QUESTIONBANKMASTER_TRAININGMASTERID.errors.required"
+                      >
+                        Training Program is required
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-field p-col-12 p-md-6">
+                    <label for="categorySkillLevel">Training Transaction</label>
+                    <p-dropdown
+                      [optionLabel]="label"
+                      [options]="trainingProgramDropdown"
+                      [filter]="true"
+                      [showClear]="true"
+                      placeholder="Select Training Program"
+                      [resetFilterOnHide]="true"
+                      [autofocus]="true"
+                      formControlName="QUESTIONBANKMASTER_TRAININGTRANSACTIONID"
+                    >
+                    </p-dropdown>
+                    <div
+                      *ngIf="submitted && f.QUESTIONBANKMASTER_TRAININGTRANSACTIONID.errors"
+                      class="alert alert-danger"
+                    >
+                      <div
+                        *ngIf="f.QUESTIONBANKMASTER_TRAININGTRANSACTIONID.errors.required"
+                      >
+                        Training Program is required
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-field p-col-12 p-md-6">
                     <label for="categorySkillLevel"
                       >Category to Skill level</label
                     >
@@ -150,10 +203,8 @@
                       [showClear]="true"
                       placeholder="Select Category to skill level"
                       [resetFilterOnHide]="true"
-                      [virtualScroll]="true"
                       [autofocus]="true"
                       formControlName="QUESTIONBANKMASTER_CATEGORYTOSKILLLEVELID"
-                      class="form-control"
                     >
                     </p-dropdown>
                     <div
@@ -164,6 +215,24 @@
                         *ngIf="f.QUESTIONBANKMASTER_CATEGORYTOSKILLLEVELID.errors.required"
                       >
                         Category to Skill level is required
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-field p-col-12 p-md-6">
+                    <label for="answer">Marks</label>
+                    <input
+                      type="number"
+                      inputId="marks"
+                      pInputText
+                      placeholder="Marks"
+                      formControlName="QUESTIONBANKMASTER_MARKS"
+                    />
+                    <div
+                      *ngIf="submitted && g.QUESTIONBANKMASTER_MARKS.errors"
+                      class="alert alert-danger"
+                    >
+                      <div *ngIf="f.QUESTIONBANKMASTER_MARKS.errors.required">
+                        Marks is required
                       </div>
                     </div>
                   </div>
@@ -222,10 +291,12 @@
                 </div>
               </form>
             </div>
-            <div class="container">
+            <div class="container shadow">
               <form focusInvalidInput [formGroup]="questionBankDetailForm">
+                <h2 class="heading font-weight-bold">Detail</h2>
+
                 <div class="p-fluid p-formgrid p-grid">
-                  <div class="p-field p-col-12">
+                  <div class="p-field p-col-12 p-md-6">
                     <label for="answer">Answer</label>
                     <input
                       type="text"
@@ -240,24 +311,6 @@
                     >
                       <div *ngIf="g.QUESTIONBANKDETAIL_ANSWER.errors.required">
                         Answer is required
-                      </div>
-                    </div>
-                  </div>
-                  <div class="p-field p-col-12 p-md-6">
-                    <label for="answer">Marks</label>
-                    <input
-                      type="number"
-                      inputId="marks"
-                      pInputText
-                      placeholder="Marks"
-                      formControlName="QUESTIONBANKDETAIL_MARKS"
-                    />
-                    <div
-                      *ngIf="submitted && g.QUESTIONBANKDETAIL_MARKS.errors"
-                      class="alert alert-danger"
-                    >
-                      <div *ngIf="g.QUESTIONBANKDETAIL_MARKS.errors.required">
-                        Marks is required
                       </div>
                     </div>
                   </div>
@@ -294,9 +347,7 @@
                 <thead>
                   <tr>
                     <th>Answer</th>
-                    <th>
-                      Marks
-                    </th>
+
                     <th>
                       Weightage
                     </th>
@@ -308,7 +359,7 @@
                 <tbody>
                   <tr *ngFor="let detail of questionDetailTable; let i=index ">
                     <td>{{detail.QUESTIONBANKDETAIL_ANSWER}}</td>
-                    <td>{{detail.QUESTIONBANKDETAIL_MARKS}}</td>
+
                     <td>{{detail.QUESTIONBANKDETAIL_WEIGHTAGE}}</td>
                     <td>
                       <button

@@ -1,22 +1,31 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
 import { CommonService } from "src/app/_services/common.service";
 import { MastersService } from "../masters.service";
 import { formatDate } from "@angular/common";
-import { UM_CODE } from "src/app/_helper/variables";
+import {
+  trainingProgramUploadFolder,
+  UM_CODE,
+} from "src/app/_helper/variables";
 import { Training_Program } from "src/app/_helper/SM_CODE";
+import { FileUpload } from "primeng/fileupload";
+
 @Component({
   selector: "app-training-program-master",
   templateUrl: "./training-program-master.component.html",
   styleUrls: ["./training-program-master.component.css"],
 })
 export class TrainingProgramMasterComponent implements OnInit {
+  @ViewChild("fileInput") fileInput: FileUpload;
+
   public trainingMaster: any[] = [];
   public trainingMasterForm: FormGroup;
   public processMasterDropdown: SelectItem[] = [];
   public categoryMasterDropdown: SelectItem[] = [];
   public skillMasterDropdown: SelectItem[] = [];
+
+  public uploadedFiles: File[] = [];
 
   public menuAccess: boolean = true;
   public addAccess: boolean = true;
@@ -37,6 +46,9 @@ export class TrainingProgramMasterComponent implements OnInit {
   public process: string;
   public comp_id: string;
   public editingPKCode: number;
+  public pkcode: any;
+
+  public totalRecords = 0;
 
   public CATEGORY_MASTER_QUERY: any = {
     TableNames: "category_master",
@@ -162,6 +174,7 @@ export class TrainingProgramMasterComponent implements OnInit {
                 process.TrainingProgramMaster_evalto,
             });
           });
+          this.totalRecords = this.trainingMaster.length;
 
           this.loading = false;
         });
@@ -173,6 +186,8 @@ export class TrainingProgramMasterComponent implements OnInit {
       this.displayBasic = true;
       this.newItem = true;
       this.submitted = false;
+      console.log(this.fileInput.files);
+      this.fileInput.files = [];
     } else {
       this.messageService.add({
         key: "t1",
@@ -183,6 +198,11 @@ export class TrainingProgramMasterComponent implements OnInit {
     }
   }
   save() {
+    this.uploadedFiles = [];
+    this.fileInput.files.forEach((file) => {
+      this.uploadedFiles.push(file);
+    });
+
     this.submitted = true;
     if (this.f["TrainingProgramMaster_title"].value != "") {
       if (this.newItem) {
@@ -222,6 +242,7 @@ export class TrainingProgramMasterComponent implements OnInit {
     }
     if (this.trainingMasterForm.valid) {
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
+
       this.confirmationService.confirm({
         message: "Are you sure that you want to save?",
         header: "Save Confirmation",
@@ -236,6 +257,16 @@ export class TrainingProgramMasterComponent implements OnInit {
               this.process
             )
             .subscribe((data) => {
+              this.newItem
+                ? (this.pkcode = data.PK_CODE)
+                : (this.pkcode = this.editingPKCode);
+              for (let file of this.uploadedFiles) {
+                this.commonService
+                  .upload(file, trainingProgramUploadFolder, this.pkcode)
+                  .subscribe((data) => {
+                    console.log(data);
+                  });
+              }
               this.displayBasic = false;
               this.getTrainingMaster();
               this.saveLoading = false;
@@ -248,7 +279,6 @@ export class TrainingProgramMasterComponent implements OnInit {
       });
     } else {
       this.saveLoading = false;
-
       this.messageService.add({
         key: "t2",
         severity: "error",
@@ -342,6 +372,8 @@ export class TrainingProgramMasterComponent implements OnInit {
     }
   }
   edit(training) {
+    this.uploadedFiles = [];
+    this.fileInput.files = [];
     this.editingPKCode = training.TrainingProgramMaster_ID;
     if (this.updateAccess) {
       console.log(training);
@@ -411,6 +443,8 @@ export class TrainingProgramMasterComponent implements OnInit {
                     "en"
                   )
                 );
+                this.getFiles(trainingProgramUploadFolder, this.editingPKCode);
+
                 this.displayBasic = true;
                 this.newItem = false;
                 this.submitted = false;
@@ -432,5 +466,40 @@ export class TrainingProgramMasterComponent implements OnInit {
         detail: "Sorry!! You dont have access to edit",
       });
     }
+  }
+  getFiles(trainingProgramUploadFolder, pkcode) {
+    this.commonService
+      .getListFiles(trainingProgramUploadFolder, pkcode)
+      .subscribe((data) => {
+        console.log(data);
+        this.uploadedFiles = [];
+        this.uploadedFiles = data;
+      });
+  }
+  deleteFile(fileName) {
+    console.log(fileName);
+    this.commonService
+      .deleteFile(fileName, trainingProgramUploadFolder, this.editingPKCode)
+      .subscribe((data) => {
+        this.messageService.add({
+          key: "t2",
+          severity: "success",
+          summary: "Success",
+          detail: "File Deleted",
+        });
+        this.getFiles(trainingProgramUploadFolder, this.editingPKCode);
+      });
+  }
+  downloadFile(fileName) {
+    this.commonService
+      .downloadFile(fileName, trainingProgramUploadFolder, this.editingPKCode)
+      .subscribe((data) => {
+        this.messageService.add({
+          key: "t2",
+          severity: "success",
+          summary: "Success",
+          detail: "File Downloaded",
+        });
+      });
   }
 }

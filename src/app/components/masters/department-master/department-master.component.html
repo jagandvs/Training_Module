@@ -14,7 +14,7 @@
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title">Department Master</h4>
-                <div>
+                <div *ngIf="menuAccess">
                   <p-table
                     #dt
                     [value]="departmentMaster"
@@ -25,6 +25,8 @@
                     [loading]="loading"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                     [globalFilterFields]="['department_name']"
+                    [totalRecords]="totalRecords"
+                    [rowsPerPageOptions]="[10,25,50]"
                   >
                     <ng-template pTemplate="caption">
                       <div class="row justify-content-between">

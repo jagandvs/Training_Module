@@ -54,6 +54,10 @@ export const setResetModify = ApiURL + "common/setResetModify";
 export const deleteRow = ApiURL + "common/deleteRow";
 export const SP_CM_FillCombo = ApiURL + "common/SP_CM_FillCombo";
 export const TableResponse = ApiURL + "common/TableResponse";
+export const uploadFiles = ApiURL + "common/upload";
+export const getListFiles = ApiURL + "common/getListFiles";
+export const deleteFile = ApiURL + "common/deleteFile";
+export const downloadFile = ApiURL + "common/downloadFile";
 
 // Login Routes
 export const getCompanyDetails = ApiURL + "auth/getCompanyDetails";

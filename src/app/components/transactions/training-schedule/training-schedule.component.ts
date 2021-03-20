@@ -1,12 +1,16 @@
 import { formatDate } from "@angular/common";
 import { HttpErrorResponse } from "@angular/common/http";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
 import { Training_Need } from "src/app/_helper/SM_CODE";
-import { UM_CODE } from "src/app/_helper/variables";
+import {
+  trainingScheduleUploadFolder,
+  UM_CODE,
+} from "src/app/_helper/variables";
 import { CommonService } from "src/app/_services/common.service";
 import { TransactionsService } from "../transactions.service";
+import { FileUpload } from "primeng/fileupload";
 
 @Component({
   selector: "app-training-schedule",
@@ -14,8 +18,11 @@ import { TransactionsService } from "../transactions.service";
   styleUrls: ["./training-schedule.component.css"],
 })
 export class TrainingScheduleComponent implements OnInit {
+  @ViewChild("fileInput") fileInput: FileUpload;
+
   public trainingMasterTable: any[] = [];
   public trainingDetailTable: any[] = [];
+  public uploadedFiles: File[] = [];
 
   public trainingMasterForm: FormGroup;
 
@@ -38,6 +45,10 @@ export class TrainingScheduleComponent implements OnInit {
   public trainingProgramMasterDropdown: SelectItem[] = [];
   public process: string;
   public comp_id: number;
+  public pkcode: any;
+
+  public totalRecords = 0;
+
   public TRAINING_PROGRAM_MASTER_QUERY = {
     TableNames: "TrainingProgramMaster",
     fieldNames: "TrainingProgramMaster_ID,TrainingProgramMaster_title",
@@ -108,6 +119,7 @@ export class TrainingScheduleComponent implements OnInit {
         console.log(data);
         this.trainingMasterTable = data;
         this.loading = false;
+        this.totalRecords = this.trainingMasterTable.length;
       });
   }
   getEmployeeList(trainingId) {
@@ -128,6 +140,8 @@ export class TrainingScheduleComponent implements OnInit {
     if (this.addAccess) {
       this.displayBasic = true;
       this.trainingDetailTable = [];
+
+      this.fileInput.files = [];
       this.newItem = true;
     } else {
       this.messageService.add({
@@ -148,6 +162,10 @@ export class TrainingScheduleComponent implements OnInit {
     console.log(this.trainingDetailTable);
   }
   save() {
+    this.uploadedFiles = [];
+    this.fileInput.files.forEach((file) => {
+      this.uploadedFiles.push(file);
+    });
     this.submitted = true;
     if (this.trainingMasterForm.valid) {
       this.submitted = false;
@@ -165,6 +183,16 @@ export class TrainingScheduleComponent implements OnInit {
             )
             .subscribe(
               (data) => {
+                this.newItem
+                  ? (this.pkcode = data.PK_CODE)
+                  : (this.pkcode = this.editingPKCODE);
+                for (let file of this.uploadedFiles) {
+                  this.commonService
+                    .upload(file, trainingScheduleUploadFolder, this.pkcode)
+                    .subscribe((data) => {
+                      console.log(data);
+                    });
+                }
                 this.editInsert = false;
                 this.getTrainingMasterTable();
                 this.displayBasic = false;
@@ -186,6 +214,8 @@ export class TrainingScheduleComponent implements OnInit {
   }
   edit(trainingId) {
     console.log(trainingId);
+    this.uploadedFiles = [];
+    this.fileInput.files = [];
     this.newItem = false;
     this.editingPKCODE = trainingId;
 
@@ -217,6 +247,10 @@ export class TrainingScheduleComponent implements OnInit {
               )
               .subscribe(
                 (data) => {
+                  this.getFiles(
+                    trainingScheduleUploadFolder,
+                    this.editingPKCODE
+                  );
                   this.displayBasic = true;
                   let trainingMasterAndDetail = this.trainingMasterTable.filter(
                     (data) => {
@@ -367,5 +401,40 @@ export class TrainingScheduleComponent implements OnInit {
   resetForm() {
     this.trainingMasterForm.reset();
     this.trainingDetailTable = [];
+  }
+  getFiles(trainingScheduleUploadFolder, pkcode) {
+    this.commonService
+      .getListFiles(trainingScheduleUploadFolder, pkcode)
+      .subscribe((data) => {
+        console.log(data);
+        this.uploadedFiles = [];
+        this.uploadedFiles = data;
+      });
+  }
+  deleteFile(fileName) {
+    console.log(fileName);
+    this.commonService
+      .deleteFile(fileName, trainingScheduleUploadFolder, this.editingPKCODE)
+      .subscribe((data) => {
+        this.messageService.add({
+          key: "t2",
+          severity: "success",
+          summary: "Success",
+          detail: "File Deleted",
+        });
+        this.getFiles(trainingScheduleUploadFolder, this.editingPKCODE);
+      });
+  }
+  downloadFile(fileName) {
+    this.commonService
+      .downloadFile(fileName, trainingScheduleUploadFolder, this.editingPKCODE)
+      .subscribe((data) => {
+        this.messageService.add({
+          key: "t2",
+          severity: "success",
+          summary: "Success",
+          detail: "File Downloaded",
+        });
+      });
   }
 }

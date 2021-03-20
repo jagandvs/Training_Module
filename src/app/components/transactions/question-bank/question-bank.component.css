@@ -10,3 +10,13 @@
 :host ::ng-deep .p-datatable .p-datatable-header input:enabled:hover {
   border-bottom: 1px solid #2196f3;
 }
+:host ::ng-deep .p-dropdown {
+  width: 100%;
+}
+form {
+  padding: 20px;
+  margin: 30px;
+}
+.heading {
+  padding-bottom: 20px;
+}

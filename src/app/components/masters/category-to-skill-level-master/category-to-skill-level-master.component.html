@@ -14,15 +14,18 @@
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title">Category To Skill Level Master</h4>
-                <div class="table-responsive" *ngIf="menuAccess">
+                <div *ngIf="menuAccess">
                   <p-table
                     #dt
                     [value]="categorySkillMaster"
                     [rows]="10"
                     [paginator]="true"
+                    [showCurrentPageReport]="true"
+                    [totalRecords]="totalRecords"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    [rowsPerPageOptions]="[10,25,50]"
                     [loading]="loading"
                     [globalFilterFields]="['CategoryToSkillLevelMaster_title','CategoryToSkillLevelMaster_passingpercentage']"
-                    [rowsPerPageOptions]="[10,25,50]"
                   >
                     <ng-template pTemplate="caption">
                       <div class="row justify-content-between">
@@ -63,7 +66,7 @@
                     <ng-template pTemplate="header">
                       <tr class="text-center">
                         <th pSortableColumn="CategoryToSkillLevelMaster_title">
-                          Title
+                          Skill Level
                           <p-sortIcon field="CategoryToSkillLevelMaster_title">
                           </p-sortIcon>
                         </th>
@@ -169,17 +172,17 @@
                   </div>
                 </div>
                 <div class="form-group row">
-                  <label class="col-sm-6 col-form-label">Title</label>
+                  <label class="col-sm-6 col-form-label"> Skill Level</label>
                   <div class="col-sm-6">
                     <input
                       type="text"
                       pInputText
                       class="form-control"
-                      placeholder="Title"
+                      placeholder=" Skill Level"
                       formControlName="CategoryToSkillLevelMaster_title"
                     />
                     <div class="alert alert-danger" *ngIf="titleError">
-                      Title already exist
+                      Skill Level already exist
                     </div>
                     <div
                       *ngIf="submitted && f.CategoryToSkillLevelMaster_title.errors && !titleError"

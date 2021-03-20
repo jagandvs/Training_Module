@@ -38,6 +38,8 @@ export class StudyMaterialMasterComponent implements OnInit {
   public editPKCode: number;
 
   public MATERIAL_MASTER_QUERY;
+
+  public totalRecords = 0;
   constructor(
     private commonService: CommonService,
     private fb: FormBuilder,
@@ -110,6 +112,7 @@ export class StudyMaterialMasterComponent implements OnInit {
           });
         });
         this.loading = false;
+        this.totalRecords = this.materialMaster.length;
       });
   }
   add() {

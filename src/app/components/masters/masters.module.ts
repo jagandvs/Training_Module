@@ -22,8 +22,7 @@ import { JwtInterceptor } from "src/app/_helper/JwtInterceptor";
 import { InputTextModule } from "primeng/inputtext";
 import { EmployeeMasterComponent } from "./employee-master/employee-master.component";
 import { ButtonModule } from "primeng/button";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-
+import { FileUploadModule } from "primeng/fileupload";
 const routes: Routes = [
   { path: "categoryMaster", component: CategoryMasterComponent },
   {
@@ -61,8 +60,10 @@ const routes: Routes = [
     ButtonModule,
     ToastModule,
     TableModule,
+    ButtonModule,
     InputTextModule,
     ConfirmDialogModule,
+    FileUploadModule,
     RouterModule.forChild(routes),
   ],
   providers: [

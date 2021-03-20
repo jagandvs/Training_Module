@@ -40,6 +40,8 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
   public cancelLoading: boolean = false;
 
   public CATEGORY_MASTER_QUERY: any;
+
+  public totalRecords = 0;
   constructor(
     private commonService: CommonService,
     private fb: FormBuilder,
@@ -126,7 +128,7 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
               category.CategoryToSkillLevelMaster_passingpercentage,
           });
         });
-
+        this.totalRecords = this.categorySkillMaster.length;
         this.loading = false;
       });
   }

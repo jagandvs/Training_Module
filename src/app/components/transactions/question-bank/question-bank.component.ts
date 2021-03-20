@@ -38,12 +38,26 @@ export class QuestionBankComponent implements OnInit {
 
   public process: string;
   public categorySkillDropdown: SelectItem[] = [];
+  public trainingProgramDropdown: SelectItem[] = [];
+
+  public totalRecords = 0;
   public CATEGORY_TO_SKILL_QUERY = {
     TableNames: "CategoryToSkillLevel_Master",
     fieldNames:
       "CategoryToSkillLevelMaster_ID,CategoryToSkillLevelMaster_title",
     condition: "ES_DELETE=0",
   };
+  public TRAINING_PROGRAM_QUERY = {
+    TableNames: "TrainingProgramMaster",
+    fieldNames: "TrainingProgramMaster_ID,TrainingProgramMaster_title",
+    condition: "ES_DELETE=0",
+  };
+  // public TRAINING_SCHEDULE_QUERY = {
+  //   TableNames: "TRAININGPROGRAM_MASTER",
+  //   fieldNames:
+  //     "TRAININGPROGRAM_ID,TrainingProgramMaster_title",
+  //   condition: "ES_DELETE=0",
+  // };
 
   public comp_id: number;
   constructor(
@@ -72,11 +86,20 @@ export class QuestionBankComponent implements OnInit {
       this.commonService
         .FillCombo(this.CATEGORY_TO_SKILL_QUERY)
         .subscribe((data) => {
-          console.log(data);
           for (let item of data) {
             this.categorySkillDropdown.push({
               label: item.CategoryToSkillLevelMaster_title,
               value: item.CategoryToSkillLevelMaster_ID,
+            });
+          }
+        });
+      this.commonService
+        .FillCombo(this.TRAINING_PROGRAM_QUERY)
+        .subscribe((data) => {
+          for (let item of data) {
+            this.trainingProgramDropdown.push({
+              label: item.TrainingProgramMaster_title,
+              value: item.TrainingProgramMaster_ID,
             });
           }
         });
@@ -90,11 +113,13 @@ export class QuestionBankComponent implements OnInit {
         QUESTIONBANKMASTER_CATEGORYTOSKILLLEVELID: ["", Validators.required],
         QUESTIONBANKMASTER_QUESTIONTYPE: ["", Validators.required],
         QUESTIONBANKMASTER_QUESTIONTITLE: ["", Validators.required],
+        QUESTIONBANKMASTER_TRAININGTRANSACTIONID: ["", Validators.required],
+        QUESTIONBANKMASTER_TRAININGMASTERID: ["", Validators.required],
+        QUESTIONBANKMASTER_MARKS: ["", Validators.required],
       });
       this.questionBankDetailForm = this.fb.group({
         QUESTIONBANKDETAIL_QUESTIONBANKMASTER_ID: [""],
         QUESTIONBANKDETAIL_ANSWER: ["", Validators.required],
-        QUESTIONBANKDETAIL_MARKS: ["", Validators.required],
         QUESTIONBANKDETAIL_WEIGHTAGE: ["", Validators.required],
       });
     }
@@ -106,6 +131,7 @@ export class QuestionBankComponent implements OnInit {
     this.service
       .UPSERT_QuestionBank("UPSERT_QuestionBank", "selectAll", 0)
       .subscribe((data) => {
+        console.log(data);
         for (let questionBank of data) {
           let CategoryToSkillLevel = this.getCategorySkillLevel(
             questionBank.QuestionBankMaster_CategoryToSkillLevelid
@@ -117,9 +143,15 @@ export class QuestionBankComponent implements OnInit {
               questionBank.QuestionBankMaster_questiontype,
             QuestionBankMaster_questionTitle:
               questionBank.QuestionBankMaster_questionTitle,
+            QUESTIONBANKMASTER_TRAININGTRANSACTIONID:
+              questionBank.QUESTIONBANKMASTER_TRAININGTRANSACTIONID,
+            QUESTIONBANKMASTER_TRAININGMASTERID:
+              questionBank.QUESTIONBANKMASTER_TRAININGMASTERID,
+            QUESTIONBANKMASTER_MARKS: questionBank.QUESTIONBANKMASTER_MARKS,
           });
         }
         this.loading = false;
+        this.totalRecords = this.questionBankTable.length;
       });
   }
   get f() {
@@ -130,10 +162,8 @@ export class QuestionBankComponent implements OnInit {
     return this.questionBankDetailForm.controls;
   }
   getCategorySkillLevel(code) {
-    console.log(code);
     var label;
     this.categorySkillDropdown.map((data) => {
-      console.log(data);
       if (data.value == code) {
         label = data.label;
       }
@@ -169,7 +199,6 @@ export class QuestionBankComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.commonService
               .setResetModify(
@@ -182,7 +211,6 @@ export class QuestionBankComponent implements OnInit {
               )
               .subscribe(
                 (data) => {
-                  console.log(questionBankId);
                   this.service
                     .UPSERT_QuestionBank(
                       "UPSERT_QuestionBank",
@@ -191,7 +219,6 @@ export class QuestionBankComponent implements OnInit {
                     )
                     .subscribe(
                       (data) => {
-                        console.log(data);
                         let type;
                         data[0].QUESTIONBANKMASTER_QUESTIONTYPE
                           ? (type = "true")
@@ -209,6 +236,17 @@ export class QuestionBankComponent implements OnInit {
                         );
                         this.f["QUESTIONBANKMASTER_QUESTIONTITLE"].setValue(
                           data[0].QUESTIONBANKMASTER_QUESTIONTITLE
+                        );
+                        this.f[
+                          "QUESTIONBANKMASTER_TRAININGTRANSACTIONID"
+                        ].setValue(
+                          data[0].QUESTIONBANKMASTER_TRAININGTRANSACTIONID
+                        );
+                        this.f["QUESTIONBANKMASTER_TRAININGMASTERID"].setValue(
+                          data[0].QUESTIONBANKMASTER_TRAININGMASTERID
+                        );
+                        this.f["QUESTIONBANKMASTER_MARKS"].setValue(
+                          data[0].QUESTIONBANKMASTER_MARKS
                         );
                         this.service
                           .UPSERT_QuestionBank(
@@ -274,25 +312,22 @@ export class QuestionBankComponent implements OnInit {
         this.questionBankDetailForm.value
       );
       this.editInsert = false;
-      this.questionBankDetailForm.reset();
     } else {
       this.questionDetailTable.push(this.questionBankDetailForm.value);
     }
+    this.questionBankDetailForm.reset();
   }
   editQuestionBankDetail(index: number) {
     this.editInsert = true;
     this.editIndex = index;
-    console.log(index);
-    console.log(this.questionDetailTable[index]);
+
     this.g["QUESTIONBANKDETAIL_QUESTIONBANKMASTER_ID"].setValue(
       this.questionDetailTable[index].QUESTIONBANKDETAIL_QUESTIONBANKMASTER_ID
     );
     this.g["QUESTIONBANKDETAIL_ANSWER"].setValue(
       this.questionDetailTable[index].QUESTIONBANKDETAIL_ANSWER
     );
-    this.g["QUESTIONBANKDETAIL_MARKS"].setValue(
-      this.questionDetailTable[index].QUESTIONBANKDETAIL_MARKS
-    );
+
     this.g["QUESTIONBANKDETAIL_WEIGHTAGE"].setValue(
       this.questionDetailTable[index].QUESTIONBANKDETAIL_WEIGHTAGE
     );
@@ -333,6 +368,8 @@ export class QuestionBankComponent implements OnInit {
             );
         },
       });
+    } else {
+      return;
     }
   }
 
@@ -372,7 +409,6 @@ export class QuestionBankComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.confirmationService.confirm({
               message: "Are you sure that you want to delete?",

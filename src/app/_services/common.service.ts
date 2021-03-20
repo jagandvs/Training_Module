@@ -3,13 +3,17 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import {
+  deleteFile,
   deleteRow,
+  downloadFile,
   getCompanyDetails,
+  getListFiles,
   httpLogin,
   httpOptions,
   setResetModify,
   SP_CM_FillCombo,
   TableResponse,
+  uploadFiles,
   userRight,
 } from "../_helper/navigation-urls";
 @Injectable({
@@ -150,5 +154,40 @@ export class CommonService {
 
   FillCombo(DropDownQuery: any): Observable<any[]> {
     return this.http.post<any[]>(SP_CM_FillCombo, DropDownQuery, httpOptions);
+  }
+
+  upload(files: File, name, pk) {
+    const formData: any = new FormData();
+
+    formData.append("file", files);
+
+    return this.http.post(
+      uploadFiles + "?name=" + name + "&pk=" + pk,
+      formData
+    );
+  }
+  getListFiles(name, pk): Observable<File[]> {
+    return this.http.get<File[]>(getListFiles + "?name=" + name + "&pk=" + pk);
+  }
+  deleteFile(fileName, name, pk): Observable<any> {
+    let body = {
+      name: name,
+      pk: pk,
+      fileName: fileName,
+    };
+    return this.http.post<any>(deleteFile, body, httpOptions);
+  }
+  downloadFile(fileName, name, pk) {
+    let body = {
+      name: name,
+      pk: pk,
+      fileName: fileName,
+    };
+    var httpOption = {
+      headers: new HttpHeaders({
+        responseType: "blob",
+      }),
+    };
+    return this.http.post(downloadFile, body, httpOption);
   }
 }

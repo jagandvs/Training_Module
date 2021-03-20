@@ -4,3 +4,6 @@ export const UM_CODE = currentUser?.user.UM_CODE;
 export const CM_CODE = currentUser?.companyDetails.CM_CODE;
 export const CM_NAME = currentUser?.companyDetails.CM_NAME;
 export const CM_ID = currentUser?.companyDetails.CM_ID;
+
+export const trainingProgramUploadFolder = "trainingProgram";
+export const trainingScheduleUploadFolder = "trainingSchedule";

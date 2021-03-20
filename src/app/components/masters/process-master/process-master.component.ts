@@ -37,6 +37,8 @@ export class ProcessMasterComponent implements OnInit {
 
   public process: string;
   public comp_id: string;
+
+  public totalRecords = 0;
   constructor(
     private commonService: CommonService,
     private fb: FormBuilder,
@@ -112,7 +114,7 @@ export class ProcessMasterComponent implements OnInit {
             process_applicable_to: process_applicable_to,
           });
         });
-
+        this.totalRecords = this.processMaster.length;
         this.loading = false;
       });
   }

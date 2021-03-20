@@ -47,6 +47,7 @@ export class EmployeeMasterComponent implements OnInit {
   public categoryDropdown: SelectItem[] = [];
   public employeeDropdown: SelectItem[] = [];
 
+  public totalRecords = 0;
   public DEPARTMENT_MASTER_QUERY = {
     TableNames: "department_master",
     fieldNames: "department_id,department_name",
@@ -198,6 +199,7 @@ export class EmployeeMasterComponent implements OnInit {
           });
         }
         this.loading = false;
+        this.totalRecords = this.employeeMasterTable.length;
       });
   }
   get f() {
@@ -250,6 +252,7 @@ export class EmployeeMasterComponent implements OnInit {
       this.employeeDetailTable = [];
       this.employeeDetails = [];
       this.newItem = true;
+      this.resetForm();
     } else {
       this.messageService.add({
         key: "t1",
@@ -315,6 +318,7 @@ export class EmployeeMasterComponent implements OnInit {
         header: "Save Confirmation",
         icon: "fas fa-save",
         accept: () => {
+          console.log(this.employeeDetails);
           this.service
             .INSERT_UPSERT_EmployeeMaster(
               this.employeeMasterForm.value,
@@ -326,13 +330,14 @@ export class EmployeeMasterComponent implements OnInit {
                 this.editInsert = false;
                 this.getEmployeeMasterTable();
                 this.displayBasic = false;
-                this.cancel();
+
                 this.messageService.add({
                   key: "t1",
                   severity: "success",
                   summary: "Success",
                   detail: this.process.toUpperCase() + " Successfully",
                 });
+                this.cancel();
               },
               (error: HttpErrorResponse) => {
                 console.log(error);
@@ -348,7 +353,6 @@ export class EmployeeMasterComponent implements OnInit {
         "EmployeeMaster",
         "ES_MODIFY",
         "EMP_MASTER_ID",
-
         this.editingPKCODE,
         0,
         "setLock"
@@ -356,12 +360,16 @@ export class EmployeeMasterComponent implements OnInit {
       .subscribe((data) => {
         this.submitted = false;
         this.displayBasic = false;
-        this.resetForm();
       });
   }
   resetForm() {
     this.employeeDetailForm.reset();
-    this.employeeMasterForm.reset();
+    this.f["EMP_MASTER_NUMBER"].setValue("");
+    this.f["EMP_MASTER_NAME"].setValue("");
+    this.f["EMP_MASTER_DEPARTMENT_ID"].setValue("");
+    this.f["EMP_MASTER_REPORTING_TO"].setValue("");
+    this.f["EMP_MASTER_PROCESS_ID"].setValue("");
+    this.f["EMP_MASTER_EMP_TYPE"].setValue("");
     this.employeeDetailTable = [];
     this.employeeDetails = [];
   }

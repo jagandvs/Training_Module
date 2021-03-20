@@ -14,7 +14,7 @@
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title">Process Master</h4>
-                <div class="table-responsive" *ngIf="menuAccess">
+                <div *ngIf="menuAccess">
                   <p-table
                     #dt
                     [value]="processMaster"
@@ -23,6 +23,9 @@
                     [loading]="loading"
                     [globalFilterFields]="['process_name','process_applicable_to']"
                     [rowsPerPageOptions]="[10,25,50]"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    [totalRecords]="totalRecords"
+                    [showCurrentPageReport]="true"
                   >
                     <ng-template pTemplate="caption">
                       <div class="row justify-content-between">

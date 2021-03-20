@@ -2,10 +2,9 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
-import { Category, Training_Need } from "src/app/_helper/SM_CODE";
+import { Category } from "src/app/_helper/SM_CODE";
 import { UM_CODE } from "src/app/_helper/variables";
 import { CommonService } from "src/app/_services/common.service";
-import { AdministratorService } from "../../administrator/administrator.service";
 import { MastersService } from "../masters.service";
 
 @Component({
@@ -14,7 +13,7 @@ import { MastersService } from "../masters.service";
   styleUrls: ["./category-master.component.css"],
 })
 export class CategoryMasterComponent implements OnInit {
-  public categoryMaster: any[];
+  public categoryMaster: any[] = [];
   public categoryMasterForm: FormGroup;
 
   public menuAccess: boolean = true;
@@ -41,16 +40,21 @@ export class CategoryMasterComponent implements OnInit {
   public editPKCode: number;
 
   public duplicateCategoryNameError: boolean = false;
+
+  public totalRecords = 0;
   constructor(
     private commonService: CommonService,
     private fb: FormBuilder,
     private service: MastersService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService
-  ) {}
+  ) {
+    this.getCategoryMaster();
+  }
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.loading = true;
+
     this.commonService
       .checkRight(UM_CODE, Category, "checkRight")
       .subscribe((data) => {
@@ -68,11 +72,11 @@ export class CategoryMasterComponent implements OnInit {
       this.categoryTypeDropdown = [
         {
           label: "Technical",
-          value: "true",
+          value: true,
         },
         {
           label: "Commercial",
-          value: "false",
+          value: false,
         },
       ];
       this.categoryApplicableToDropdown = [
@@ -88,8 +92,12 @@ export class CategoryMasterComponent implements OnInit {
           label: "Management",
           value: 3,
         },
+        {
+          label: "Security",
+          value: 4,
+        },
       ];
-      this.getCategoryMaster();
+
       var companyID = JSON.parse(localStorage.getItem("companyDetails"));
       this.comp_id = companyID.CM_ID;
       this.categoryMasterForm = this.fb.group({
@@ -107,9 +115,9 @@ export class CategoryMasterComponent implements OnInit {
     return this.categoryMasterForm.controls;
   }
 
-  getCategoryMaster() {
+  private getCategoryMaster() {
     this.loading = true;
-    this.categoryMaster = [];
+
     this.commonService
       .getTableResponse("*", "CATEGORY_MASTER", "es_delete=0")
       .subscribe((data) => {
@@ -131,6 +139,8 @@ export class CategoryMasterComponent implements OnInit {
           });
         });
         this.loading = false;
+        console.log(this.categoryMaster);
+        this.totalRecords = this.categoryMaster.length;
       });
   }
   save() {
@@ -217,6 +227,7 @@ export class CategoryMasterComponent implements OnInit {
       });
     }
     return;
+    console.log(this.categoryMasterForm.value);
   }
   reset() {
     this.duplicateCategoryNameError = false;
@@ -255,8 +266,8 @@ export class CategoryMasterComponent implements OnInit {
                 );
                 this.f["category_name"].setValue(category.category_name);
                 category.category_type == "Technical"
-                  ? this.f["category_type"].setValue("true")
-                  : this.f["category_type"].setValue("false");
+                  ? this.f["category_type"].setValue(true)
+                  : this.f["category_type"].setValue(false);
 
                 if (category.cateogry_applicable_to === "Staff") {
                   this.f["cateogry_applicable_to"].setValue(1);
@@ -290,6 +301,7 @@ export class CategoryMasterComponent implements OnInit {
   }
   cancel() {
     this.cancelLoading = true;
+    this.reset();
     this.commonService
       .setResetModify(
         "CATEGORY_MASTER",

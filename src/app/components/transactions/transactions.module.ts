@@ -19,6 +19,7 @@ import { TrainingScheduleComponent } from "./training-schedule/training-schedule
 import { DashboardComponent } from "../dashboard/dashboard.component";
 import { TrainingApprovalComponent } from "./training-approval/training-approval.component";
 import { AttendanceApprovalComponent } from "./attendance-approval/attendance-approval.component";
+import { FileUploadModule } from "primeng/fileupload";
 
 const routes: Routes = [
   { path: "questionBank", component: QuestionBankComponent },
@@ -52,6 +53,7 @@ const routes: Routes = [
     TableModule,
     ConfirmDialogModule,
     InputTextModule,
+    FileUploadModule,
     RouterModule.forChild(routes),
   ],
   providers: [

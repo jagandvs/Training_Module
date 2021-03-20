@@ -14,15 +14,18 @@
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title">Category Master</h4>
-                <div class="table-responsive" *ngIf="menuAccess">
+                <div *ngIf="menuAccess">
                   <p-table
                     #dt
                     [value]="categoryMaster"
                     [rows]="10"
                     [paginator]="true"
+                    [showCurrentPageReport]="true"
+                    [totalRecords]="totalRecords"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    [rowsPerPageOptions]="[10,25,50]"
                     [loading]="loading"
                     [globalFilterFields]="['category_name','category_type', 'cateogry_applicable_to']"
-                    [rowsPerPageOptions]="[10,25,50]"
                   >
                     <ng-template pTemplate="caption">
                       <div class="row d-flex justify-content-between">
@@ -41,7 +44,7 @@
                             <i class="pi pi-search"></i>
                             <input
                               pInputText
-                              type="text"
+                              type="search"
                               (input)="dt.filterGlobal($event.target.value, 'contains')"
                               placeholder="search..."
                             />
@@ -51,7 +54,7 @@
                     </ng-template>
 
                     <ng-template pTemplate="header">
-                      <tr class="text-center">
+                      <tr>
                         <th pSortableColumn="category_name">
                           Category Name
                           <p-sortIcon field="category_name"> </p-sortIcon>
@@ -68,11 +71,7 @@
                         <th>Action</th>
                       </tr>
                     </ng-template>
-                    <ng-template
-                      pTemplate="body"
-                      let-category
-                      let-ri="rowIndex"
-                    >
+                    <ng-template pTemplate="body" let-category>
                       <tr>
                         <td>{{category.category_name}}</td>
                         <td>{{category.category_type}}</td>

@@ -37,6 +37,8 @@ export class CustomerMasterComponent implements OnInit {
   public process: string;
   public comp_id: string;
   public editPKCode: number;
+
+  public totalRecords = 0;
   constructor(
     private commonService: CommonService,
     private fb: FormBuilder,
@@ -108,6 +110,7 @@ export class CustomerMasterComponent implements OnInit {
         });
 
         this.loading = false;
+        this.totalRecords = this.customerMaster.length;
       });
   }
   add() {

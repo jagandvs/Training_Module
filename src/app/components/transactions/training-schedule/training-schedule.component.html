@@ -14,7 +14,7 @@
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title">Training Schedule</h4>
-                <div class="table-responsive" *ngIf="menuAccess">
+                <div *ngIf="menuAccess">
                   <p-table
                     #dt
                     [value]="trainingMasterTable"
@@ -23,6 +23,9 @@
                     [loading]="loading"
                     [globalFilterFields]="['EMP_MASTER_NUMBER','EMP_MASTER_NAME', 'TrainingProgramMaster_title', 'TRAININGPROGRAM_ID_FROM_DATE','TRAININGPROGRAM_ID_TO_DATE','TRAININGPROGRAMDETAIL_APPROVED','TRAININGPROGRAMDETAIL_ATTENDANCE','TRAININGPROGRAMDETAIL_REQUIRED_FOR_TRAINING']"
                     [rowsPerPageOptions]="[10,25,50]"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    [totalRecords]="totalRecords"
+                    [showCurrentPageReport]="true"
                   >
                     <ng-template pTemplate="colgroup">
                       <colgroup>
@@ -261,6 +264,47 @@
                   </div>
                 </div>
               </form>
+              <p-fileUpload
+                #fileInput
+                name="demo[]"
+                multiple="multiple"
+                maxFileSize="1000000"
+                [showUploadButton]="false"
+                [showCancelButton]="false"
+              >
+                <ng-template pTemplate="content">
+                  <table *ngIf="uploadedFiles.length">
+                    <thead>
+                      <tr>
+                        <th>File Name</th>
+                        <th>Download</th>
+                        <th>Delete</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let file of uploadedFiles">
+                        <td>{{file.name}}</td>
+                        <td>
+                          <button
+                            (click)="downloadFile(file.name)"
+                            class="btn btn-primary"
+                          >
+                            <i class="fas fa-download"></i>
+                          </button>
+                        </td>
+                        <td>
+                          <button
+                            (click)="deleteFile(file.name)"
+                            class="btn btn-danger"
+                          >
+                            <i class="fas fa-folder-minus"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </ng-template>
+              </p-fileUpload>
             </div>
             <div class="table table-responsive">
               <p-table

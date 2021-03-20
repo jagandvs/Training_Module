@@ -1,11 +1,15 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { CommonService } from "src/app/_services/common.service";
 import {
+  deleteFile,
+  downloadFile,
+  getListFiles,
   httpOptions,
   INSERT_EMPLOYEE_MASTER,
   MASTERS,
   TRANSACTIONS,
+  uploadFiles,
 } from "src/app/_helper/navigation-urls";
 import { Observable } from "rxjs";
 @Injectable({
@@ -14,7 +18,7 @@ import { Observable } from "rxjs";
 export class MastersService {
   constructor(private http: HttpClient, private commonService: CommonService) {}
 
-  CRUDMasters(route: string, values: any, process: string) {
+  CRUDMasters(route: string, values: any, process: string): Observable<any> {
     let body = [values, { process: process }];
 
     return this.http.post(
