@@ -27,6 +27,13 @@
                     [totalRecords]="totalRecords"
                     [showCurrentPageReport]="true"
                   >
+                    <ng-template pTemplate="colgroup">
+                      <colgroup>
+                        <col style="width: 200px;" />
+                        <col style="width: 200px;" />
+                        <col style="width: 200px;" />
+                      </colgroup>
+                    </ng-template>
                     <ng-template pTemplate="caption">
                       <div class="row justify-content-between">
                         <div class="col-md-3">
@@ -52,7 +59,7 @@
                             <i class="pi pi-search"></i>
                             <input
                               pInputText
-                              type="text"
+                              type="search"
                               (input)="dt.filterGlobal($event.target.value, 'contains')"
                               placeholder="Search..."
                             />
@@ -196,10 +203,7 @@
               ></i>
               Save
             </button>
-            <button
-              class="btn btn-outline-dark"
-              (click)="processMasterForm.reset()"
-            >
+            <button class="btn btn-outline-dark" (click)="reset()">
               <i class="fas fa-undo"></i> Reset
             </button>
             <button

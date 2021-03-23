@@ -120,7 +120,7 @@ export class StudyMaterialMasterComponent implements OnInit {
       this.displayBasic = true;
       this.newItem = true;
       this.submitted = false;
-      this.materialMasterForm.reset();
+      this.reset();
     } else {
       this.messageService.add({
         key: "t1",
@@ -132,23 +132,30 @@ export class StudyMaterialMasterComponent implements OnInit {
   }
   cancel() {
     this.cancelLoading = true;
-
-    this.commonService
-      .setResetModify(
-        "StudyMaterialMaster",
-        "es_modify",
-        "StudyMaterialMaster_id",
-        this.editPKCode,
-        0,
-        "setLock"
-      )
-      .subscribe((data) => {
-        this.newItem = false;
-        this.displayBasic = false;
-        this.submitted = false;
-        this.materialMasterForm.reset();
-        this.cancelLoading = false;
-      });
+    if (this.newItem) {
+      this.newItem = false;
+      this.displayBasic = false;
+      this.submitted = false;
+      this.reset();
+      this.cancelLoading = false;
+    } else {
+      this.commonService
+        .setResetModify(
+          "StudyMaterialMaster",
+          "es_modify",
+          "StudyMaterialMaster_id",
+          this.editPKCode,
+          0,
+          "setLock"
+        )
+        .subscribe((data) => {
+          this.newItem = false;
+          this.displayBasic = false;
+          this.submitted = false;
+          this.reset();
+          this.cancelLoading = false;
+        });
+    }
   }
   delete(code) {
     if (this.deleteAccess) {
@@ -162,7 +169,6 @@ export class StudyMaterialMasterComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.confirmationService.confirm({
               message: "Are you sure that you want to delete?",
@@ -214,6 +220,12 @@ export class StudyMaterialMasterComponent implements OnInit {
   }
   reset() {
     this.materialMasterForm.reset();
+    this.duplicateError = false;
+    this.submitted = false;
+    this.newItem
+      ? this.f["StudyMaterialMaster_id"].setValue("")
+      : this.f["StudyMaterialMaster_id"].setValue(this.editPKCode);
+    this.f["StudyMaterialMaster_CM_COMP_ID"].setValue(this.comp_id);
   }
   save() {
     this.submitted = true;
@@ -244,7 +256,6 @@ export class StudyMaterialMasterComponent implements OnInit {
             return master;
           }
         });
-        console.log(arr);
         if (arr.length > 0) {
           this.duplicateError = true;
           return;
@@ -307,7 +318,6 @@ export class StudyMaterialMasterComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.commonService
               .setResetModify(

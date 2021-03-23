@@ -27,8 +27,16 @@
                     [loading]="loading"
                     [globalFilterFields]="['category_name','category_type', 'cateogry_applicable_to']"
                   >
+                    <ng-template pTemplate="colgroup">
+                      <colgroup>
+                        <col style="width: 200px;" />
+                        <col style="width: 200px;" />
+                        <col style="width: 200px;" />
+                        <col style="width: 200px;" />
+                      </colgroup>
+                    </ng-template>
                     <ng-template pTemplate="caption">
-                      <div class="row d-flex justify-content-between">
+                      <div class="row justify-content-between">
                         <div class="col-md-3">
                           <button
                             class="btn btn-primary"
@@ -113,7 +121,6 @@
           </div>
         </div>
         <p-dialog
-          [contentStyle]="{'overflow':'visible'}"
           header="Category Master"
           [(visible)]="displayBasic"
           [style]="{width: '80vw'}"

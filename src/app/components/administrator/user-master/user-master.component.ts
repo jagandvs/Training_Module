@@ -61,7 +61,6 @@ export class UserMasterComponent implements OnInit {
       .getTableResponse("*", "USER_MASTER", "ES_DELETE=0")
       .subscribe((data) => {
         this.userMaster = data;
-        console.log(data);
       });
   }
 

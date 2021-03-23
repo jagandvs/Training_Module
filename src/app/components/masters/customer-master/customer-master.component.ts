@@ -66,11 +66,11 @@ export class CustomerMasterComponent implements OnInit {
       this.categoryTypeDropdown = [
         {
           label: "Technical",
-          value: "true",
+          value: true,
         },
         {
           label: "Commercial",
-          value: "false",
+          value: false,
         },
       ];
       this.getCustomerMaster();
@@ -140,7 +140,6 @@ export class CustomerMasterComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.confirmationService.confirm({
               message: "Are you sure that you want to delete?",
@@ -203,7 +202,6 @@ export class CustomerMasterComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.commonService
               .setResetModify(
@@ -227,8 +225,8 @@ export class CustomerMasterComponent implements OnInit {
                   customer.customer_expectedskills
                 );
                 customer.customer_category === "Technical"
-                  ? this.f["customer_category"].setValue("true")
-                  : this.f["customer_category"].setValue("false");
+                  ? this.f["customer_category"].setValue(true)
+                  : this.f["customer_category"].setValue(false);
 
                 this.displayBasic = true;
                 this.newItem = false;
@@ -254,34 +252,45 @@ export class CustomerMasterComponent implements OnInit {
   }
   cancel() {
     this.cancelLoading = true;
-
-    this.commonService
-      .setResetModify(
-        "customer_master",
-        "es_modify",
-        "customer_id",
-        this.f["customer_id"].value,
-        0,
-        "setLock"
-      )
-      .subscribe(
-        (data) => {
-          this.newItem = false;
-          this.displayBasic = false;
-          this.submitted = false;
-          this.reset();
-          this.cancelLoading = false;
-        },
-        (error: HttpErrorResponse) => {
-          console.log(error);
-          this.cancelLoading = false;
-        }
-      );
+    if (this.newItem) {
+      this.newItem = false;
+      this.displayBasic = false;
+      this.submitted = false;
+      this.reset();
+      this.cancelLoading = false;
+    } else {
+      this.commonService
+        .setResetModify(
+          "customer_master",
+          "es_modify",
+          "customer_id",
+          this.f["customer_id"].value,
+          0,
+          "setLock"
+        )
+        .subscribe(
+          (data) => {
+            this.newItem = false;
+            this.displayBasic = false;
+            this.submitted = false;
+            this.reset();
+            this.cancelLoading = false;
+          },
+          (error: HttpErrorResponse) => {
+            console.log(error);
+            this.cancelLoading = false;
+          }
+        );
+    }
   }
   reset() {
     this.duplicateCustomerNameError = false;
     this.submitted = false;
     this.customerMasterForm.reset();
+    this.newItem
+      ? this.f["customer_id"].setValue("")
+      : this.f["customer_id"].setValue(this.editPKCode);
+    this.f["customer_id_CM_COMP_ID"].setValue(this.comp_id);
   }
   save() {
     this.submitted = true;
@@ -313,7 +322,7 @@ export class CustomerMasterComponent implements OnInit {
             return master;
           }
         });
-        console.log(arr);
+
         if (arr.length > 0) {
           this.duplicateCustomerNameError = true;
           return;

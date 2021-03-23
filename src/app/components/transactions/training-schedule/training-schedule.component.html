@@ -146,17 +146,17 @@
 
                         <td>
                           <button
-                            class="btn btn-primary mr-4"
+                            class="btn btn-warning mr-4"
                             (click)="edit(training.TRAININGPROGRAM_ID)"
                           >
-                            <i class="mdi mdi-pencil-box"></i> Edit
+                            <i class="mdi mdi-pencil-box"></i>
                           </button>
 
                           <button
                             class="btn btn-danger"
                             (click)="delete(training.TRAININGPROGRAM_ID)"
                           >
-                            <i class="mdi mdi-delete"></i> Delete
+                            <i class="mdi mdi-delete"></i>
                           </button>
                         </td>
                       </tr>
@@ -368,7 +368,7 @@
               <button class="btn btn-outline-primary" (click)="save();">
                 <i class="fas fa-save"></i> Save
               </button>
-              <button class="btn btn-outline-secondary" (click)="resetForm()">
+              <button class="btn btn-outline-secondary" (click)="reset()">
                 <i class="fas fa-undo"></i> Reset
               </button>
               <button class="btn btn-outline-danger" (click)="cancel()">
@@ -378,6 +378,7 @@
           </ng-template>
         </p-dialog>
       </div>
+      <app-footer></app-footer>
     </div>
   </div>
 </div>

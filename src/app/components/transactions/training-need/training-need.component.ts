@@ -80,7 +80,6 @@ export class TrainingNeedComponent implements OnInit {
       this.commonService
         .FillCombo(this.EMPLOYEE_MASTER_QUERY)
         .subscribe((data) => {
-          console.log(data);
           for (let item of data) {
             this.employeeMasterDropdown.push({
               label: item.EMP_MASTER_NAME,
@@ -130,7 +129,6 @@ export class TrainingNeedComponent implements OnInit {
     this.service
       .UPSERT_TrainingNeedsMaster("UPSERT_TrainingNeedsMaster", "SelectAll", 0)
       .subscribe((data) => {
-        console.log(data);
         for (let employee of data) {
           this.trainingMasterTable.push({
             EMP_NAME: employee.EMP_MASTER_NAME,
@@ -144,10 +142,8 @@ export class TrainingNeedComponent implements OnInit {
   }
 
   getEmployeeMaster(code) {
-    console.log(code);
     var label;
     this.employeeMasterDropdown.map((data) => {
-      console.log(data);
       if (data.value == code) {
         label = data.label;
       }
@@ -156,10 +152,8 @@ export class TrainingNeedComponent implements OnInit {
   }
 
   getProgramMaster(code) {
-    console.log(code);
     var label;
     this.trainingProgramMasterDropdown.map((data) => {
-      console.log(data);
       if (data.value == code) {
         label = data.label;
       }
@@ -283,7 +277,6 @@ export class TrainingNeedComponent implements OnInit {
     this.trainingDetails = [];
   }
   edit(trainingId) {
-    console.log(trainingId);
     this.newItem = false;
     this.editingPKCODE = trainingId;
     if (this.updateAccess) {
@@ -297,7 +290,6 @@ export class TrainingNeedComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.commonService
               .setResetModify(
@@ -310,7 +302,6 @@ export class TrainingNeedComponent implements OnInit {
               )
               .subscribe(
                 (data) => {
-                  console.log(trainingId);
                   this.service
                     .UPSERT_TrainingNeedsMaster(
                       "UPSERT_TrainingNeedsMaster",
@@ -343,7 +334,6 @@ export class TrainingNeedComponent implements OnInit {
                           )
                           .subscribe(
                             (data) => {
-                              console.log(data);
                               this.displayBasic = true;
                               this.trainingDetails = data;
                               for (let item of data) {
@@ -406,7 +396,6 @@ export class TrainingNeedComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.confirmationService.confirm({
               message: "Are you sure that you want to delete?",

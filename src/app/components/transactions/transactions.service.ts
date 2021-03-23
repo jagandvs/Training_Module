@@ -1,6 +1,8 @@
 import { HttpClient } from "@angular/common/http";
+import { identifierModuleUrl } from "@angular/compiler";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 import {
   INSERT_QUESTION_BANK,
   httpOptions,
@@ -13,6 +15,8 @@ import {
   UpdateApproval,
   getEmployeeListForAttendance,
   UpdateAttendance,
+  getQuestionBank,
+  UPSERT_Eval,
 } from "src/app/_helper/navigation-urls";
 import { CommonService } from "src/app/_services/common.service";
 
@@ -148,6 +152,69 @@ export class TransactionsService {
         "Training attendance Approval",
         "approval",
         "Training Program Approval",
+        "",
+        ""
+      )
+    );
+  }
+
+  getQuestionBank(TrainingTransaction_id): Observable<any[]> {
+    return this.http
+      .post<any[]>(
+        getQuestionBank,
+        { TrainingTransaction_id: TrainingTransaction_id },
+        this.commonService.logger(
+          "Training program Questions",
+          "get questions",
+          "Training program Questions",
+          "",
+          ""
+        )
+      )
+      .pipe(
+        map((data) => {
+          console.log(data);
+          let allQuestions = [];
+          for (let questions of data) {
+            allQuestions.push({
+              id: questions.id,
+              Question: questions.Question,
+              options: [],
+            });
+          }
+          data.map((options) => {
+            for (let arr of allQuestions) {
+              if (options.id == arr.id) {
+                arr.options.push({
+                  QUESTIONBANKDETAIL_QUESTIONBANKDETAIL_ID:
+                    options.QUESTIONBANKDETAIL_QUESTIONBANKDETAIL_ID,
+                  QuestionBankDetail_Answer: options.QuestionBankDetail_Answer,
+                  QuestionBankDetail_weightage:
+                    options.QuestionBankDetail_weightage,
+                  Marks: options.Marks,
+                });
+              }
+            }
+          });
+          const setArray = new Set();
+          const filteredArr = allQuestions.filter((el) => {
+            const duplicate = setArray.has(el.id);
+            setArray.add(el.id);
+            return !duplicate;
+          });
+          return filteredArr;
+          // return allQuestions;
+        })
+      );
+  }
+  saveEvaluation(QuestionsAnswered) {
+    return this.http.post(
+      UPSERT_Eval,
+      QuestionsAnswered,
+      this.commonService.logger(
+        "Answers",
+        "get questions",
+        "Training program Questions",
         "",
         ""
       )

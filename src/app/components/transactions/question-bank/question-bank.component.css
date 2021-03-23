@@ -20,3 +20,6 @@ form {
 .heading {
   padding-bottom: 20px;
 }
+:host ::ng-deep .p-datatable .p-datatable-wrapper {
+  overflow-x: scroll;
+}

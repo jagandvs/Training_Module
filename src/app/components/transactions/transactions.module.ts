@@ -14,12 +14,15 @@ import { TransactionsService } from "./transactions.service";
 import { ConfirmationService, MessageService } from "primeng/api";
 import { JwtInterceptor } from "src/app/_helper/JwtInterceptor";
 import { InputTextModule } from "primeng/inputtext";
+
 import { TrainingNeedComponent } from "./training-need/training-need.component";
 import { TrainingScheduleComponent } from "./training-schedule/training-schedule.component";
 import { DashboardComponent } from "../dashboard/dashboard.component";
 import { TrainingApprovalComponent } from "./training-approval/training-approval.component";
 import { AttendanceApprovalComponent } from "./attendance-approval/attendance-approval.component";
 import { FileUploadModule } from "primeng/fileupload";
+import { EvaluationComponent } from "./evaluation/evaluation.component";
+import { NgxSpinnerModule } from "ngx-spinner";
 
 const routes: Routes = [
   { path: "questionBank", component: QuestionBankComponent },
@@ -29,6 +32,10 @@ const routes: Routes = [
   {
     path: "trainingAttendanceApproval",
     component: AttendanceApprovalComponent,
+  },
+  {
+    path: "evaluation",
+    component: EvaluationComponent,
   },
   { path: "**", redirectTo: "DashboardComponent" },
 ];
@@ -40,6 +47,7 @@ const routes: Routes = [
     TrainingScheduleComponent,
     TrainingApprovalComponent,
     AttendanceApprovalComponent,
+    EvaluationComponent,
   ],
   imports: [
     CommonModule,
@@ -54,6 +62,7 @@ const routes: Routes = [
     ConfirmDialogModule,
     InputTextModule,
     FileUploadModule,
+    NgxSpinnerModule,
     RouterModule.forChild(routes),
   ],
   providers: [

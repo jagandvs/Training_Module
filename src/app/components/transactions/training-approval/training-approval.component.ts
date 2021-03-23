@@ -63,7 +63,6 @@ export class TrainingApprovalComponent implements OnInit {
     this.service
       .getEmployeeListForApproval(this.EMP_ID, this.COMPANY_ID)
       .subscribe((data) => {
-        console.log(data);
         this.appovalList = data;
       });
   }

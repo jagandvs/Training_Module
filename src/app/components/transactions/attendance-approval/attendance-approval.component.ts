@@ -70,13 +70,11 @@ export class AttendanceApprovalComponent implements OnInit {
   }
 
   onTrainingProgramChange() {
-    console.log(this.selectedTraining);
     if (this.selectedTraining != null) {
       this.appovalList = [];
       this.service
         .getEmployeeListForAttendance(this.selectedTraining)
         .subscribe((data) => {
-          console.log(data);
           this.appovalList = data;
         });
     } else {

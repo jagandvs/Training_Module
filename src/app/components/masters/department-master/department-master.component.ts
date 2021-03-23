@@ -80,7 +80,6 @@ export class DepartmentMasterComponent implements OnInit {
       .getTableResponse("*", "department_master", "es_delete=0")
       .subscribe((data) => {
         data.map((department) => {
-          console.log(this.departmentMaster.length);
           this.departmentMaster.push({
             department_id: department.department_id,
             department_CM_COMP_ID: department.department_CM_COMP_ID,
@@ -122,7 +121,7 @@ export class DepartmentMasterComponent implements OnInit {
             return master;
           }
         });
-        console.log(arr);
+
         if (arr.length > 0) {
           this.duplicatedepartmentNameError = true;
           return;
@@ -175,7 +174,7 @@ export class DepartmentMasterComponent implements OnInit {
       this.displayBasic = true;
       this.newItem = true;
       this.submitted = false;
-      this.departmentMasterForm.reset();
+      this.reset();
     } else {
       this.messageService.add({
         key: "t1",
@@ -197,7 +196,6 @@ export class DepartmentMasterComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.confirmationService.confirm({
               message: "Are you sure that you want to delete?",
@@ -260,7 +258,6 @@ export class DepartmentMasterComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.commonService
               .setResetModify(
@@ -302,26 +299,38 @@ export class DepartmentMasterComponent implements OnInit {
   }
   cancel() {
     this.cancelLoading = true;
-    this.commonService
-      .setResetModify(
-        "department_master",
-        "es_modify",
-        "department_id",
-        this.editingPKCode,
-        0,
-        "setLock"
-      )
-      .subscribe((data) => {
-        this.newItem = false;
-        this.displayBasic = false;
-        this.submitted = false;
-        this.reset();
-        this.cancelLoading = false;
-      });
+    if (this.newItem) {
+      this.newItem = false;
+      this.displayBasic = false;
+      this.submitted = false;
+      this.reset();
+      this.cancelLoading = false;
+    } else {
+      this.commonService
+        .setResetModify(
+          "department_master",
+          "es_modify",
+          "department_id",
+          this.editingPKCode,
+          0,
+          "setLock"
+        )
+        .subscribe((data) => {
+          this.newItem = false;
+          this.displayBasic = false;
+          this.submitted = false;
+          this.reset();
+          this.cancelLoading = false;
+        });
+    }
   }
   reset() {
     this.departmentMasterForm.reset();
     this.duplicatedepartmentNameError = false;
     this.submitted = false;
+    this.newItem
+      ? this.f["department_id"].setValue("")
+      : this.f["department_id"].setValue(this.editingPKCode);
+    this.f["department_CM_COMP_ID"].setValue(this.comp_id);
   }
 }

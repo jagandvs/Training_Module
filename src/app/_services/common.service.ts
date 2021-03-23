@@ -133,7 +133,6 @@ export class CommonService {
       )
       .pipe(
         map((userRightsData) => {
-          console.log(userRightsData);
           var access = userRightsData[0].UR_RIGHTS.split("");
           return [
             {

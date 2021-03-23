@@ -1,0 +1,123 @@
+<div class="container-scroller">
+  <app-header></app-header>
+  <div class="container-fluid page-body-wrapper">
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <ngx-spinner
+          bdColor="rgba(0, 0, 0, 0.8)"
+          size="medium"
+          color="#fff"
+          type="ball-clip-rotate-pulse"
+          [fullScreen]="true"
+          ><p style="color: white;">Submitting...</p></ngx-spinner
+        >
+        <p-toast position="bottom-center" key="t1"></p-toast>
+        <p-confirmDialog
+          [style]="{width: '30vw'}"
+          [baseZIndex]="10000"
+          key="c1"
+        ></p-confirmDialog>
+        <p-dialog
+          header="Result"
+          [(visible)]="displayResponsive"
+          [breakpoints]="{'960px': '75vw'}"
+          [style]="{width: '50vw'}"
+          [baseZIndex]="10000"
+          [draggable]="false"
+          [resizable]="false"
+        >
+          <h2 class="text-center">Thank You for attending the test</h2>
+          <h4 class="text-center pt-20">You scored {{scoredMarks}}</h4>
+          <ng-template pTemplate="footer">
+            <p-button
+              (click)="displayResponsive=false"
+              label="Ok"
+              styleClass="p-button-text"
+            ></p-button>
+          </ng-template>
+        </p-dialog>
+        <div class="row mt-4 mb-4">
+          <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card" *ngIf="!trainingSelected">
+              <div class="card-body">
+                <h4 class="card-title">Evaluation</h4>
+                <div *ngIf="menuAccess">
+                  <div class="row justify-content-center">
+                    <div class="col-12 col-md-3">
+                      <label>Choose Your Training Program</label>
+                    </div>
+                    <div class="col-12 col-md-3">
+                      <p-dropdown
+                        [options]="trainingProgramDropdown"
+                        [(ngModel)]="selectedTraining"
+                        [filter]="true"
+                        [showClear]="true"
+                        placeholder="Select Your Training Program"
+                        [resetFilterOnHide]="true"
+                        appendTo="body"
+                      >
+                      </p-dropdown>
+                    </div>
+                    <div class="col-12 col-md-3">
+                      <button
+                        class="btn btn-primary"
+                        (click)="onTrainingProgramChange()"
+                      >
+                        Attend Exam
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="container align-item-center" *ngIf="!menuAccess">
+                  <h1 class="text-center" style="padding: 80px 20px;">
+                    OOPS!!! You don't have access to this Page...
+                  </h1>
+                  <p class="text-center">Please Contact Administrator</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-4" *ngIf="trainingSelected">
+          <div class="col-12" *ngFor="let question of QuestionList; index as i">
+            <div class="card mt-4">
+              <div class="card-body">
+                <h4 class="card-title">{{i+1}}. {{question.Question}}</h4>
+
+                <div *ngFor="let option of question.options" class="form-group">
+                  <div class="form-check">
+                    <label class="form-check-label">
+                      <input
+                        type="radio"
+                        class="form-check-input"
+                        name="{{question.id}}"
+                        id="{{option.QuestionBankDetail_Answer}}"
+                        value="{{option.QUESTIONBANKDETAIL_QUESTIONBANKDETAIL_ID}}"
+                        (change)="answered(question,option,i)"
+                      />
+                      {{option.QuestionBankDetail_Answer}}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="card mt-4">
+              <div class="card-body">
+                <div class="row d-flex justify-content-center">
+                  <div class="col-3">
+                    <button class="btn btn-success text-white" (click)="save()">
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <app-footer></app-footer>
+    </div>
+  </div>
+</div>

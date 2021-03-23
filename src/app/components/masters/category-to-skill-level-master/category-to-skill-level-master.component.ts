@@ -100,7 +100,6 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
   }
 
   checkPassingPercentage(value) {
-    console.log(value);
     if (value > 100 || value < 0) {
       this.percentageError = true;
     } else {
@@ -177,7 +176,7 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
             return master;
           }
         });
-        console.log(arr);
+
         if (arr.length > 0) {
           this.titleError = true;
           return;
@@ -236,6 +235,10 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
     this.percentageError = false;
     this.submitted = false;
     this.categorySkillMasterForm.reset();
+    this.newItem
+      ? this.f["CategoryToSkillLevelMaster_ID"].setValue("")
+      : this.f["CategoryToSkillLevelMaster_ID"].setValue(this.editPKCode);
+    this.f["CategoryToSkillLevelMaster_CM_COMP_ID"].setValue(this.comp_id);
   }
   edit(category) {
     this.editPKCode = category.CategoryToSkillLevelMaster_ID;
@@ -250,7 +253,6 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.commonService
               .setResetModify(
@@ -315,7 +317,6 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.confirmationService.confirm({
               message: "Are you sure that you want to delete?",
@@ -368,27 +369,35 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
   cancel() {
     this.cancelLoading = true;
 
-    this.commonService
-      .setResetModify(
-        "CategoryToSkillLevel_Master",
-        "es_modify",
-        "CategoryToSkillLevelMaster_ID",
-        this.editPKCode,
-        0,
-        "setLock"
-      )
-      .subscribe(
-        (data) => {
-          this.newItem = false;
-          this.displayBasic = false;
-          this.submitted = false;
-          this.reset();
-          this.cancelLoading = false;
-        },
-        (error: HttpErrorResponse) => {
-          console.log(error);
-          this.cancelLoading = false;
-        }
-      );
+    if (this.newItem) {
+      this.newItem = false;
+      this.displayBasic = false;
+      this.submitted = false;
+      this.reset();
+      this.cancelLoading = false;
+    } else {
+      this.commonService
+        .setResetModify(
+          "CategoryToSkillLevel_Master",
+          "es_modify",
+          "CategoryToSkillLevelMaster_ID",
+          this.editPKCode,
+          0,
+          "setLock"
+        )
+        .subscribe(
+          (data) => {
+            this.newItem = false;
+            this.displayBasic = false;
+            this.submitted = false;
+            this.reset();
+            this.cancelLoading = false;
+          },
+          (error: HttpErrorResponse) => {
+            console.log(error);
+            this.cancelLoading = false;
+          }
+        );
+    }
   }
 }

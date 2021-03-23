@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
+import { fakeAsync } from "@angular/core/testing";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
 import { Question_Bank } from "src/app/_helper/SM_CODE";
@@ -39,6 +40,7 @@ export class QuestionBankComponent implements OnInit {
   public process: string;
   public categorySkillDropdown: SelectItem[] = [];
   public trainingProgramDropdown: SelectItem[] = [];
+  public trainingScheduleDropdown: SelectItem[] = [];
 
   public totalRecords = 0;
   public CATEGORY_TO_SKILL_QUERY = {
@@ -52,12 +54,13 @@ export class QuestionBankComponent implements OnInit {
     fieldNames: "TrainingProgramMaster_ID,TrainingProgramMaster_title",
     condition: "ES_DELETE=0",
   };
-  // public TRAINING_SCHEDULE_QUERY = {
-  //   TableNames: "TRAININGPROGRAM_MASTER",
-  //   fieldNames:
-  //     "TRAININGPROGRAM_ID,TrainingProgramMaster_title",
-  //   condition: "ES_DELETE=0",
-  // };
+  public TRAINING_SCHEDULE_QUERY = {
+    TableNames: "TRAININGPROGRAM_MASTER,TrainingProgramMaster",
+    fieldNames:
+      "TRAININGPROGRAM_TRAINING_PROGRAM_ID, TrainingProgramMaster_title",
+    condition:
+      "TRAININGPROGRAM_TRAINING_PROGRAM_ID=TrainingProgramMaster_ID AND TRAININGPROGRAM_MASTER.ES_DELETE=0",
+  };
 
   public comp_id: number;
   constructor(
@@ -103,6 +106,17 @@ export class QuestionBankComponent implements OnInit {
             });
           }
         });
+      this.commonService
+        .FillCombo(this.TRAINING_SCHEDULE_QUERY)
+        .subscribe((data) => {
+          console.log(data);
+          for (let item of data) {
+            this.trainingScheduleDropdown.push({
+              label: item.TrainingProgramMaster_title,
+              value: item.TRAININGPROGRAM_TRAINING_PROGRAM_ID,
+            });
+          }
+        });
       var companyID = JSON.parse(localStorage.getItem("companyDetails"));
       this.comp_id = companyID.CM_ID;
 
@@ -131,7 +145,6 @@ export class QuestionBankComponent implements OnInit {
     this.service
       .UPSERT_QuestionBank("UPSERT_QuestionBank", "selectAll", 0)
       .subscribe((data) => {
-        console.log(data);
         for (let questionBank of data) {
           let CategoryToSkillLevel = this.getCategorySkillLevel(
             questionBank.QuestionBankMaster_CategoryToSkillLevelid
@@ -377,23 +390,33 @@ export class QuestionBankComponent implements OnInit {
     this.questionDetailTable.splice(index, 1);
   }
   cancel() {
-    this.commonService
-      .setResetModify(
-        "QuestionBank_Master",
-        "ES_MODIFY",
-        "QUESTIONBANKMASTER_ID",
-        this.editingPKCODE,
-        0,
-        "setLock"
-      )
-      .subscribe((data) => {
-        this.submitted = false;
-        this.displayBasic = false;
-        this.resetForm();
-      });
+    if (this.newItem) {
+      this.submitted = false;
+      this.displayBasic = false;
+      this.reset();
+    } else {
+      this.commonService
+        .setResetModify(
+          "QuestionBank_Master",
+          "ES_MODIFY",
+          "QUESTIONBANKMASTER_ID",
+          this.editingPKCODE,
+          0,
+          "setLock"
+        )
+        .subscribe((data) => {
+          this.submitted = false;
+          this.displayBasic = false;
+          this.reset();
+        });
+    }
   }
-  resetForm() {
+  reset() {
     this.questionBankMasterForm.reset();
+    this.newItem
+      ? this.f["TrainingProgramMaster_ID"].setValue("")
+      : this.f["TrainingProgramMaster_ID"].setValue(this.editingPKCODE);
+    this.f["QUESTIONBANKMASTER_CM_COMP_ID"].setValue(this.comp_id);
     this.questionBankDetailForm.reset();
     this.questionDetailTable = [];
   }

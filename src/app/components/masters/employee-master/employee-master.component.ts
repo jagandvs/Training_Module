@@ -134,11 +134,11 @@ export class EmployeeMasterComponent implements OnInit {
       this.employeeType = [
         {
           label: "Staff",
-          value: "1",
+          value: true,
         },
         {
           label: "Workers",
-          value: "0",
+          value: false,
         },
       ];
       this.commonService
@@ -180,7 +180,6 @@ export class EmployeeMasterComponent implements OnInit {
         EMP_MASTER_SKILLS_PRESENT_SKILLS_LEVEL: ["", Validators.required],
         EMP_MASTER_SKILLS_NEXT_SKILLS_LEVEL: ["", Validators.required],
       });
-      console.log(this.employeeMasterForm.value);
     }
   }
   getEmployeeMasterTable() {
@@ -189,7 +188,6 @@ export class EmployeeMasterComponent implements OnInit {
     this.service
       .UPSERT_EmployeeMaster("UPSERT_EmployeeMaster", "selectAll", 0)
       .subscribe((data) => {
-        console.log(data);
         for (let employee of data) {
           this.employeeMasterTable.push({
             EMP_MASTER_NUMBER: employee.EMP_MASTER_NUMBER,
@@ -211,10 +209,8 @@ export class EmployeeMasterComponent implements OnInit {
   }
 
   getDepartmentMaster(code) {
-    console.log(code);
     var label;
     this.departmentDropdown.map((data) => {
-      console.log(data);
       if (data.value == code) {
         label = data.label;
       }
@@ -223,10 +219,8 @@ export class EmployeeMasterComponent implements OnInit {
   }
 
   getCategory(code) {
-    console.log(code);
     var label;
     this.categoryDropdown.map((data) => {
-      console.log(data);
       if (data.value == code) {
         label = data.label;
       }
@@ -235,10 +229,8 @@ export class EmployeeMasterComponent implements OnInit {
   }
 
   getSkill(code) {
-    console.log(code);
     var label;
     this.categoryToSkillDropdown.map((data) => {
-      console.log(data);
       if (data.value == code) {
         label = data.label;
       }
@@ -252,7 +244,7 @@ export class EmployeeMasterComponent implements OnInit {
       this.employeeDetailTable = [];
       this.employeeDetails = [];
       this.newItem = true;
-      this.resetForm();
+      this.reset();
     } else {
       this.messageService.add({
         key: "t1",
@@ -318,7 +310,6 @@ export class EmployeeMasterComponent implements OnInit {
         header: "Save Confirmation",
         icon: "fas fa-save",
         accept: () => {
-          console.log(this.employeeDetails);
           this.service
             .INSERT_UPSERT_EmployeeMaster(
               this.employeeMasterForm.value,
@@ -348,33 +339,39 @@ export class EmployeeMasterComponent implements OnInit {
     }
   }
   cancel() {
-    this.commonService
-      .setResetModify(
-        "EmployeeMaster",
-        "ES_MODIFY",
-        "EMP_MASTER_ID",
-        this.editingPKCODE,
-        0,
-        "setLock"
-      )
-      .subscribe((data) => {
-        this.submitted = false;
-        this.displayBasic = false;
-      });
+    if (this.newItem) {
+      this.submitted = false;
+      this.displayBasic = false;
+      this.reset();
+    } else {
+      this.commonService
+        .setResetModify(
+          "EmployeeMaster",
+          "ES_MODIFY",
+          "EMP_MASTER_ID",
+          this.editingPKCODE,
+          0,
+          "setLock"
+        )
+        .subscribe((data) => {
+          this.submitted = false;
+          this.displayBasic = false;
+          this.reset();
+        });
+    }
   }
-  resetForm() {
+  reset() {
     this.employeeDetailForm.reset();
-    this.f["EMP_MASTER_NUMBER"].setValue("");
-    this.f["EMP_MASTER_NAME"].setValue("");
-    this.f["EMP_MASTER_DEPARTMENT_ID"].setValue("");
-    this.f["EMP_MASTER_REPORTING_TO"].setValue("");
-    this.f["EMP_MASTER_PROCESS_ID"].setValue("");
-    this.f["EMP_MASTER_EMP_TYPE"].setValue("");
+    this.employeeMasterForm.reset();
+    this.newItem
+      ? this.f["EMP_MASTER_ID"].setValue(0)
+      : this.f["EMP_MASTER_ID"].setValue(this.editingPKCODE);
+
+    this.f["EMP_MASTER_CM_COMP_ID"].setValue(this.comp_id);
     this.employeeDetailTable = [];
     this.employeeDetails = [];
   }
   edit(employeeId) {
-    console.log(employeeId);
     this.newItem = false;
     this.editingPKCODE = employeeId;
     if (this.updateAccess) {
@@ -388,7 +385,6 @@ export class EmployeeMasterComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.commonService
               .setResetModify(
@@ -401,7 +397,6 @@ export class EmployeeMasterComponent implements OnInit {
               )
               .subscribe(
                 (data) => {
-                  console.log(employeeId);
                   this.service
                     .UPSERT_EmployeeMaster(
                       "UPSERT_EmployeeMaster",
@@ -446,7 +441,6 @@ export class EmployeeMasterComponent implements OnInit {
                               this.displayBasic = true;
                               this.employeeDetails = data;
                               for (let item of data) {
-                                console.log(data);
                                 this.employeeDetailTable.push({
                                   CATEGORY: this.getCategory(
                                     item.EMP_MASTER_SKILLS_CATEGORY_ID
@@ -509,7 +503,6 @@ export class EmployeeMasterComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.confirmationService.confirm({
               message: "Are you sure that you want to delete?",

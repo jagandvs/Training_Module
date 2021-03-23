@@ -144,7 +144,6 @@ export class ProcessMasterComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.confirmationService.confirm({
               message: "Are you sure that you want to delete?",
@@ -196,29 +195,36 @@ export class ProcessMasterComponent implements OnInit {
   }
   cancel() {
     this.cancelLoading = true;
-
-    this.commonService
-      .setResetModify(
-        "process_master",
-        "es_modify",
-        "process_id",
-        this.editingPKCode,
-        0,
-        "setLock"
-      )
-      .subscribe(
-        (data) => {
-          this.newItem = false;
-          this.displayBasic = false;
-          this.submitted = false;
-          this.processMasterForm.reset();
-          this.cancelLoading = false;
-        },
-        (error: HttpErrorResponse) => {
-          console.log(error);
-          this.cancelLoading = false;
-        }
-      );
+    if (this.newItem) {
+      this.newItem = false;
+      this.displayBasic = false;
+      this.submitted = false;
+      this.reset();
+      this.cancelLoading = false;
+    } else {
+      this.commonService
+        .setResetModify(
+          "process_master",
+          "es_modify",
+          "process_id",
+          this.editingPKCode,
+          0,
+          "setLock"
+        )
+        .subscribe(
+          (data) => {
+            this.newItem = false;
+            this.displayBasic = false;
+            this.submitted = false;
+            this.reset();
+            this.cancelLoading = false;
+          },
+          (error: HttpErrorResponse) => {
+            console.log(error);
+            this.cancelLoading = false;
+          }
+        );
+    }
   }
   save() {
     this.submitted = true;
@@ -250,7 +256,6 @@ export class ProcessMasterComponent implements OnInit {
             return master;
           }
         });
-        console.log(arr);
         if (arr.length > 0) {
           this.duplicateProcessNameError = true;
           return;
@@ -280,7 +285,7 @@ export class ProcessMasterComponent implements OnInit {
               (data) => {
                 this.displayBasic = false;
                 this.saveLoading = false;
-                this.processMasterForm.reset();
+                this.reset();
                 this.getProcessMaster();
               },
               (error: HttpErrorResponse) => {
@@ -301,6 +306,15 @@ export class ProcessMasterComponent implements OnInit {
     }
     return;
   }
+  reset() {
+    this.processMasterForm.reset();
+    this.duplicateProcessNameError = false;
+    this.submitted = false;
+    this.newItem
+      ? this.f["process_id"].setValue("")
+      : this.f["process_id"].setValue(this.editingPKCode);
+    this.f["process_CM_COMP_ID"].setValue(this.comp_id);
+  }
   edit(process) {
     this.editingPKCode = process.process_id;
     if (this.updateAccess) {
@@ -314,7 +328,6 @@ export class ProcessMasterComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.commonService
               .setResetModify(

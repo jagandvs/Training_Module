@@ -38,7 +38,7 @@ export class MastersService {
       process: process,
       EMP_MASTER_ID: EMP_MASTER_ID,
     };
-    return this.http.post<any[]>(TRANSACTIONS + url, body, httpOptions);
+    return this.http.post<any[]>(MASTERS + url, body, httpOptions);
   }
 
   INSERT_UPSERT_EmployeeMaster(masterForm, detailForm, process) {

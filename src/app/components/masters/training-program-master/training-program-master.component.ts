@@ -120,8 +120,8 @@ export class TrainingProgramMasterComponent implements OnInit {
       TrainingProgramMaster_location: ["", Validators.required],
       TrainingProgramMaster_modeOfTraining: ["", Validators.required],
       TrainingProgramMaster_iscustomerend: [""],
-      TrainingProgramMaster_evalfrom: [new Date(), Validators.required],
-      TrainingProgramMaster_evalto: [new Date(), Validators.required],
+      TrainingProgramMaster_evalfrom: [new Date()],
+      TrainingProgramMaster_evalto: [new Date()],
     });
   }
   get f() {
@@ -186,7 +186,6 @@ export class TrainingProgramMasterComponent implements OnInit {
       this.displayBasic = true;
       this.newItem = true;
       this.submitted = false;
-      console.log(this.fileInput.files);
       this.fileInput.files = [];
     } else {
       this.messageService.add({
@@ -231,7 +230,6 @@ export class TrainingProgramMasterComponent implements OnInit {
             return master;
           }
         });
-        console.log(arr);
         if (arr.length > 0) {
           this.duplicateError = true;
           return;
@@ -264,13 +262,13 @@ export class TrainingProgramMasterComponent implements OnInit {
                 this.commonService
                   .upload(file, trainingProgramUploadFolder, this.pkcode)
                   .subscribe((data) => {
-                    console.log(data);
+                    this.displayBasic = false;
+                    this.getTrainingMaster();
+                    this.saveLoading = false;
+                    this.submitted = false;
+                    this.reset();
                   });
               }
-              this.displayBasic = false;
-              this.getTrainingMaster();
-              this.saveLoading = false;
-              this.submitted = false;
             });
         },
         reject: () => {
@@ -290,24 +288,39 @@ export class TrainingProgramMasterComponent implements OnInit {
   }
   cancel() {
     this.cancelLoading = true;
-
-    this.commonService
-      .setResetModify(
-        "TrainingProgramMaster",
-        "es_modify",
-        "TrainingProgramMaster_ID",
-        this.editingPKCode,
-        0,
-        "setLock"
-      )
-      .subscribe((data) => {
-        this.newItem = false;
-        this.displayBasic = false;
-        this.submitted = false;
-        this.cancelLoading = false;
-
-        this.trainingMasterForm.reset();
-      });
+    if (this.newItem) {
+      this.newItem = false;
+      this.displayBasic = false;
+      this.submitted = false;
+      this.cancelLoading = false;
+      this.reset();
+    } else {
+      this.commonService
+        .setResetModify(
+          "TrainingProgramMaster",
+          "es_modify",
+          "TrainingProgramMaster_ID",
+          this.editingPKCode,
+          0,
+          "setLock"
+        )
+        .subscribe((data) => {
+          this.newItem = false;
+          this.displayBasic = false;
+          this.submitted = false;
+          this.cancelLoading = false;
+          this.reset();
+        });
+    }
+  }
+  reset() {
+    this.trainingMasterForm.reset();
+    this.duplicateError = false;
+    this.submitted = false;
+    this.newItem
+      ? this.f["TrainingProgramMaster_ID"].setValue("")
+      : this.f["TrainingProgramMaster_ID"].setValue(this.editingPKCode);
+    this.f["TrainingProgramMaster_CM_COMP_ID"].setValue(this.comp_id);
   }
   delete(code) {
     if (this.deleteAccess) {
@@ -321,7 +334,6 @@ export class TrainingProgramMasterComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.confirmationService.confirm({
               message: "Are you sure that you want to delete?",
@@ -376,7 +388,6 @@ export class TrainingProgramMasterComponent implements OnInit {
     this.fileInput.files = [];
     this.editingPKCode = training.TrainingProgramMaster_ID;
     if (this.updateAccess) {
-      console.log(training);
       this.commonService
         .setResetModify(
           "TrainingProgramMaster",
@@ -387,7 +398,6 @@ export class TrainingProgramMasterComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.commonService
               .setResetModify(
@@ -471,13 +481,11 @@ export class TrainingProgramMasterComponent implements OnInit {
     this.commonService
       .getListFiles(trainingProgramUploadFolder, pkcode)
       .subscribe((data) => {
-        console.log(data);
         this.uploadedFiles = [];
         this.uploadedFiles = data;
       });
   }
   deleteFile(fileName) {
-    console.log(fileName);
     this.commonService
       .deleteFile(fileName, trainingProgramUploadFolder, this.editingPKCode)
       .subscribe((data) => {

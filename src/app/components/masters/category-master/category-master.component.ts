@@ -139,7 +139,7 @@ export class CategoryMasterComponent implements OnInit {
           });
         });
         this.loading = false;
-        console.log(this.categoryMaster);
+
         this.totalRecords = this.categoryMaster.length;
       });
   }
@@ -164,7 +164,6 @@ export class CategoryMasterComponent implements OnInit {
           this.duplicateCategoryNameError = false;
         }
       } else {
-        console.log(this.f["category_id"].value);
         var arr = this.categoryMaster.filter((master) => {
           if (
             master.category_name.toLowerCase() ==
@@ -174,7 +173,7 @@ export class CategoryMasterComponent implements OnInit {
             return master;
           }
         });
-        console.log(arr);
+
         if (arr.length > 0) {
           this.duplicateCategoryNameError = true;
           return;
@@ -227,17 +226,19 @@ export class CategoryMasterComponent implements OnInit {
       });
     }
     return;
-    console.log(this.categoryMasterForm.value);
   }
   reset() {
     this.duplicateCategoryNameError = false;
     this.submitted = false;
     this.categoryMasterForm.reset();
+    this.newItem
+      ? this.f["category_id"].setValue("")
+      : this.f["category_id"].setValue(this.editPKCode);
+    this.f["category_id_CM_COMP_ID"].setValue(this.comp_id);
   }
   edit(category) {
     this.editPKCode = category.category_id;
     if (this.updateAccess) {
-      console.log(category);
       this.commonService
         .setResetModify(
           "CATEGORY_MASTER",
@@ -248,7 +249,6 @@ export class CategoryMasterComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.commonService
               .setResetModify(
@@ -301,29 +301,37 @@ export class CategoryMasterComponent implements OnInit {
   }
   cancel() {
     this.cancelLoading = true;
-    this.reset();
-    this.commonService
-      .setResetModify(
-        "CATEGORY_MASTER",
-        "ES_MODIFY",
-        "category_id",
-        this.editPKCode,
-        0,
-        "setLock"
-      )
-      .subscribe(
-        (data) => {
-          this.newItem = false;
-          this.displayBasic = false;
-          this.submitted = false;
-          this.categoryMasterForm.reset();
-          this.cancelLoading = false;
-        },
-        (error: HttpErrorResponse) => {
-          console.log(error);
-          this.cancelLoading = false;
-        }
-      );
+
+    if (this.newItem) {
+      this.newItem = false;
+      this.displayBasic = false;
+      this.submitted = false;
+      this.reset();
+      this.cancelLoading = false;
+    } else {
+      this.commonService
+        .setResetModify(
+          "CATEGORY_MASTER",
+          "ES_MODIFY",
+          "category_id",
+          this.editPKCode,
+          0,
+          "setLock"
+        )
+        .subscribe(
+          (data) => {
+            this.newItem = false;
+            this.displayBasic = false;
+            this.submitted = false;
+            this.reset();
+            this.cancelLoading = false;
+          },
+          (error: HttpErrorResponse) => {
+            console.log(error);
+            this.cancelLoading = false;
+          }
+        );
+    }
   }
   addCategory() {
     if (this.addAccess) {
@@ -352,7 +360,6 @@ export class CategoryMasterComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.confirmationService.confirm({
               message: "Are you sure that you want to delete?",

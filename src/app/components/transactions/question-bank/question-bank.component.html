@@ -27,6 +27,14 @@
                     [totalRecords]="totalRecords"
                     [showCurrentPageReport]="true"
                   >
+                    <ng-template pTemplate="colgroup">
+                      <colgroup>
+                        <col style="width: 200px;" />
+                        <col style="width: 200px;" />
+                        <col style="width: 200px;" />
+                        <col style="width: 200px;" />
+                      </colgroup>
+                    </ng-template>
                     <ng-template pTemplate="caption">
                       <div class="row justify-content-between">
                         <div class="col-md-3">
@@ -91,17 +99,17 @@
                         <td>{{question.QuestionBankMaster_questionTitle}}</td>
                         <td>
                           <button
-                            class="btn btn-primary mr-4"
+                            class="btn btn-warning mr-4"
                             (click)="edit(question.QuestionBankMaster_ID)"
                           >
-                            <i class="mdi mdi-pencil-box"></i> Edit
+                            <i class="mdi mdi-pencil-box"></i>
                           </button>
 
                           <button
                             class="btn btn-danger"
                             (click)="delete(question.QuestionBankMaster_ID)"
                           >
-                            <i class="mdi mdi-delete"></i> Delete
+                            <i class="mdi mdi-delete"></i>
                           </button>
                         </td>
                       </tr>
@@ -172,10 +180,10 @@
                     <label for="categorySkillLevel">Training Transaction</label>
                     <p-dropdown
                       [optionLabel]="label"
-                      [options]="trainingProgramDropdown"
+                      [options]="trainingScheduleDropdown"
                       [filter]="true"
                       [showClear]="true"
-                      placeholder="Select Training Program"
+                      placeholder="Select Training Schedule Progaram"
                       [resetFilterOnHide]="true"
                       [autofocus]="true"
                       formControlName="QUESTIONBANKMASTER_TRAININGTRANSACTIONID"
@@ -188,7 +196,7 @@
                       <div
                         *ngIf="f.QUESTIONBANKMASTER_TRAININGTRANSACTIONID.errors.required"
                       >
-                        Training Program is required
+                        Training Schedule sss is required
                       </div>
                     </div>
                   </div>
@@ -228,7 +236,7 @@
                       formControlName="QUESTIONBANKMASTER_MARKS"
                     />
                     <div
-                      *ngIf="submitted && g.QUESTIONBANKMASTER_MARKS.errors"
+                      *ngIf="submitted && f.QUESTIONBANKMASTER_MARKS.errors"
                       class="alert alert-danger"
                     >
                       <div *ngIf="f.QUESTIONBANKMASTER_MARKS.errors.required">
@@ -385,7 +393,7 @@
               <button class="btn btn-outline-primary" (click)="save();">
                 <i class="fas fa-save"></i> Save
               </button>
-              <button class="btn btn-outline-secondary" (click)="resetForm()">
+              <button class="btn btn-outline-secondary" (click)="reset()">
                 <i class="fas fa-undo"></i> Reset
               </button>
               <button class="btn btn-outline-danger" (click)="cancel()">
@@ -394,6 +402,7 @@
             </div>
           </ng-template>
         </p-dialog>
+        <app-footer></app-footer>
       </div>
     </div>
   </div>

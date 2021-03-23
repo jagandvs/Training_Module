@@ -116,7 +116,6 @@ export class TrainingScheduleComponent implements OnInit {
         0
       )
       .subscribe((data) => {
-        console.log(data);
         this.trainingMasterTable = data;
         this.loading = false;
         this.totalRecords = this.trainingMasterTable.length;
@@ -158,8 +157,6 @@ export class TrainingScheduleComponent implements OnInit {
     ].TRAININGPROGRAMDETAIL_REQUIRED_FOR_TRAINING = !this.trainingDetailTable[
       value
     ].TRAININGPROGRAMDETAIL_REQUIRED_FOR_TRAINING;
-
-    console.log(this.trainingDetailTable);
   }
   save() {
     this.uploadedFiles = [];
@@ -190,13 +187,12 @@ export class TrainingScheduleComponent implements OnInit {
                   this.commonService
                     .upload(file, trainingScheduleUploadFolder, this.pkcode)
                     .subscribe((data) => {
-                      console.log(data);
+                      this.editInsert = false;
+                      this.getTrainingMasterTable();
+                      this.displayBasic = false;
+                      this.cancel();
                     });
                 }
-                this.editInsert = false;
-                this.getTrainingMasterTable();
-                this.displayBasic = false;
-                this.cancel();
                 this.messageService.add({
                   key: "t1",
                   severity: "success",
@@ -213,9 +209,7 @@ export class TrainingScheduleComponent implements OnInit {
     }
   }
   edit(trainingId) {
-    console.log(trainingId);
     this.uploadedFiles = [];
-    this.fileInput.files = [];
     this.newItem = false;
     this.editingPKCODE = trainingId;
 
@@ -234,7 +228,6 @@ export class TrainingScheduleComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.commonService
               .setResetModify(
@@ -320,20 +313,26 @@ export class TrainingScheduleComponent implements OnInit {
   }
 
   cancel() {
-    this.commonService
-      .setResetModify(
-        "TRAININGPROGRAM_MASTER",
-        "ES_MODIFY",
-        "TRAININGPROGRAM_ID",
-        this.editingPKCODE,
-        0,
-        "setLock"
-      )
-      .subscribe((data) => {
-        this.submitted = false;
-        this.displayBasic = false;
-        this.resetForm();
-      });
+    if (this.newItem) {
+      this.submitted = false;
+      this.displayBasic = false;
+      this.reset();
+    } else {
+      this.commonService
+        .setResetModify(
+          "TRAININGPROGRAM_MASTER",
+          "ES_MODIFY",
+          "TRAININGPROGRAM_ID",
+          this.editingPKCODE,
+          0,
+          "setLock"
+        )
+        .subscribe((data) => {
+          this.submitted = false;
+          this.displayBasic = false;
+          this.reset();
+        });
+    }
   }
 
   delete(trainingId) {
@@ -348,7 +347,6 @@ export class TrainingScheduleComponent implements OnInit {
           "check"
         )
         .subscribe((data) => {
-          console.log(data);
           if (data == 0) {
             this.confirmationService.confirm({
               message: "Are you sure that you want to delete?",
@@ -398,21 +396,23 @@ export class TrainingScheduleComponent implements OnInit {
       });
     }
   }
-  resetForm() {
+  reset() {
     this.trainingMasterForm.reset();
+    this.newItem
+      ? this.f["TRAININGPROGRAM_ID"].setValue("")
+      : this.f["TRAININGPROGRAM_ID"].setValue(this.editingPKCODE);
+    this.f["TRAININGPROGRAM_CM_COMP_ID"].setValue(this.comp_id);
     this.trainingDetailTable = [];
   }
   getFiles(trainingScheduleUploadFolder, pkcode) {
     this.commonService
       .getListFiles(trainingScheduleUploadFolder, pkcode)
       .subscribe((data) => {
-        console.log(data);
         this.uploadedFiles = [];
         this.uploadedFiles = data;
       });
   }
   deleteFile(fileName) {
-    console.log(fileName);
     this.commonService
       .deleteFile(fileName, trainingScheduleUploadFolder, this.editingPKCODE)
       .subscribe((data) => {
