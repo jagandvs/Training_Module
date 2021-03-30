@@ -116,8 +116,8 @@ export class CategoryMasterComponent implements OnInit {
   }
 
   private getCategoryMaster() {
+    this.categoryMaster = [];
     this.loading = true;
-
     this.commonService
       .getTableResponse("*", "CATEGORY_MASTER", "es_delete=0")
       .subscribe((data) => {
@@ -127,8 +127,10 @@ export class CategoryMasterComponent implements OnInit {
             cateogry_applicable_to = "Staff";
           } else if (category.cateogry_applicable_to == 2) {
             cateogry_applicable_to = "Workers";
-          } else {
+          } else if (category.cateogry_applicable_to == 3) {
             cateogry_applicable_to = "Management";
+          } else {
+            cateogry_applicable_to = "Security";
           }
           this.categoryMaster.push({
             category_id: category.category_id,
@@ -143,9 +145,7 @@ export class CategoryMasterComponent implements OnInit {
         this.totalRecords = this.categoryMaster.length;
       });
   }
-  save() {
-    this.submitted = true;
-
+  checkDuplicate() {
     this.duplicateCategoryNameError = false;
     if (this.f["category_name"].value != "") {
       if (this.newItem) {
@@ -182,7 +182,17 @@ export class CategoryMasterComponent implements OnInit {
         }
       }
     }
-
+  }
+  save() {
+    this.submitted = true;
+    if (this.duplicateCategoryNameError) {
+      return this.messageService.add({
+        key: "t2",
+        severity: "error",
+        summary: "Error",
+        detail: "Duplicates Category Name not allowed",
+      });
+    }
     if (this.categoryMasterForm.valid) {
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
       this.confirmationService.confirm({
@@ -273,8 +283,10 @@ export class CategoryMasterComponent implements OnInit {
                   this.f["cateogry_applicable_to"].setValue(1);
                 } else if (category.cateogry_applicable_to === "Workers") {
                   this.f["cateogry_applicable_to"].setValue(2);
-                } else {
+                } else if (category.cateogry_applicable_to === "Management") {
                   this.f["cateogry_applicable_to"].setValue(3);
+                } else {
+                  this.f["cateogry_applicable_to"].setValue(4);
                 }
 
                 this.displayBasic = true;

@@ -148,6 +148,7 @@
                       class="form-control"
                       placeholder="Process Name"
                       formControlName="process_name"
+                      (input)="checkDuplicate()"
                     />
                     <div
                       *ngIf="submitted && f.process_name.errors"
@@ -159,7 +160,7 @@
                     </div>
                     <div
                       class="alert alert-danger"
-                      *ngIf="duplicateProcessNameError"
+                      *ngIf="duplicateProcessNameError && !f.process_name.errors"
                     >
                       Process Name already exist
                     </div>

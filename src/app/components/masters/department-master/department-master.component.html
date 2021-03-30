@@ -142,6 +142,7 @@
                         class="form-control"
                         placeholder="Department Name"
                         formControlName="department_name"
+                        (input)="checkDuplicate()"
                       />
                       <div
                         *ngIf="submitted && f.department_name.errors"
@@ -153,7 +154,7 @@
                       </div>
                       <div
                         class="alert alert-danger"
-                        *ngIf="duplicatedepartmentNameError"
+                        *ngIf="duplicatedepartmentNameError && !f.department_name.errors"
                       >
                         Department Name already exist
                       </div>

@@ -72,16 +72,7 @@ export class StudyMaterialMasterComponent implements OnInit {
           "CategoryToSkillLevelMaster_ID,CategoryToSkillLevelMaster_title",
         condition: "es_delete=0",
       };
-      this.commonService
-        .FillCombo(this.MATERIAL_MASTER_QUERY)
-        .subscribe((data) => {
-          for (let value of data) {
-            this.skillLevelDropdown.push({
-              label: value.CategoryToSkillLevelMaster_title,
-              value: value.CategoryToSkillLevelMaster_ID,
-            });
-          }
-        });
+
       this.materialMasterForm = this.fb.group({
         StudyMaterialMaster_id: [""],
         StudyMaterialMaster_CM_COMP_ID: [this.comp_id],
@@ -115,8 +106,21 @@ export class StudyMaterialMasterComponent implements OnInit {
         this.totalRecords = this.materialMaster.length;
       });
   }
+  getFillCombo() {
+    this.commonService
+      .FillCombo(this.MATERIAL_MASTER_QUERY)
+      .subscribe((data) => {
+        for (let value of data) {
+          this.skillLevelDropdown.push({
+            label: value.CategoryToSkillLevelMaster_title,
+            value: value.CategoryToSkillLevelMaster_ID,
+          });
+        }
+      });
+  }
   add() {
     if (this.addAccess) {
+      this.getFillCombo();
       this.displayBasic = true;
       this.newItem = true;
       this.submitted = false;
@@ -227,8 +231,8 @@ export class StudyMaterialMasterComponent implements OnInit {
       : this.f["StudyMaterialMaster_id"].setValue(this.editPKCode);
     this.f["StudyMaterialMaster_CM_COMP_ID"].setValue(this.comp_id);
   }
-  save() {
-    this.submitted = true;
+
+  checkDuplicate() {
     if (this.f["StudyMaterialMaster_filetype"].value != "") {
       if (this.newItem) {
         var arr = this.materialMaster.filter((master) => {
@@ -264,7 +268,18 @@ export class StudyMaterialMasterComponent implements OnInit {
         }
       }
     }
-    if (this.materialMasterForm.valid) {
+  }
+  save() {
+    this.submitted = true;
+    if (this.duplicateError) {
+      return this.messageService.add({
+        key: "t2",
+        severity: "error",
+        summary: "Error",
+        detail: "Duplicates not allowed",
+      });
+    }
+    if (this.materialMasterForm.valid && !this.duplicateError) {
       this.saveLoading = true;
 
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
@@ -307,7 +322,9 @@ export class StudyMaterialMasterComponent implements OnInit {
 
   edit(material) {
     this.editPKCode = material.StudyMaterialMaster_id;
+
     if (this.updateAccess) {
+      this.getFillCombo();
       this.commonService
         .setResetModify(
           "StudyMaterialMaster",

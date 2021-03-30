@@ -40,13 +40,17 @@ export class EmployeeMasterComponent implements OnInit {
   public process: string;
   public comp_id: number;
 
+  public saveLoading: boolean = false;
+  public cancelLoading: boolean = false;
+
   public departmentDropdown: SelectItem[] = [];
   public processDropdown: SelectItem[] = [];
   public employeeType: SelectItem[] = [];
   public categoryToSkillDropdown: SelectItem[] = [];
   public categoryDropdown: SelectItem[] = [];
   public employeeDropdown: SelectItem[] = [];
-
+  public duplicateError: boolean = false;
+  public duplicateNameError: boolean = false;
   public totalRecords = 0;
   public DEPARTMENT_MASTER_QUERY = {
     TableNames: "department_master",
@@ -101,36 +105,6 @@ export class EmployeeMasterComponent implements OnInit {
     if (this.menuAccess) {
       var companyID = JSON.parse(localStorage.getItem("companyDetails"));
       this.comp_id = companyID.CM_ID;
-      this.commonService
-        .FillCombo(this.DEPARTMENT_MASTER_QUERY)
-        .subscribe((data) => {
-          for (let item of data) {
-            this.departmentDropdown.push({
-              label: item.department_name,
-              value: item.department_id,
-            });
-          }
-        });
-      this.commonService
-        .FillCombo(this.PROCESS_MASTER_QUERY)
-        .subscribe((data) => {
-          for (let item of data) {
-            this.processDropdown.push({
-              label: item.process_name,
-              value: item.process_id,
-            });
-          }
-        });
-      this.commonService
-        .FillCombo(this.EMPLOYEE_MASTER_QUERY)
-        .subscribe((data) => {
-          for (let item of data) {
-            this.employeeDropdown.push({
-              label: item.EMP_MASTER_NAME,
-              value: item.EMP_MASTER_ID,
-            });
-          }
-        });
       this.employeeType = [
         {
           label: "Staff",
@@ -141,26 +115,6 @@ export class EmployeeMasterComponent implements OnInit {
           value: false,
         },
       ];
-      this.commonService
-        .FillCombo(this.CATEGORY_TO_SKILL_QUERY)
-        .subscribe((data) => {
-          for (let item of data) {
-            this.categoryToSkillDropdown.push({
-              label: item.CategoryToSkillLevelMaster_title,
-              value: item.CategoryToSkillLevelMaster_ID,
-            });
-          }
-        });
-      this.commonService
-        .FillCombo(this.CATEGORY_MASTER_QUERY)
-        .subscribe((data) => {
-          for (let item of data) {
-            this.categoryDropdown.push({
-              label: item.category_name,
-              value: item.category_id,
-            });
-          }
-        });
 
       this.getEmployeeMasterTable();
       this.employeeMasterForm = this.fb.group({
@@ -181,6 +135,59 @@ export class EmployeeMasterComponent implements OnInit {
         EMP_MASTER_SKILLS_NEXT_SKILLS_LEVEL: ["", Validators.required],
       });
     }
+  }
+  getFillCombo() {
+    this.commonService
+      .FillCombo(this.DEPARTMENT_MASTER_QUERY)
+      .subscribe((data) => {
+        for (let item of data) {
+          this.departmentDropdown.push({
+            label: item.department_name,
+            value: item.department_id,
+          });
+        }
+      });
+    this.commonService
+      .FillCombo(this.PROCESS_MASTER_QUERY)
+      .subscribe((data) => {
+        for (let item of data) {
+          this.processDropdown.push({
+            label: item.process_name,
+            value: item.process_id,
+          });
+        }
+      });
+    this.commonService
+      .FillCombo(this.EMPLOYEE_MASTER_QUERY)
+      .subscribe((data) => {
+        for (let item of data) {
+          this.employeeDropdown.push({
+            label: item.EMP_MASTER_NAME,
+            value: item.EMP_MASTER_ID,
+          });
+        }
+      });
+
+    this.commonService
+      .FillCombo(this.CATEGORY_TO_SKILL_QUERY)
+      .subscribe((data) => {
+        for (let item of data) {
+          this.categoryToSkillDropdown.push({
+            label: item.CategoryToSkillLevelMaster_title,
+            value: item.CategoryToSkillLevelMaster_ID,
+          });
+        }
+      });
+    this.commonService
+      .FillCombo(this.CATEGORY_MASTER_QUERY)
+      .subscribe((data) => {
+        for (let item of data) {
+          this.categoryDropdown.push({
+            label: item.category_name,
+            value: item.category_id,
+          });
+        }
+      });
   }
   getEmployeeMasterTable() {
     this.employeeMasterTable = [];
@@ -240,6 +247,7 @@ export class EmployeeMasterComponent implements OnInit {
 
   add() {
     if (this.addAccess) {
+      this.getFillCombo();
       this.displayBasic = true;
       this.employeeDetailTable = [];
       this.employeeDetails = [];
@@ -255,7 +263,10 @@ export class EmployeeMasterComponent implements OnInit {
     }
   }
   insertIntoTable() {
+    this.submitted = false;
     if (!(this.employeeMasterForm.valid && this.employeeDetailForm.valid)) {
+      this.submitted = true;
+
       this.messageService.add({
         key: "t2",
         severity: "error",
@@ -298,10 +309,96 @@ export class EmployeeMasterComponent implements OnInit {
     this.editInsert = false;
     this.employeeDetailForm.reset();
   }
+  checkDuplicateEmployeeNumber() {
+    this.duplicateError = false;
 
+    if (this.f["EMP_MASTER_NUMBER"].value != "") {
+      if (this.newItem) {
+        var arr = this.employeeMasterTable.filter((master) => {
+          if (master.EMP_MASTER_NUMBER == this.f["EMP_MASTER_NUMBER"].value) {
+            return master;
+          }
+        });
+        if (arr.length > 0) {
+          this.duplicateError = true;
+          return;
+        } else {
+          this.duplicateError = false;
+        }
+      } else {
+        var arr = this.employeeMasterTable.filter((master) => {
+          if (
+            master.EMP_MASTER_NUMBER == this.f["EMP_MASTER_NUMBER"].value &&
+            master.EMP_MASTER_ID != this.f["EMP_MASTER_ID"].value
+          ) {
+            return master;
+          }
+        });
+
+        if (arr.length > 0) {
+          this.duplicateError = true;
+          return;
+        } else {
+          this.duplicateError = false;
+        }
+      }
+    }
+  }
+  checkDuplicateEmployeeName() {
+    this.duplicateNameError = false;
+
+    if (this.f["EMP_MASTER_NAME"].value != "") {
+      if (this.newItem) {
+        var arr = this.employeeMasterTable.filter((master) => {
+          if (
+            master.EMP_MASTER_NAME.toLowerCase() ==
+            this.f["EMP_MASTER_NAME"].value.toLowerCase()
+          ) {
+            return master;
+          }
+        });
+        if (arr.length > 0) {
+          this.duplicateNameError = true;
+          return;
+        } else {
+          this.duplicateNameError = false;
+        }
+      } else {
+        var arr = this.employeeMasterTable.filter((master) => {
+          if (
+            master.EMP_MASTER_NAME.toLowerCase() ==
+              this.f["EMP_MASTER_NAME"].value.toLowerCase() &&
+            master.EMP_MASTER_ID != this.f["EMP_MASTER_ID"].value
+          ) {
+            return master;
+          }
+        });
+
+        if (arr.length > 0) {
+          this.duplicateNameError = true;
+          return;
+        } else {
+          this.duplicateNameError = false;
+        }
+      }
+    }
+  }
   save() {
     this.submitted = true;
-    if (this.employeeMasterForm.valid) {
+    if (this.duplicateError || this.duplicateNameError) {
+      return this.messageService.add({
+        key: "t2",
+        severity: "error",
+        summary: "Error",
+        detail: "Duplicates not allowed",
+      });
+    }
+
+    if (
+      this.employeeMasterForm.valid &&
+      !this.duplicateNameError &&
+      !this.duplicateError
+    ) {
       this.submitted = false;
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
 
@@ -310,6 +407,7 @@ export class EmployeeMasterComponent implements OnInit {
         header: "Save Confirmation",
         icon: "fas fa-save",
         accept: () => {
+          this.saveLoading = true;
           this.service
             .INSERT_UPSERT_EmployeeMaster(
               this.employeeMasterForm.value,
@@ -329,12 +427,25 @@ export class EmployeeMasterComponent implements OnInit {
                   detail: this.process.toUpperCase() + " Successfully",
                 });
                 this.cancel();
+                this.saveLoading = false;
               },
               (error: HttpErrorResponse) => {
                 console.log(error);
               }
             );
         },
+        reject: () => {
+          this.saveLoading = false;
+        },
+      });
+    } else {
+      this.saveLoading = false;
+
+      this.messageService.add({
+        key: "t2",
+        severity: "error",
+        summary: "Error",
+        detail: "Please Fill all required fields",
       });
     }
   }
@@ -374,6 +485,7 @@ export class EmployeeMasterComponent implements OnInit {
   edit(employeeId) {
     this.newItem = false;
     this.editingPKCODE = employeeId;
+    this.getFillCombo();
     if (this.updateAccess) {
       this.commonService
         .setResetModify(

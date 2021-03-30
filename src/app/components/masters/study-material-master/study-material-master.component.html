@@ -156,6 +156,7 @@
                       class="form-control"
                       placeholder="File Type"
                       formControlName="StudyMaterialMaster_filetype"
+                      (input)="checkDuplicate()"
                     />
                     <div
                       *ngIf="submitted && f.StudyMaterialMaster_filetype.errors"
@@ -167,7 +168,10 @@
                         File type is required
                       </div>
                     </div>
-                    <div class="alert alert-danger" *ngIf="duplicateError">
+                    <div
+                      class="alert alert-danger"
+                      *ngIf="duplicateError && !f.StudyMaterialMaster_filetype.errors"
+                    >
                       File Type already exist
                     </div>
                   </div>

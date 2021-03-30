@@ -91,8 +91,8 @@ export class DepartmentMasterComponent implements OnInit {
         this.totalRecords = this.departmentMaster.length;
       });
   }
-  save() {
-    this.submitted = true;
+
+  checkDuplicate() {
     this.duplicatedepartmentNameError = false;
 
     if (this.f["department_name"].value != "") {
@@ -130,8 +130,19 @@ export class DepartmentMasterComponent implements OnInit {
         }
       }
     }
+  }
+  save() {
+    if (this.duplicatedepartmentNameError) {
+      return this.messageService.add({
+        key: "t2",
+        severity: "error",
+        summary: "Error",
+        detail: "Duplicate Department Name not allowed",
+      });
+    }
+    this.submitted = true;
 
-    if (this.departmentMasterForm.valid) {
+    if (this.departmentMasterForm.valid && !this.duplicatedepartmentNameError) {
       this.saveLoading = true;
 
       this.newItem ? (this.process = "Insert") : (this.process = "Update");

@@ -186,6 +186,7 @@
                       class="form-control"
                       placeholder=" Skill Level"
                       formControlName="CategoryToSkillLevelMaster_title"
+                      (input)="checkDuplicate()"
                     />
                     <div class="alert alert-danger" *ngIf="titleError">
                       Skill Level already exist
@@ -197,7 +198,7 @@
                       <div
                         *ngIf="f.CategoryToSkillLevelMaster_title.errors.required"
                       >
-                        Title is required
+                        Skill Level is required
                       </div>
                     </div>
                   </div>
@@ -223,7 +224,7 @@
                       class="alert alert-danger"
                     >
                       <div
-                        *ngIf="f.CategoryToSkillLevelMaster_passingpercentage.errors.required"
+                        *ngIf="f.CategoryToSkillLevelMaster_passingpercentage.errors.required && !percentageError"
                       >
                         Percentage is required
                       </div>

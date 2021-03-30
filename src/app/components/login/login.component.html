@@ -31,7 +31,7 @@
                   >
                 </select>
               </div>
-              <div class="form-group">
+              <!-- <div class="form-group">
                 <label class="small mb-1" for="financialYear"
                   >Financial Year</label
                 >
@@ -47,7 +47,7 @@
                     To {{companyMaster.CM_CLOSING_DATE | date : 'dd/MM/y'}}
                   </option>
                 </select>
-              </div>
+              </div> -->
               <div class="form-group">
                 <label for="exampleInputEmail">Username</label>
                 <div class="input-group">
@@ -106,8 +106,7 @@
                   [disabled]="isLoading"
                 >
                   <i
-                    class="fa"
-                    [ngClass]="{'fa-spin fa-spinner': isLoading, 'fa-check': !isLoading}"
+                    [ngClass]="{'fa fa-spin fa-spinner': isLoading, 'fas fa-lock': !isLoading}"
                   ></i>
                   {{button}}
                 </button>

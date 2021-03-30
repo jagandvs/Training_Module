@@ -121,6 +121,7 @@
           </div>
         </div>
         <p-dialog
+          [contentStyle]="{'overflow':'visible'}"
           header="Category Master"
           [(visible)]="displayBasic"
           [style]="{width: '80vw'}"
@@ -145,6 +146,7 @@
                       pInputText
                       placeholder="Category Name"
                       formControlName="category_name"
+                      (input)="checkDuplicate()"
                     />
                     <div
                       *ngIf="submitted && f.category_name.errors"
@@ -156,7 +158,7 @@
                     </div>
                     <div
                       class="alert alert-danger"
-                      *ngIf="duplicateCategoryNameError"
+                      *ngIf="duplicateCategoryNameError && !f.category_name.errors"
                     >
                       Category Name already exist
                     </div>

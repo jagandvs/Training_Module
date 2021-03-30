@@ -125,7 +125,7 @@ export class QuestionBankComponent implements OnInit {
         QUESTIONBANKMASTER_ID: [0],
         QUESTIONBANKMASTER_CM_COMP_ID: [this.comp_id],
         QUESTIONBANKMASTER_CATEGORYTOSKILLLEVELID: ["", Validators.required],
-        QUESTIONBANKMASTER_QUESTIONTYPE: ["", Validators.required],
+        QUESTIONBANKMASTER_QUESTIONTYPE: ["true", Validators.required],
         QUESTIONBANKMASTER_QUESTIONTITLE: ["", Validators.required],
         QUESTIONBANKMASTER_TRAININGTRANSACTIONID: ["", Validators.required],
         QUESTIONBANKMASTER_TRAININGMASTERID: ["", Validators.required],
@@ -307,6 +307,37 @@ export class QuestionBankComponent implements OnInit {
     }
   }
   insertIntoTable() {
+    if (this.g["QUESTIONBANKDETAIL_WEIGHTAGE"].value == 100) {
+      var index = this.questionDetailTable.findIndex((detail) => {
+        return (
+          detail.QUESTIONBANKDETAIL_WEIGHTAGE ==
+          this.g["QUESTIONBANKDETAIL_WEIGHTAGE"].value
+        );
+      });
+    }
+    if (
+      !(
+        this.g["QUESTIONBANKDETAIL_WEIGHTAGE"].value == 100 ||
+        this.g["QUESTIONBANKDETAIL_WEIGHTAGE"].value == 0
+      )
+    ) {
+      this.messageService.add({
+        key: "t2",
+        severity: "error",
+        summary: "Error",
+        detail: "Weightage Should be 0 or 100",
+      });
+      return;
+    }
+    if (index >= 0) {
+      this.messageService.add({
+        key: "t2",
+        severity: "error",
+        summary: "Error",
+        detail: "Weightage 100 already exist",
+      });
+      return;
+    }
     if (
       !(this.questionBankMasterForm.valid && this.questionBankDetailForm.valid)
     ) {

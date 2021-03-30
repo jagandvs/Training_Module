@@ -226,8 +226,8 @@ export class ProcessMasterComponent implements OnInit {
         );
     }
   }
-  save() {
-    this.submitted = true;
+
+  checkDuplicate() {
     this.duplicateProcessNameError = false;
 
     if (this.f["process_name"].value != "") {
@@ -264,8 +264,18 @@ export class ProcessMasterComponent implements OnInit {
         }
       }
     }
-
-    if (this.processMasterForm.valid) {
+  }
+  save() {
+    this.submitted = true;
+    if (this.duplicateProcessNameError) {
+      return this.messageService.add({
+        key: "t2",
+        severity: "error",
+        summary: "Error",
+        detail: "Duplicates not allowed",
+      });
+    }
+    if (this.processMasterForm.valid && !this.duplicateProcessNameError) {
       this.loading = true;
       this.saveLoading = true;
 

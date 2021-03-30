@@ -39,7 +39,11 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
   public saveLoading: boolean = false;
   public cancelLoading: boolean = false;
 
-  public CATEGORY_MASTER_QUERY: any;
+  public CATEGORY_MASTER_QUERY = {
+    TableNames: "CATEGORY_MASTER",
+    fieldNames: "category_name,category_id",
+    condition: "ES_DELETE=0",
+  };
 
   public totalRecords = 0;
   constructor(
@@ -69,21 +73,6 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
       this.getCategorySkillMaster();
       var companyID = JSON.parse(localStorage.getItem("companyDetails"));
       this.comp_id = companyID.CM_ID;
-      this.CATEGORY_MASTER_QUERY = {
-        TableNames: "CATEGORY_MASTER",
-        fieldNames: "category_name,category_id",
-        condition: "ES_DELETE=0",
-      };
-      this.commonService
-        .FillCombo(this.CATEGORY_MASTER_QUERY)
-        .subscribe((data) => {
-          for (let value of data) {
-            this.categoryMasterDropdown.push({
-              label: value.category_name,
-              value: value.category_id,
-            });
-          }
-        });
 
       this.categorySkillMasterForm = this.fb.group({
         CategoryToSkillLevelMaster_ID: [""],
@@ -99,6 +88,19 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
     return this.categorySkillMasterForm.controls;
   }
 
+  fillCombo() {
+    this.categoryMasterDropdown.length = 0;
+    this.commonService
+      .FillCombo(this.CATEGORY_MASTER_QUERY)
+      .subscribe((data) => {
+        for (let value of data) {
+          this.categoryMasterDropdown.push({
+            label: value.category_name,
+            value: value.category_id,
+          });
+        }
+      });
+  }
   checkPassingPercentage(value) {
     if (value > 100 || value < 0) {
       this.percentageError = true;
@@ -109,7 +111,7 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
 
   getCategorySkillMaster() {
     this.loading = true;
-    this.categorySkillMaster = [];
+    this.categorySkillMaster.length = 0;
     this.commonService
       .getTableResponse("*", "CategoryToSkillLevel_Master", "ES_DELETE=0")
       .subscribe((data) => {
@@ -133,6 +135,7 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
   }
   addCategory() {
     if (this.addAccess) {
+      this.fillCombo();
       this.displayBasic = true;
       this.newItem = true;
       this.submitted = false;
@@ -145,8 +148,8 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
       });
     }
   }
-  save() {
-    this.submitted = true;
+
+  checkDuplicate() {
     this.titleError = false;
 
     if (this.f["CategoryToSkillLevelMaster_title"].value != "") {
@@ -185,8 +188,22 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
         }
       }
     }
-
-    if (this.categorySkillMasterForm.valid && !this.percentageError) {
+  }
+  save() {
+    this.submitted = true;
+    if (this.titleError) {
+      return this.messageService.add({
+        key: "t2",
+        severity: "error",
+        summary: "Error",
+        detail: "Duplicates not allowed",
+      });
+    }
+    if (
+      this.categorySkillMasterForm.valid &&
+      !this.percentageError &&
+      !this.titleError
+    ) {
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
       this.confirmationService.confirm({
         message: "Are you sure that you want to save?",
@@ -241,6 +258,7 @@ export class CategoryToSkillLevelMasterComponent implements OnInit {
     this.f["CategoryToSkillLevelMaster_CM_COMP_ID"].setValue(this.comp_id);
   }
   edit(category) {
+    this.fillCombo();
     this.editPKCode = category.CategoryToSkillLevelMaster_ID;
     if (this.updateAccess) {
       this.commonService

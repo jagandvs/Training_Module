@@ -182,9 +182,10 @@ export class CommonService {
       pk: pk,
       fileName: fileName,
     };
-    var httpOption = {
+    const httpOption = {
       headers: new HttpHeaders({
-        responseType: "blob",
+        "Content-Type": "application/json",
+        Accept: "application/pdf",
       }),
     };
     return this.http.post(downloadFile, body, httpOption);

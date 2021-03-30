@@ -1,6 +1,6 @@
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { formatDate } from "@angular/common";
 import { HttpErrorResponse } from "@angular/common/http";
-import { Component, OnInit, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
 import { Training_Need } from "src/app/_helper/SM_CODE";
@@ -46,7 +46,7 @@ export class TrainingScheduleComponent implements OnInit {
   public process: string;
   public comp_id: number;
   public pkcode: any;
-
+  public percentageError: boolean = false;
   public totalRecords = 0;
 
   public TRAINING_PROGRAM_MASTER_QUERY = {
@@ -135,19 +135,28 @@ export class TrainingScheduleComponent implements OnInit {
       }
     });
   }
+  checkPassingPercentage(value) {
+    if (value > 100 || value < 0) {
+      this.percentageError = true;
+    } else {
+      this.percentageError = false;
+    }
+  }
   add() {
     if (this.addAccess) {
       this.displayBasic = true;
       this.trainingDetailTable = [];
 
-      this.fileInput.files = [];
       this.newItem = true;
+      this.uploadedFiles = [];
+
+      this.fileInput.files = [];
     } else {
       this.messageService.add({
         key: "t1",
         severity: "warn",
         summary: "Warning",
-        detail: "Sorry!! You dont have access to add Question Bank",
+        detail: "Sorry!! You dont have access to add",
       });
     }
   }
@@ -160,10 +169,21 @@ export class TrainingScheduleComponent implements OnInit {
   }
   save() {
     this.uploadedFiles = [];
+    this.submitted = true;
+
     this.fileInput.files.forEach((file) => {
       this.uploadedFiles.push(file);
     });
-    this.submitted = true;
+
+    if (this.uploadedFiles.length == 0) {
+      return this.messageService.add({
+        key: "t2",
+        severity: "error",
+        summary: "Error",
+        detail: "Please upload files",
+      });
+    }
+
     if (this.trainingMasterForm.valid) {
       this.submitted = false;
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
@@ -186,18 +206,24 @@ export class TrainingScheduleComponent implements OnInit {
                 for (let file of this.uploadedFiles) {
                   this.commonService
                     .upload(file, trainingScheduleUploadFolder, this.pkcode)
-                    .subscribe((data) => {
-                      this.editInsert = false;
-                      this.getTrainingMasterTable();
-                      this.displayBasic = false;
-                      this.cancel();
-                    });
+                    .subscribe(
+                      (data) => {
+                        console.log(data);
+                      },
+                      (error) => {
+                        console.log(error);
+                      }
+                    );
                 }
+                this.editInsert = false;
+                this.getTrainingMasterTable();
+                this.displayBasic = false;
+                this.cancel();
                 this.messageService.add({
                   key: "t1",
                   severity: "success",
                   summary: "Success",
-                  detail: this.process.toUpperCase() + " Successfully",
+                  detail: "Submitted Successfully",
                 });
               },
               (error: HttpErrorResponse) => {
@@ -212,7 +238,7 @@ export class TrainingScheduleComponent implements OnInit {
     this.uploadedFiles = [];
     this.newItem = false;
     this.editingPKCODE = trainingId;
-
+    this.fileInput.files = [];
     let editarray = this.trainingMasterTable.filter((data) => {
       return trainingId == data.TRAININGPROGRAM_ID;
     });
@@ -307,7 +333,7 @@ export class TrainingScheduleComponent implements OnInit {
         key: "t1",
         severity: "warn",
         summary: "Warning",
-        detail: "Sorry!! You dont have access to Edit Question Bank",
+        detail: "Sorry!! You dont have access to Edit",
       });
     }
   }

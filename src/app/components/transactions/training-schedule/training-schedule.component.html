@@ -225,16 +225,17 @@
                     </div>
                   </div>
                   <div class="p-field p-col-12 p-md-6">
-                    <label for="percentage">Percentage</label>
+                    <label for="percentage">Passing Percentage</label>
                     <input
                       type="number"
                       inputId="percentage"
                       pInputText
                       placeholder="Percentage"
                       formControlName="TRAININGPROGRAM_ID_PASSING_PERCENTAGE"
-                      min="0"
-                      max="100"
                     />
+                    <div class="alert alert-danger" *ngIf="percentageError">
+                      percentage should between 0 and 100
+                    </div>
                     <div
                       *ngIf="submitted && f.TRAININGPROGRAM_ID_PASSING_PERCENTAGE.errors"
                       class="alert alert-danger"
@@ -253,6 +254,16 @@
                       class="form-control"
                       formControlName="TRAININGPROGRAM_ID_FROM_DATE"
                     />
+                    <div
+                      *ngIf="submitted && f.TRAININGPROGRAM_ID_FROM_DATE.errors"
+                      class="alert alert-danger"
+                    >
+                      <div
+                        *ngIf="f.TRAININGPROGRAM_ID_FROM_DATE.errors.required"
+                      >
+                        From Date is required
+                      </div>
+                    </div>
                   </div>
                   <div class="p-field p-col-12 p-md-6">
                     <label>To Date </label>
@@ -261,6 +272,14 @@
                       class="form-control"
                       formControlName="TRAININGPROGRAM_ID_TO_DATE"
                     />
+                    <div
+                      *ngIf="submitted && f.TRAININGPROGRAM_ID_TO_DATE.errors"
+                      class="alert alert-danger"
+                    >
+                      <div *ngIf="f.TRAININGPROGRAM_ID_TO_DATE.errors.required">
+                        To Date is required
+                      </div>
+                    </div>
                   </div>
                 </div>
               </form>

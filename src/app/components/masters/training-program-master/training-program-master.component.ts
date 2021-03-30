@@ -26,7 +26,8 @@ export class TrainingProgramMasterComponent implements OnInit {
   public skillMasterDropdown: SelectItem[] = [];
 
   public uploadedFiles: File[] = [];
-
+  public showSelectedFiles: File[] = [];
+  public attachments: File[] = [];
   public menuAccess: boolean = true;
   public addAccess: boolean = true;
   public viewAccess: boolean = true;
@@ -77,7 +78,6 @@ export class TrainingProgramMasterComponent implements OnInit {
 
   ngOnInit(): void {
     this.loading = true;
-
     this.getTrainingMaster();
     var companyID = JSON.parse(localStorage.getItem("companyDetails"));
     this.comp_id = companyID.CM_ID;
@@ -180,13 +180,24 @@ export class TrainingProgramMasterComponent implements OnInit {
         });
     }
   }
+  selectedFiles(event) {
+    console.log(event.files);
 
+    for (let file of event.files) {
+      console.log(file);
+      this.showSelectedFiles.push(file);
+      console.log(this.showSelectedFiles);
+    }
+  }
   add() {
     if (this.addAccess) {
-      this.displayBasic = true;
+      this.showSelectedFiles = [];
+
       this.newItem = true;
       this.submitted = false;
-      this.fileInput.files = [];
+      this.displayBasic = true;
+
+      this.uploadedFiles = [];
     } else {
       this.messageService.add({
         key: "t1",
@@ -196,13 +207,8 @@ export class TrainingProgramMasterComponent implements OnInit {
       });
     }
   }
-  save() {
-    this.uploadedFiles = [];
-    this.fileInput.files.forEach((file) => {
-      this.uploadedFiles.push(file);
-    });
 
-    this.submitted = true;
+  checkDuplicate() {
     if (this.f["TrainingProgramMaster_title"].value != "") {
       if (this.newItem) {
         var arr = this.trainingMaster.filter((master) => {
@@ -238,7 +244,19 @@ export class TrainingProgramMasterComponent implements OnInit {
         }
       }
     }
-    if (this.trainingMasterForm.valid) {
+  }
+  save() {
+    this.submitted = true;
+
+    if (this.duplicateError) {
+      return this.messageService.add({
+        key: "t2",
+        severity: "error",
+        summary: "Error",
+        detail: "Duplicates Not Allowed",
+      });
+    }
+    if (this.trainingMasterForm.valid && !this.duplicateError) {
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
 
       this.confirmationService.confirm({
@@ -255,19 +273,28 @@ export class TrainingProgramMasterComponent implements OnInit {
               this.process
             )
             .subscribe((data) => {
-              this.newItem
-                ? (this.pkcode = data.PK_CODE)
-                : (this.pkcode = this.editingPKCode);
-              for (let file of this.uploadedFiles) {
-                this.commonService
-                  .upload(file, trainingProgramUploadFolder, this.pkcode)
-                  .subscribe((data) => {
-                    this.displayBasic = false;
-                    this.getTrainingMaster();
-                    this.saveLoading = false;
-                    this.submitted = false;
-                    this.reset();
-                  });
+              if (this.showSelectedFiles.length > 0) {
+                this.newItem
+                  ? (this.pkcode = data.PK_CODE)
+                  : (this.pkcode = this.editingPKCode);
+
+                for (let file of this.showSelectedFiles) {
+                  this.commonService
+                    .upload(file, trainingProgramUploadFolder, this.pkcode)
+                    .subscribe((data) => {
+                      this.displayBasic = false;
+                      this.getTrainingMaster();
+                      this.saveLoading = false;
+                      this.submitted = false;
+                      this.reset();
+                    });
+                }
+              } else {
+                this.displayBasic = false;
+                this.getTrainingMaster();
+                this.saveLoading = false;
+                this.submitted = false;
+                this.reset();
               }
             });
         },
@@ -317,6 +344,8 @@ export class TrainingProgramMasterComponent implements OnInit {
     this.trainingMasterForm.reset();
     this.duplicateError = false;
     this.submitted = false;
+
+    this.uploadedFiles.length = 0;
     this.newItem
       ? this.f["TrainingProgramMaster_ID"].setValue("")
       : this.f["TrainingProgramMaster_ID"].setValue(this.editingPKCode);
@@ -385,7 +414,7 @@ export class TrainingProgramMasterComponent implements OnInit {
   }
   edit(training) {
     this.uploadedFiles = [];
-    this.fileInput.files = [];
+    this.showSelectedFiles = [];
     this.editingPKCode = training.TrainingProgramMaster_ID;
     if (this.updateAccess) {
       this.commonService
@@ -409,6 +438,8 @@ export class TrainingProgramMasterComponent implements OnInit {
                 "setLock"
               )
               .subscribe((data) => {
+                this.getFiles(trainingProgramUploadFolder, this.editingPKCode);
+
                 this.f["TrainingProgramMaster_ID"].setValue(
                   training.TrainingProgramMaster_ID
                 );
@@ -453,7 +484,6 @@ export class TrainingProgramMasterComponent implements OnInit {
                     "en"
                   )
                 );
-                this.getFiles(trainingProgramUploadFolder, this.editingPKCode);
 
                 this.displayBasic = true;
                 this.newItem = false;
@@ -483,9 +513,13 @@ export class TrainingProgramMasterComponent implements OnInit {
       .subscribe((data) => {
         this.uploadedFiles = [];
         this.uploadedFiles = data;
+        console.log(this.uploadedFiles);
       });
   }
-  deleteFile(fileName) {
+  removeFile(index) {
+    this.showSelectedFiles.splice(index, 1);
+  }
+  deleteFile(fileName, index) {
     this.commonService
       .deleteFile(fileName, trainingProgramUploadFolder, this.editingPKCode)
       .subscribe((data) => {
@@ -502,6 +536,7 @@ export class TrainingProgramMasterComponent implements OnInit {
     this.commonService
       .downloadFile(fileName, trainingProgramUploadFolder, this.editingPKCode)
       .subscribe((data) => {
+        this.download(data);
         this.messageService.add({
           key: "t2",
           severity: "success",
@@ -509,5 +544,10 @@ export class TrainingProgramMasterComponent implements OnInit {
           detail: "File Downloaded",
         });
       });
+  }
+  download(data) {
+    const blob = new Blob([data]);
+    const url = window.URL.createObjectURL(blob);
+    window.open(url);
   }
 }

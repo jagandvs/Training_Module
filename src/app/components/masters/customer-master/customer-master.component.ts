@@ -176,7 +176,7 @@ export class CustomerMasterComponent implements OnInit {
               key: "t1",
               severity: "warn",
               summary: "Warning",
-              detail: "Sorry!! You dont have access to edit",
+              detail: "Sorry!! You dont have access to Delete",
             });
           }
         });
@@ -292,8 +292,7 @@ export class CustomerMasterComponent implements OnInit {
       : this.f["customer_id"].setValue(this.editPKCode);
     this.f["customer_id_CM_COMP_ID"].setValue(this.comp_id);
   }
-  save() {
-    this.submitted = true;
+  checkDuplicate() {
     this.duplicateCustomerNameError = false;
 
     if (this.f["customer_name"].value != "") {
@@ -331,7 +330,19 @@ export class CustomerMasterComponent implements OnInit {
         }
       }
     }
-    if (this.customerMasterForm.valid) {
+  }
+  save() {
+    if (this.duplicateCustomerNameError) {
+      return this.messageService.add({
+        key: "t2",
+        severity: "error",
+        summary: "Error",
+        detail: "Duplicates Customer Name not allowed",
+      });
+    }
+    this.submitted = true;
+
+    if (this.customerMasterForm.valid && !this.duplicateCustomerNameError) {
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
       this.confirmationService.confirm({
         message: "Are you sure that you want to save?",

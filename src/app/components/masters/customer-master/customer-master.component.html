@@ -169,6 +169,7 @@
                       class="form-control"
                       placeholder="Customer Name"
                       formControlName="customer_name"
+                      (input)="checkDuplicate()"
                     />
                     <div
                       *ngIf="submitted && f.customer_name.errors"
@@ -180,7 +181,7 @@
                     </div>
                     <div
                       class="alert alert-danger"
-                      *ngIf="duplicateCustomerNameError"
+                      *ngIf="duplicateCustomerNameError && !f.customer_name.errors"
                     >
                       Customer Name already exist
                     </div>
@@ -205,7 +206,7 @@
                       class="alert alert-danger"
                     >
                       <div *ngIf="f.customer_category.errors.required">
-                        Customer Category is required
+                        Program Category is required
                       </div>
                     </div>
                   </div>
