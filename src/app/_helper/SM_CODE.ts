@@ -9,3 +9,4 @@ export const Training_Program = 273;
 export const Question_Bank = 274;
 export const Employee = 275;
 export const Training_Need = 276;
+export const administrator = 1;

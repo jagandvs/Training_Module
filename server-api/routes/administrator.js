@@ -18,8 +18,8 @@ router.post("/UPSERT_USER_MASTER", isSignedIn, UPSERT_USER_MASTER);
 
 router.get("/userMaster", isSignedIn, userMaster);
 router.get("/getModule", isSignedIn, getModule);
-router.get("/getScreen", getScreen);
-router.post("/userRight", isSignedIn, logger, userRight);
+router.get("/getScreen", isSignedIn, getScreen);
+router.post("/userRight", isSignedIn, userRight);
 router.post("/insertUserRights", isSignedIn, logger, insertUserRights);
 
 module.exports = router;

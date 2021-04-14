@@ -3,7 +3,6 @@ import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
 import { Employee } from "src/app/_helper/SM_CODE";
-import { UM_CODE } from "src/app/_helper/variables";
 import { CommonService } from "src/app/_services/common.service";
 import { TransactionsService } from "../../transactions/transactions.service";
 import { MastersService } from "../masters.service";
@@ -45,13 +44,17 @@ export class EmployeeMasterComponent implements OnInit {
 
   public departmentDropdown: SelectItem[] = [];
   public processDropdown: SelectItem[] = [];
-  public employeeType: SelectItem[] = [];
+  public employeeTypeDropdown: SelectItem[] = [];
   public categoryToSkillDropdown: SelectItem[] = [];
   public categoryDropdown: SelectItem[] = [];
+  public employeeReportingToDropdown: SelectItem[] = [];
   public employeeDropdown: SelectItem[] = [];
+  public employees: any[] = [];
+
   public duplicateError: boolean = false;
   public duplicateNameError: boolean = false;
   public totalRecords = 0;
+  public userId: string = "";
   public DEPARTMENT_MASTER_QUERY = {
     TableNames: "department_master",
     fieldNames: "department_id,department_name",
@@ -61,13 +64,6 @@ export class EmployeeMasterComponent implements OnInit {
     TableNames: "process_master",
     fieldNames: "process_id,process_name",
     condition: "es_delete=0",
-  };
-
-  public CATEGORY_TO_SKILL_QUERY = {
-    TableNames: "CategoryToSkillLevel_Master",
-    fieldNames:
-      "CategoryToSkillLevelMaster_ID,CategoryToSkillLevelMaster_title",
-    condition: "ES_DELETE=0",
   };
 
   public CATEGORY_MASTER_QUERY = {
@@ -80,6 +76,11 @@ export class EmployeeMasterComponent implements OnInit {
     fieldNames: "EMP_MASTER_ID,EMP_MASTER_NAME",
     condition: "ES_DELETE=0",
   };
+  public OUTSOURCE_EMP_QUERY = {
+    TableNames: "OUTSOURCE_EMP",
+    fieldNames: "EMPNO,EMPFNAME",
+    condition: "EMPNO IS NOT NULL",
+  };
   constructor(
     private commonService: CommonService,
     private fb: FormBuilder,
@@ -89,6 +90,9 @@ export class EmployeeMasterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    var currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+    var UM_CODE = currentUser?.user.UM_CODE;
     this.commonService
       .checkRight(UM_CODE, Employee, "checkRight")
       .subscribe((data) => {
@@ -105,21 +109,25 @@ export class EmployeeMasterComponent implements OnInit {
     if (this.menuAccess) {
       var companyID = JSON.parse(localStorage.getItem("companyDetails"));
       this.comp_id = companyID.CM_ID;
-      this.employeeType = [
-        {
-          label: "Staff",
-          value: true,
-        },
-        {
-          label: "Workers",
-          value: false,
-        },
-      ];
+
+      // this.commonService
+      //   .FillCombo(this.OUTSOURCE_EMP_QUERY)
+      //   .subscribe((data) => {
+      //     console.log(data);
+      //     for (let item of data) {
+      //       this.employeeDropdown.push({
+      //         label: item.EMPFNAME,
+      //         value: item.EMPNO,
+      //       });
+      //     }
+      //   });
 
       this.getEmployeeMasterTable();
       this.employeeMasterForm = this.fb.group({
         EMP_MASTER_ID: [0],
         EMP_MASTER_CM_COMP_ID: [this.comp_id],
+        EMP_MASTER_TYPE: [""],
+        EMP_MASTER_OUTSOURCE: [""],
         EMP_MASTER_NUMBER: ["", Validators.required],
         EMP_MASTER_NAME: ["", Validators.required],
         EMP_MASTER_DEPARTMENT_ID: ["", Validators.required],
@@ -130,16 +138,27 @@ export class EmployeeMasterComponent implements OnInit {
       });
       this.employeeDetailForm = this.fb.group({
         EMP_MASTER_SKILLS_ID: [""],
-        EMP_MASTER_SKILLS_CATEGORY_ID: ["", Validators.required],
+        EMP_MASTER_SKILLS_CATEGORY_ID: [0],
         EMP_MASTER_SKILLS_PRESENT_SKILLS_LEVEL: ["", Validators.required],
         EMP_MASTER_SKILLS_NEXT_SKILLS_LEVEL: ["", Validators.required],
       });
+      this.employeeTypeDropdown = [
+        {
+          label: "Staff",
+          value: 1,
+        },
+        {
+          label: "Workers",
+          value: 2,
+        },
+      ];
     }
   }
   getFillCombo() {
     this.commonService
       .FillCombo(this.DEPARTMENT_MASTER_QUERY)
       .subscribe((data) => {
+        this.departmentDropdown = [];
         for (let item of data) {
           this.departmentDropdown.push({
             label: item.department_name,
@@ -150,6 +169,7 @@ export class EmployeeMasterComponent implements OnInit {
     this.commonService
       .FillCombo(this.PROCESS_MASTER_QUERY)
       .subscribe((data) => {
+        this.processDropdown = [];
         for (let item of data) {
           this.processDropdown.push({
             label: item.process_name,
@@ -160,41 +180,115 @@ export class EmployeeMasterComponent implements OnInit {
     this.commonService
       .FillCombo(this.EMPLOYEE_MASTER_QUERY)
       .subscribe((data) => {
+        this.employeeReportingToDropdown = [];
         for (let item of data) {
-          this.employeeDropdown.push({
+          this.employeeReportingToDropdown.push({
             label: item.EMP_MASTER_NAME,
             value: item.EMP_MASTER_ID,
           });
         }
       });
 
-    this.commonService
-      .FillCombo(this.CATEGORY_TO_SKILL_QUERY)
-      .subscribe((data) => {
-        for (let item of data) {
-          this.categoryToSkillDropdown.push({
-            label: item.CategoryToSkillLevelMaster_title,
-            value: item.CategoryToSkillLevelMaster_ID,
-          });
-        }
-      });
-    this.commonService
-      .FillCombo(this.CATEGORY_MASTER_QUERY)
-      .subscribe((data) => {
-        for (let item of data) {
-          this.categoryDropdown.push({
-            label: item.category_name,
-            value: item.category_id,
-          });
-        }
-      });
+    // this.commonService
+    //   .FillCombo(this.CATEGORY_MASTER_QUERY)
+    //   .subscribe((data) => {
+
+    //     for (let item of data) {
+    //       this.categoryDropdown.push({
+    //         label: item.category_name,
+    //         value: item.category_id,
+    //       });
+    //     }
+    //   });
+  }
+  onSelecteEmployeeType() {
+    var EMPLOYEE_QUERY = {
+      TableNames: "OUTSOURCE_EMP",
+      fieldNames: "*",
+      condition: `emptype=${this.f["EMP_MASTER_TYPE"].value}`,
+    };
+
+    var CATEGORY_TO_SKILL_QUERY = {
+      TableNames: "CategoryToSkillLevel_Master",
+      fieldNames:
+        "CategoryToSkillLevelMaster_ID,CategoryToSkillLevelMaster_title",
+      condition: `ES_DELETE=0 AND CategoryToSkillLevelMaster_categorymaster_id=${this.f["EMP_MASTER_TYPE"].value}`,
+    };
+
+    this.commonService.FillCombo(CATEGORY_TO_SKILL_QUERY).subscribe((data) => {
+      this.categoryToSkillDropdown = [];
+      for (let item of data) {
+        this.categoryToSkillDropdown.push({
+          label: item.CategoryToSkillLevelMaster_title,
+          value: item.CategoryToSkillLevelMaster_ID,
+        });
+      }
+    });
+
+    this.f["EMP_MASTER_TYPE"].value == 1
+      ? this.f["EMP_MASTER_EMP_TYPE"].setValue(true)
+      : this.f["EMP_MASTER_EMP_TYPE"].setValue(false);
+    this.commonService.FillCombo(EMPLOYEE_QUERY).subscribe((data) => {
+      console.log(data);
+      this.employeeDropdown = [];
+      this.employees = [];
+      this.f["EMP_MASTER_NUMBER"].setValue("");
+      this.f["EMP_MASTER_NAME"].setValue("");
+      this.f["EMP_MASTER_OUTSOURCE"].setValue("");
+      this.f["EMP_MASTER_DEPARTMENT_ID"].setValue("");
+
+      this.employees = data;
+      for (let item of data) {
+        this.employeeDropdown.push({
+          label: item.EMPFNAME,
+          value: item.EMPNO,
+        });
+      }
+    });
+  }
+  selectedEmployee() {
+    var empNumber = "";
+    var empName = "";
+    var empDept = "";
+    var duplicate = false;
+    this.userId = "";
+    this.f["EMP_MASTER_NUMBER"].setValue("");
+    this.f["EMP_MASTER_NAME"].setValue("");
+
+    this.employees.map((data) => {
+      if (data.EMPNO == this.f["EMP_MASTER_OUTSOURCE"].value) {
+        empNumber = data.EMPNO;
+        // empName = data.label + data.label.replace(/\s/g, "");
+        this.userId = data.EMPNO + data.EMPFNAME.replace(/\s/g, "");
+        empDept = data.EMPDEPARTMENTID;
+        empName = data.EMPFNAME;
+      }
+    });
+    this.employeeMasterTable.map((data) => {
+      if (data.EMP_MASTER_NUMBER == empNumber) {
+        duplicate = true;
+        this.messageService.add({
+          key: "t2",
+          severity: "error",
+          summary: "Error",
+          detail: "Employee Already exists",
+        });
+      }
+    });
+    if (!duplicate) {
+      this.f["EMP_MASTER_NUMBER"].setValue(empNumber);
+      this.f["EMP_MASTER_NAME"].setValue(empName);
+      this.f["EMP_MASTER_DEPARTMENT_ID"].setValue(empDept);
+    }
   }
   getEmployeeMasterTable() {
-    this.employeeMasterTable = [];
+    this.totalRecords = 0;
     this.loading = true;
     this.service
       .UPSERT_EmployeeMaster("UPSERT_EmployeeMaster", "selectAll", 0)
       .subscribe((data) => {
+        this.employeeMasterTable = [];
+
         for (let employee of data) {
           this.employeeMasterTable.push({
             EMP_MASTER_NUMBER: employee.EMP_MASTER_NUMBER,
@@ -204,7 +298,9 @@ export class EmployeeMasterComponent implements OnInit {
           });
         }
         this.loading = false;
+
         this.totalRecords = this.employeeMasterTable.length;
+        console.log(this.totalRecords);
       });
   }
   get f() {
@@ -276,15 +372,16 @@ export class EmployeeMasterComponent implements OnInit {
       return;
     }
     if (this.editInsert) {
+      console.log(this.employeeDetailForm.value);
+
       this.employeeDetails.splice(
         this.editIndex,
         1,
         this.employeeDetailForm.value
       );
+      console.log(this.employeeDetails);
       this.employeeDetailTable.splice(this.editIndex, 1, {
-        CATEGORY: this.getCategory(
-          this.g["EMP_MASTER_SKILLS_CATEGORY_ID"].value
-        ),
+        CATEGORY: "0",
         PRESENT_SKILL: this.getSkill(
           this.g["EMP_MASTER_SKILLS_PRESENT_SKILLS_LEVEL"].value
         ),
@@ -292,12 +389,12 @@ export class EmployeeMasterComponent implements OnInit {
           this.g["EMP_MASTER_SKILLS_NEXT_SKILLS_LEVEL"].value
         ),
       });
+      console.log("edit insert");
+      console.log();
     } else {
       this.employeeDetails.push(this.employeeDetailForm.value);
       this.employeeDetailTable.push({
-        CATEGORY: this.getCategory(
-          this.g["EMP_MASTER_SKILLS_CATEGORY_ID"].value
-        ),
+        CATEGORY: "0",
         PRESENT_SKILL: this.getSkill(
           this.g["EMP_MASTER_SKILLS_PRESENT_SKILLS_LEVEL"].value
         ),
@@ -408,11 +505,16 @@ export class EmployeeMasterComponent implements OnInit {
         icon: "fas fa-save",
         accept: () => {
           this.saveLoading = true;
+          console.log(this.employeeDetailTable);
+          console.log(this.employeeDetails);
           this.service
             .INSERT_UPSERT_EmployeeMaster(
               this.employeeMasterForm.value,
+
               this.employeeDetails,
-              this.process
+
+              this.process,
+              this.userId
             )
             .subscribe(
               (data) => {
@@ -518,6 +620,7 @@ export class EmployeeMasterComponent implements OnInit {
                     .subscribe(
                       (data) => {
                         this.f["EMP_MASTER_ID"].setValue(data[0].EMP_MASTER_ID);
+                        this.f["EMP_MASTER_OUTSOURCE"].setValue("");
                         this.f["EMP_MASTER_CM_COMP_ID"].setValue(
                           data[0].EMP_MASTER_CM_COMP_ID
                         );
@@ -542,34 +645,56 @@ export class EmployeeMasterComponent implements OnInit {
                         this.f["EMP_MASTER_IS_HOD"].setValue(
                           data[0].EMP_MASTER_IS_HOD
                         );
-                        this.service
-                          .UPSERT_EmployeeMaster(
-                            "UPSERT_EmployeeMaster",
-                            "SelectDetail",
-                            employeeId
-                          )
-                          .subscribe(
-                            (data) => {
-                              this.displayBasic = true;
-                              this.employeeDetails = data;
-                              for (let item of data) {
-                                this.employeeDetailTable.push({
-                                  CATEGORY: this.getCategory(
-                                    item.EMP_MASTER_SKILLS_CATEGORY_ID
-                                  ),
-                                  PRESENT_SKILL: this.getSkill(
-                                    item.EMP_MASTER_SKILLS_PRESENT_SKILLS_LEVEL
-                                  ),
-                                  NEXT_SKILL: this.getSkill(
-                                    item.EMP_MASTER_SKILLS_NEXT_SKILLS_LEVEL
-                                  ),
-                                });
-                              }
-                            },
-                            (error: HttpErrorResponse) => {
-                              console.log(error);
+                        var type;
+                        data[0].EMP_MASTER_EMP_TYPE ? (type = 1) : (type = 2);
+                        var CATEGORY_TO_SKILL_QUERY = {
+                          TableNames: "CategoryToSkillLevel_Master",
+                          fieldNames:
+                            "CategoryToSkillLevelMaster_ID,CategoryToSkillLevelMaster_title",
+                          condition: `ES_DELETE=0 AND CategoryToSkillLevelMaster_categorymaster_id=${type}`,
+                        };
+
+                        this.commonService
+                          .FillCombo(CATEGORY_TO_SKILL_QUERY)
+                          .subscribe((data) => {
+                            this.categoryToSkillDropdown = [];
+                            for (let item of data) {
+                              this.categoryToSkillDropdown.push({
+                                label: item.CategoryToSkillLevelMaster_title,
+                                value: item.CategoryToSkillLevelMaster_ID,
+                              });
                             }
-                          );
+
+                            this.service
+                              .UPSERT_EmployeeMaster(
+                                "UPSERT_EmployeeMaster",
+                                "SelectDetail",
+                                employeeId
+                              )
+                              .subscribe(
+                                (data) => {
+                                  console.log(data);
+                                  this.displayBasic = true;
+                                  this.employeeDetails = data;
+                                  for (let item of data) {
+                                    this.employeeDetailTable.push({
+                                      CATEGORY: this.getCategory(
+                                        item.EMP_MASTER_SKILLS_CATEGORY_ID
+                                      ),
+                                      PRESENT_SKILL: this.getSkill(
+                                        item.EMP_MASTER_SKILLS_PRESENT_SKILLS_LEVEL
+                                      ),
+                                      NEXT_SKILL: this.getSkill(
+                                        item.EMP_MASTER_SKILLS_NEXT_SKILLS_LEVEL
+                                      ),
+                                    });
+                                  }
+                                },
+                                (error: HttpErrorResponse) => {
+                                  console.log(error);
+                                }
+                              );
+                          });
                       },
                       (error: HttpErrorResponse) => {
                         console.log(error);
@@ -602,8 +727,54 @@ export class EmployeeMasterComponent implements OnInit {
     this.employeeDetailTable.splice(index, 1);
     this.employeeDetails.splice(index, 1);
   }
-
   delete(deleteItem) {
+    if (this.deleteAccess) {
+      var DEL_CHECK_EVAL_QUERY = {
+        TableNames: "EVAL",
+        fieldNames: "*",
+        condition: `EVAL_EMP_ID=${deleteItem}`,
+      };
+      var DEL_CHECK_TRAININGPROGRAM_MASTER_QUERY = {
+        TableNames: "TRAININGPROGRAM_MASTER, TRAININGPROGRAM_DETAIL",
+        fieldNames: "*",
+        condition: `TRAININGPROGRAM_ID=TRAININGPROGRAMDETAIL_TRAININGPROGRAM_ID and TRAININGPROGRAMDETAIL_EMP_ID=${deleteItem} and ES_DELETE=0`,
+      };
+
+      this.commonService.FillCombo(DEL_CHECK_EVAL_QUERY).subscribe((data) => {
+        if (data.length == 0) {
+          this.commonService
+            .FillCombo(DEL_CHECK_TRAININGPROGRAM_MASTER_QUERY)
+            .subscribe((data) => {
+              if (data.length == 0) {
+                this._delete(deleteItem);
+              } else {
+                this.messageService.add({
+                  key: "t1",
+                  severity: "info",
+                  summary: "info",
+                  detail: "Employee cannot be deleted",
+                });
+              }
+            });
+        } else {
+          this.messageService.add({
+            key: "t1",
+            severity: "info",
+            summary: "info",
+            detail: "employee cannot be deleted",
+          });
+        }
+      });
+    } else {
+      this.messageService.add({
+        key: "t1",
+        severity: "warn",
+        summary: "Warning",
+        detail: "Sorry!! You dont have access to Delete Item",
+      });
+    }
+  }
+  _delete(deleteItem) {
     if (this.deleteAccess) {
       this.commonService
         .setResetModify(
@@ -670,6 +841,10 @@ export class EmployeeMasterComponent implements OnInit {
     this.g["EMP_MASTER_SKILLS_CATEGORY_ID"].setValue(
       this.employeeDetails[index].EMP_MASTER_SKILLS_CATEGORY_ID
     );
+    this.g["EMP_MASTER_SKILLS_ID"].setValue(
+      this.employeeDetails[index].EMP_MASTER_SKILLS_ID
+    );
+
     this.g["EMP_MASTER_SKILLS_PRESENT_SKILLS_LEVEL"].setValue(
       this.employeeDetails[index].EMP_MASTER_SKILLS_PRESENT_SKILLS_LEVEL
     );

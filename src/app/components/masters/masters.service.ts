@@ -41,8 +41,13 @@ export class MastersService {
     return this.http.post<any[]>(MASTERS + url, body, httpOptions);
   }
 
-  INSERT_UPSERT_EmployeeMaster(masterForm, detailForm, process) {
-    let body = [masterForm, detailForm, { process: process }];
+  INSERT_UPSERT_EmployeeMaster(masterForm, detailForm, process, userId) {
+    let body = [
+      masterForm,
+      detailForm,
+      { process: process },
+      { userId: userId },
+    ];
     return this.http.post<any>(
       INSERT_EMPLOYEE_MASTER,
       body,

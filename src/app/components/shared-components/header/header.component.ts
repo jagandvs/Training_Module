@@ -12,6 +12,7 @@ export class HeaderComponent implements OnInit {
   public collapsed = false;
   public submenuMasters = false;
   public submenuTransactions = false;
+  public submenuReports = false;
 
   constructor(
     public router: Router,
@@ -34,5 +35,8 @@ export class HeaderComponent implements OnInit {
   }
   toggleSubmenuTransactions() {
     this.submenuTransactions = !this.submenuTransactions;
+  }
+  toggleSubmenuReports() {
+    this.submenuReports = !this.submenuReports;
   }
 }

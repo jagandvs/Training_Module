@@ -1,12 +1,9 @@
 import { HttpErrorResponse } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
-import { fakeAsync } from "@angular/core/testing";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
 import { Question_Bank } from "src/app/_helper/SM_CODE";
-import { UM_CODE } from "src/app/_helper/variables";
 import { CommonService } from "src/app/_services/common.service";
-import { MastersService } from "../../masters/masters.service";
 import { TransactionsService } from "../transactions.service";
 
 @Component({
@@ -38,9 +35,11 @@ export class QuestionBankComponent implements OnInit {
   public backDateAccess: boolean = true;
 
   public process: string;
+  public marksError: boolean = false;
   public categorySkillDropdown: SelectItem[] = [];
   public trainingProgramDropdown: SelectItem[] = [];
   public trainingScheduleDropdown: SelectItem[] = [];
+  public trainingProgramArray: any[] = [];
 
   public totalRecords = 0;
   public CATEGORY_TO_SKILL_QUERY = {
@@ -51,16 +50,17 @@ export class QuestionBankComponent implements OnInit {
   };
   public TRAINING_PROGRAM_QUERY = {
     TableNames: "TrainingProgramMaster",
-    fieldNames: "TrainingProgramMaster_ID,TrainingProgramMaster_title",
+    fieldNames:
+      "TrainingProgramMaster_ID,TrainingProgramMaster_title,TrainingProgramMaster_skilllevelid",
     condition: "ES_DELETE=0",
   };
-  public TRAINING_SCHEDULE_QUERY = {
-    TableNames: "TRAININGPROGRAM_MASTER,TrainingProgramMaster",
-    fieldNames:
-      "TRAININGPROGRAM_TRAINING_PROGRAM_ID, TrainingProgramMaster_title",
-    condition:
-      "TRAININGPROGRAM_TRAINING_PROGRAM_ID=TrainingProgramMaster_ID AND TRAININGPROGRAM_MASTER.ES_DELETE=0",
-  };
+  // public TRAINING_SCHEDULE_QUERY = {
+  //   TableNames: "TRAININGPROGRAM_MASTER,TrainingProgramMaster",
+  //   fieldNames:
+  //     "TRAININGPROGRAM_TRAINING_PROGRAM_ID, TrainingProgramMaster_title",
+  //   condition:
+  //     "TRAININGPROGRAM_TRAINING_PROGRAM_ID=TrainingProgramMaster_ID AND TRAININGPROGRAM_MASTER.ES_DELETE=0",
+  // };
 
   public comp_id: number;
   constructor(
@@ -72,6 +72,9 @@ export class QuestionBankComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    var currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+    var UM_CODE = currentUser?.user.UM_CODE;
     this.commonService
       .checkRight(UM_CODE, Question_Bank, "checkRight")
       .subscribe((data) => {
@@ -99,6 +102,7 @@ export class QuestionBankComponent implements OnInit {
       this.commonService
         .FillCombo(this.TRAINING_PROGRAM_QUERY)
         .subscribe((data) => {
+          this.trainingProgramArray = data;
           for (let item of data) {
             this.trainingProgramDropdown.push({
               label: item.TrainingProgramMaster_title,
@@ -106,17 +110,17 @@ export class QuestionBankComponent implements OnInit {
             });
           }
         });
-      this.commonService
-        .FillCombo(this.TRAINING_SCHEDULE_QUERY)
-        .subscribe((data) => {
-          console.log(data);
-          for (let item of data) {
-            this.trainingScheduleDropdown.push({
-              label: item.TrainingProgramMaster_title,
-              value: item.TRAININGPROGRAM_TRAINING_PROGRAM_ID,
-            });
-          }
-        });
+      // this.commonService
+      //   .FillCombo(this.TRAINING_SCHEDULE_QUERY)
+      //   .subscribe((data) => {
+      //     console.log(data);
+      //     for (let item of data) {
+      //       this.trainingScheduleDropdown.push({
+      //         label: item.TrainingProgramMaster_title,
+      //         value: item.TRAININGPROGRAM_TRAINING_PROGRAM_ID,
+      //       });
+      //     }
+      //   });
       var companyID = JSON.parse(localStorage.getItem("companyDetails"));
       this.comp_id = companyID.CM_ID;
 
@@ -125,9 +129,9 @@ export class QuestionBankComponent implements OnInit {
         QUESTIONBANKMASTER_ID: [0],
         QUESTIONBANKMASTER_CM_COMP_ID: [this.comp_id],
         QUESTIONBANKMASTER_CATEGORYTOSKILLLEVELID: ["", Validators.required],
-        QUESTIONBANKMASTER_QUESTIONTYPE: ["true", Validators.required],
+
         QUESTIONBANKMASTER_QUESTIONTITLE: ["", Validators.required],
-        QUESTIONBANKMASTER_TRAININGTRANSACTIONID: ["", Validators.required],
+        QUESTIONBANKMASTER_TRAININGTRANSACTIONID: [""],
         QUESTIONBANKMASTER_TRAININGMASTERID: ["", Validators.required],
         QUESTIONBANKMASTER_MARKS: ["", Validators.required],
       });
@@ -139,16 +143,47 @@ export class QuestionBankComponent implements OnInit {
     }
   }
 
+  selectProcessSkillLevel() {
+    console.log(this.f["QUESTIONBANKMASTER_TRAININGMASTERID"].value);
+    this.trainingProgramArray.map((data) => {
+      if (
+        this.f["QUESTIONBANKMASTER_TRAININGMASTERID"].value ==
+        data.TrainingProgramMaster_ID
+      ) {
+        this.f["QUESTIONBANKMASTER_CATEGORYTOSKILLLEVELID"].setValue(
+          data.TrainingProgramMaster_skilllevelid
+        );
+      }
+    });
+  }
+
   getQuestionBankTable() {
     this.questionBankTable = [];
     this.loading = true;
     this.service
       .UPSERT_QuestionBank("UPSERT_QuestionBank", "selectAll", 0)
       .subscribe((data) => {
-        for (let questionBank of data) {
+        const setArray = new Set();
+        const filteredArr = data.filter((el) => {
+          const duplicate = setArray.has(el.QuestionBankMaster_ID);
+          setArray.add(el.QuestionBankMaster_ID);
+          return !duplicate;
+        });
+        console.log(filteredArr);
+        for (let questionBank of filteredArr) {
           let CategoryToSkillLevel = this.getCategorySkillLevel(
-            questionBank.QuestionBankMaster_CategoryToSkillLevelid
+            questionBank?.QuestionBankMaster_CategoryToSkillLevelid
           );
+          let programTitle;
+          this.trainingProgramArray.filter((data) => {
+            if (
+              data.TrainingProgramMaster_ID ==
+              questionBank.QUESTIONBANKMASTER_TRAININGMASTERID
+            ) {
+              programTitle = data.TrainingProgramMaster_title;
+            }
+          });
+          console.log(programTitle);
           this.questionBankTable.push({
             QuestionBankMaster_ID: questionBank.QuestionBankMaster_ID,
             CategoryToSkillLevel: CategoryToSkillLevel,
@@ -161,6 +196,7 @@ export class QuestionBankComponent implements OnInit {
             QUESTIONBANKMASTER_TRAININGMASTERID:
               questionBank.QUESTIONBANKMASTER_TRAININGMASTERID,
             QUESTIONBANKMASTER_MARKS: questionBank.QUESTIONBANKMASTER_MARKS,
+            QUESTIONBANKMASRER_TRAININGTITLE: programTitle,
           });
         }
         this.loading = false;
@@ -232,10 +268,6 @@ export class QuestionBankComponent implements OnInit {
                     )
                     .subscribe(
                       (data) => {
-                        let type;
-                        data[0].QUESTIONBANKMASTER_QUESTIONTYPE
-                          ? (type = "true")
-                          : (type = "false");
                         this.f["QUESTIONBANKMASTER_ID"].setValue(
                           data[0].QUESTIONBANKMASTER_ID
                         );
@@ -244,9 +276,7 @@ export class QuestionBankComponent implements OnInit {
                         ].setValue(
                           data[0].QUESTIONBANKMASTER_CATEGORYTOSKILLLEVELID
                         );
-                        this.f["QUESTIONBANKMASTER_QUESTIONTYPE"].setValue(
-                          type
-                        );
+
                         this.f["QUESTIONBANKMASTER_QUESTIONTITLE"].setValue(
                           data[0].QUESTIONBANKMASTER_QUESTIONTITLE
                         );
@@ -349,22 +379,36 @@ export class QuestionBankComponent implements OnInit {
       });
       return;
     }
-    if (this.editInsert) {
-      this.questionDetailTable.splice(
-        this.editIndex,
-        1,
-        this.questionBankDetailForm.value
-      );
-      this.editInsert = false;
+    var duplicateAnswer = [];
+    duplicateAnswer = this.questionDetailTable.filter((data) => {
+      if (
+        this.g["QUESTIONBANKDETAIL_ANSWER"].value.toLowerCase() ==
+        data.QUESTIONBANKDETAIL_ANSWER.toLowerCase()
+      ) {
+        return data.QUESTIONBANKDETAIL_ANSWER;
+      }
+    });
+    if (duplicateAnswer.length == 0) {
+      if (this.editInsert) {
+        this.questionDetailTable.push(this.questionBankDetailForm.value);
+        this.editInsert = false;
+        this.questionBankDetailForm.reset();
+      } else if (duplicateAnswer.length == 0) {
+        this.questionDetailTable.push(this.questionBankDetailForm.value);
+        this.questionBankDetailForm.reset();
+      }
     } else {
-      this.questionDetailTable.push(this.questionBankDetailForm.value);
+      this.messageService.add({
+        key: "t2",
+        severity: "error",
+        summary: "Error",
+        detail: "Answer already exists",
+      });
     }
-    this.questionBankDetailForm.reset();
   }
   editQuestionBankDetail(index: number) {
     this.editInsert = true;
     this.editIndex = index;
-
     this.g["QUESTIONBANKDETAIL_QUESTIONBANKMASTER_ID"].setValue(
       this.questionDetailTable[index].QUESTIONBANKDETAIL_QUESTIONBANKMASTER_ID
     );
@@ -375,10 +419,35 @@ export class QuestionBankComponent implements OnInit {
     this.g["QUESTIONBANKDETAIL_WEIGHTAGE"].setValue(
       this.questionDetailTable[index].QUESTIONBANKDETAIL_WEIGHTAGE
     );
+    this.questionDetailTable.splice(index, 1);
+  }
+  checkMarks(value) {
+    if (value > 100 || value < 0) {
+      this.marksError = true;
+    } else {
+      this.marksError = false;
+    }
   }
   save() {
     this.submitted = true;
-    if (this.questionBankMasterForm.valid) {
+    if (this.questionDetailTable.length < 2) {
+      return this.messageService.add({
+        key: "t2",
+        severity: "info",
+        summary: "Info",
+        detail: "Please add atleast 2 Answers",
+      });
+    }
+    if (this.marksError) {
+      return this.messageService.add({
+        key: "t2",
+        severity: "error",
+        summary: "Error",
+        detail: "Marks should between 0 and 100",
+      });
+    }
+
+    if (this.questionBankMasterForm.valid && !this.marksError) {
       this.submitted = false;
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
 
@@ -445,13 +514,46 @@ export class QuestionBankComponent implements OnInit {
   reset() {
     this.questionBankMasterForm.reset();
     this.newItem
-      ? this.f["TrainingProgramMaster_ID"].setValue("")
-      : this.f["TrainingProgramMaster_ID"].setValue(this.editingPKCODE);
+      ? this.f["QUESTIONBANKMASTER_ID"].setValue(0)
+      : this.f["QUESTIONBANKMASTER_ID"].setValue(this.editingPKCODE);
     this.f["QUESTIONBANKMASTER_CM_COMP_ID"].setValue(this.comp_id);
     this.questionBankDetailForm.reset();
     this.questionDetailTable = [];
   }
   delete(deleteItem) {
+    if (this.deleteAccess) {
+      var DEL_CHECK_EVAL_DETAIL_QUERY = {
+        TableNames: "EVAL_DETAIL",
+        fieldNames: "*",
+        condition: `EVAL_QUESTION_ID=${deleteItem}`,
+      };
+      console.log(DEL_CHECK_EVAL_DETAIL_QUERY.condition);
+      this.commonService
+        .FillCombo(DEL_CHECK_EVAL_DETAIL_QUERY)
+        .subscribe((data) => {
+          console.log(data.length);
+          if (data.length == 0) {
+            this._delete(deleteItem);
+          } else {
+            this.messageService.add({
+              key: "t1",
+              severity: "info",
+              summary: "info",
+              detail: "Question cannot be deleted",
+            });
+          }
+        });
+    } else {
+      this.messageService.add({
+        key: "t1",
+        severity: "warn",
+        summary: "Warning",
+        detail: "Sorry!! You dont have access to Delete Item",
+      });
+    }
+  }
+
+  _delete(deleteItem) {
     if (this.deleteAccess) {
       this.commonService
         .setResetModify(

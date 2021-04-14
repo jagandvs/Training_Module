@@ -3,7 +3,6 @@ import { FormBuilder } from "@angular/forms";
 import { NgxSpinnerService } from "ngx-spinner";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
 import { Question_Bank } from "src/app/_helper/SM_CODE";
-import { UM_CODE } from "src/app/_helper/variables";
 import { CommonService } from "src/app/_services/common.service";
 import { TransactionsService } from "../transactions.service";
 
@@ -34,12 +33,20 @@ export class EvaluationComponent implements OnInit {
   public emp_id: number;
   public total_marks: number = 0;
   public displayResponsive: boolean = false;
+  // public TRAINING_PROGRAM_QUERY = {
+  //   TableNames: "TRAININGPROGRAM_MASTER,TrainingProgramMaster",
+  //   fieldNames:
+  //     "TRAININGPROGRAM_TRAINING_PROGRAM_ID, TrainingProgramMaster_title +' -> '+ CONVERT(varchar,TRAININGPROGRAM_ID_FROM_DATE,107) +' - '+ CONVERT(varchar,TRAININGPROGRAM_ID_TO_DATE,107) as TrainingProgramMaster_title",
+  //   condition:
+  //     "TRAININGPROGRAM_TRAINING_PROGRAM_ID=TrainingProgramMaster_ID AND TRAININGPROGRAM_MASTER.ES_DELETE=0 AND TrainingProgramMaster_emptype=1",
+  // };
+
   public TRAINING_PROGRAM_QUERY = {
     TableNames: "TRAININGPROGRAM_MASTER,TrainingProgramMaster",
     fieldNames:
-      "TRAININGPROGRAM_TRAINING_PROGRAM_ID, TrainingProgramMaster_title",
+      "TRAININGPROGRAM_ID , TrainingProgramMaster_title +' -> '+ CONVERT(varchar,TRAININGPROGRAM_ID_FROM_DATE,107) +' - '+ CONVERT(varchar,TRAININGPROGRAM_ID_TO_DATE,107) as TrainingProgramMaster_title",
     condition:
-      "TRAININGPROGRAM_TRAINING_PROGRAM_ID=TrainingProgramMaster_ID AND TRAININGPROGRAM_MASTER.ES_DELETE=0",
+      "TRAININGPROGRAM_TRAINING_PROGRAM_ID=TrainingProgramMaster_ID AND TRAININGPROGRAM_MASTER.ES_DELETE=0 AND TrainingProgramMaster_emptype=1",
   };
   constructor(
     private commonService: CommonService,
@@ -53,7 +60,9 @@ export class EvaluationComponent implements OnInit {
   ngOnInit(): void {
     var companyID = JSON.parse(localStorage.getItem("companyDetails"));
     this.comp_id = companyID.CM_ID;
-    var empID = JSON.parse(localStorage.getItem("currentUser"));
+    var empID = JSON.parse(sessionStorage.getItem("currentUser"));
+    var UM_CODE = empID?.user.UM_CODE;
+
     console.log(empID);
     this.emp_id = empID.user.EMP_CODE;
     this.commonService
@@ -77,7 +86,7 @@ export class EvaluationComponent implements OnInit {
           for (let item of data) {
             this.trainingProgramDropdown.push({
               label: item.TrainingProgramMaster_title,
-              value: item.TRAININGPROGRAM_TRAINING_PROGRAM_ID,
+              value: item.TRAININGPROGRAM_ID,
             });
           }
         });
@@ -85,16 +94,38 @@ export class EvaluationComponent implements OnInit {
   }
 
   onTrainingProgramChange() {
-    this.trainingSelected = true;
+    this.SpinnerService.show();
     console.log(this.selectedTraining);
-    this.service.getQuestionBank(this.selectedTraining).subscribe((data) => {
-      this.QuestionList = data;
-      let marks = 0;
-      this.QuestionList.map((data) => {
-        marks = marks + data.options[0].Marks;
+    this.service
+      .getQuestionBank(this.selectedTraining, this.emp_id)
+      .subscribe((data) => {
+        if (data.length == 0) {
+          this.SpinnerService.hide();
+
+          return this.messageService.add({
+            key: "t1",
+            severity: "error",
+            summary: "Error",
+            detail: "No Questions are added for this training",
+          });
+        } else if (data[0].EVAL_TOTAL_MARKS) {
+          this.scoredMarks = data[0].EVAL_TOTAL_MARKS;
+          this.SpinnerService.hide();
+          this.displayResponsive = true;
+        } else {
+          this.trainingSelected = true;
+
+          this.QuestionList = data;
+          console.log(data);
+
+          let marks = 0;
+          this.QuestionList.map((data) => {
+            marks = marks + data.options[0].Marks;
+          });
+          console.log(marks);
+          this.SpinnerService.hide();
+        }
       });
-      console.log(marks);
-    });
   }
   answered(question, option, i) {
     console.log(question, option, i);
@@ -186,7 +217,7 @@ export class EvaluationComponent implements OnInit {
         key: "t1",
         severity: "error",
         summary: "Error",
-        detail: "Please Fill All required fields",
+        detail: "Answer all quesions",
       });
     }
   }

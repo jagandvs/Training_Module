@@ -19,7 +19,7 @@
                     #dt
                     [value]="appovalList"
                     [(selection)]="selectedAppovalList"
-                    dataKey="TRAININGPROGRAM_ID"
+                    dataKey="EMP_MASTER_NUMBER"
                     [rows]="10"
                     [paginator]="true"
                     [loading]="loading"
@@ -55,6 +55,14 @@
                           </p-dropdown>
                         </div>
                         <div class="col-md-3">
+                          <input
+                            pInputText
+                            type="text"
+                            [(ngModel)]="traineeName"
+                            placeholder="Training Conducted By"
+                          />
+                        </div>
+                        <div class="col-md-3">
                           <button
                             class="btn btn-success text-white"
                             (click)="approve()"
@@ -62,17 +70,6 @@
                             <i class="mdi mdi mdi-check"></i>
                             Appove
                           </button>
-                        </div>
-                        <div class="col-md-3">
-                          <!-- <button
-                    type="button"
-                    class="btn btn-success"
-                    (click)="exportExcel()"
-                    pTooltip="CSV"
-                    tooltipPosition="bottom"
-                  >
-                    <i class="fas fa-file-excel"></i> Export Excel
-                  </button> -->
                         </div>
 
                         <div class="col-md-3">

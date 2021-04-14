@@ -24,9 +24,11 @@ export class TrainingProgramMasterComponent implements OnInit {
   public processMasterDropdown: SelectItem[] = [];
   public categoryMasterDropdown: SelectItem[] = [];
   public skillMasterDropdown: SelectItem[] = [];
+  public applicableToDropdown: SelectItem[] = [];
 
   public uploadedFiles: File[] = [];
   public showSelectedFiles: File[] = [];
+
   public attachments: File[] = [];
   public menuAccess: boolean = true;
   public addAccess: boolean = true;
@@ -61,12 +63,6 @@ export class TrainingProgramMasterComponent implements OnInit {
     fieldNames: "process_id,process_name",
     condition: "es_delete=0",
   };
-  public SKILL_MASTER_QUERY: any = {
-    TableNames: "CategoryToSkillLevel_Master",
-    fieldNames:
-      "CategoryToSkillLevelMaster_ID,CategoryToSkillLevelMaster_title",
-    condition: "es_delete=0",
-  };
 
   constructor(
     private commonService: CommonService,
@@ -78,6 +74,22 @@ export class TrainingProgramMasterComponent implements OnInit {
 
   ngOnInit(): void {
     this.loading = true;
+    var currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+    var UM_CODE = currentUser?.user.UM_CODE;
+    this.commonService
+      .checkRight(UM_CODE, Training_Program, "checkRight")
+      .subscribe((data) => {
+        for (let access of data) {
+          this.menuAccess = access.MENU;
+          this.addAccess = access.ADD;
+          this.deleteAccess = access.DELETE;
+          this.viewAccess = access.VIEW;
+          this.printAccess = access.PRINT;
+          this.backDateAccess = access.BACK_DATE;
+          this.updateAccess = access.UPDATE;
+        }
+      });
     this.getTrainingMaster();
     var companyID = JSON.parse(localStorage.getItem("companyDetails"));
     this.comp_id = companyID.CM_ID;
@@ -91,30 +103,25 @@ export class TrainingProgramMasterComponent implements OnInit {
           });
         }
       });
-    this.commonService
-      .FillCombo(this.CATEGORY_MASTER_QUERY)
-      .subscribe((data) => {
-        for (let value of data) {
-          this.categoryMasterDropdown.push({
-            label: value.category_name,
-            value: value.category_id,
-          });
-        }
-      });
-    this.commonService.FillCombo(this.SKILL_MASTER_QUERY).subscribe((data) => {
-      for (let value of data) {
-        this.skillMasterDropdown.push({
-          label: value.CategoryToSkillLevelMaster_title,
-          value: value.CategoryToSkillLevelMaster_ID,
-        });
-      }
-    });
+
+    // this.commonService
+    //   .FillCombo(this.CATEGORY_MASTER_QUERY)
+    //   .subscribe((data) => {
+    //     for (let value of data) {
+    //       this.categoryMasterDropdown.push({
+    //         label: value.category_name,
+    //         value: value.category_id,
+    //       });
+    //     }
+    //   });
+
     this.trainingMasterForm = this.fb.group({
       TrainingProgramMaster_ID: [""],
       TrainingProgramMaster_CM_COMP_ID: [this.comp_id],
       TrainingProgramMaster_processMasterid: ["", Validators.required],
-      TrainingProgramMaster_categoryid: ["", Validators.required],
+      TrainingProgramMaster_categoryid: [""],
       TrainingProgramMaster_skilllevelid: ["", Validators.required],
+      TrainingProgramMaster_emptype: ["", Validators.required],
       TrainingProgramMaster_title: ["", Validators.required],
       TrainingProgramMaster_duration: ["", Validators.required],
       TrainingProgramMaster_location: ["", Validators.required],
@@ -130,25 +137,19 @@ export class TrainingProgramMasterComponent implements OnInit {
 
   getTrainingMaster() {
     this.loading = true;
-    this.commonService
-      .checkRight(UM_CODE, Training_Program, "checkRight")
-      .subscribe((data) => {
-        for (let access of data) {
-          this.menuAccess = access.MENU;
-          this.addAccess = access.ADD;
-          this.deleteAccess = access.DELETE;
-          this.viewAccess = access.VIEW;
-          this.printAccess = access.PRINT;
-          this.backDateAccess = access.BACK_DATE;
-          this.updateAccess = access.UPDATE;
-        }
-      });
+
     if (this.menuAccess) {
       this.trainingMaster = [];
+      // [TrainingProgramMaster_ID],[TrainingProgramMaster_CM_COMP_ID],[TrainingProgramMaster_processMasterid],[TrainingProgramMaster_categoryid],[TrainingProgramMaster_skilllevelid],[TrainingProgramMaster_title],[TrainingProgramMaster_duration],[TrainingProgramMaster_location],[TrainingProgramMaster_modeOfTraining],[TrainingProgramMaster_iscustomerend],[TrainingProgramMaster_evalfrom],[TrainingProgramMaster_evalto],case [TrainingProgramMaster_emptype] when 1 then 'Staff' else 'Worker' end as TrainingProgramMaster_emptype,[es_modify],[es_delete]
       this.commonService
         .getTableResponse("*", "TrainingProgramMaster", "es_delete=0")
         .subscribe((data) => {
           data.map((process) => {
+            var type = "";
+            console.log(process.TrainingProgramMaster_emptype);
+            process.TrainingProgramMaster_emptype == 1
+              ? (type = "Staff")
+              : (type = "Worker");
             this.trainingMaster.push({
               TrainingProgramMaster_ID: process.TrainingProgramMaster_ID,
               TrainingProgramMaster_CM_COMP_ID:
@@ -159,6 +160,7 @@ export class TrainingProgramMasterComponent implements OnInit {
                 process.TrainingProgramMaster_categoryid,
               TrainingProgramMaster_skilllevelid:
                 process.TrainingProgramMaster_skilllevelid,
+              TrainingProgramMaster_emptype: type,
               TrainingProgramMaster_title: process.TrainingProgramMaster_title,
               TrainingProgramMaster_duration:
                 process.TrainingProgramMaster_duration,
@@ -178,7 +180,37 @@ export class TrainingProgramMasterComponent implements OnInit {
 
           this.loading = false;
         });
+
+      this.applicableToDropdown = [
+        {
+          label: "Staff",
+          value: 1,
+        },
+        {
+          label: "Workers",
+          value: 2,
+        },
+      ];
     }
+  }
+
+  selectedEmpType() {
+    var SKILL_MASTER_QUERY: any = {
+      TableNames: "CategoryToSkillLevel_Master",
+      fieldNames:
+        "CategoryToSkillLevelMaster_ID,CategoryToSkillLevelMaster_title",
+      condition: `es_delete=0 AND CategoryToSkillLevelMaster_categorymaster_id=${this.f["TrainingProgramMaster_emptype"].value}`,
+    };
+
+    this.commonService.FillCombo(SKILL_MASTER_QUERY).subscribe((data) => {
+      this.skillMasterDropdown = [];
+      for (let value of data) {
+        this.skillMasterDropdown.push({
+          label: value.CategoryToSkillLevelMaster_title,
+          value: value.CategoryToSkillLevelMaster_ID,
+        });
+      }
+    });
   }
   selectedFiles(event) {
     console.log(event.files);
@@ -192,6 +224,7 @@ export class TrainingProgramMasterComponent implements OnInit {
   add() {
     if (this.addAccess) {
       this.showSelectedFiles = [];
+      this.skillMasterDropdown = [];
 
       this.newItem = true;
       this.submitted = false;
@@ -353,6 +386,55 @@ export class TrainingProgramMasterComponent implements OnInit {
   }
   delete(code) {
     if (this.deleteAccess) {
+      var DEL_CHECK_QUESTIONBANK_MASTER_QUERY = {
+        TableNames: "QuestionBank_Master",
+        fieldNames: "*",
+        condition: `QUESTIONBANKMASTER_TRAININGMASTERID=${code}`,
+      };
+      var DEL_CHECK_TRAININGPROGRAM_MASTER_QUERY = {
+        TableNames: "TRAININGPROGRAM_MASTER",
+        fieldNames: "*",
+        condition: `TRAININGPROGRAM_TRAINING_PROGRAM_ID=${code}`,
+      };
+
+      this.commonService
+        .FillCombo(DEL_CHECK_QUESTIONBANK_MASTER_QUERY)
+        .subscribe((data) => {
+          if (data.length == 0) {
+            this.commonService
+              .FillCombo(DEL_CHECK_TRAININGPROGRAM_MASTER_QUERY)
+              .subscribe((data) => {
+                if (data.length == 0) {
+                  this._delete(code);
+                } else {
+                  this.messageService.add({
+                    key: "t1",
+                    severity: "info",
+                    summary: "info",
+                    detail: "Training Program cannot be deleted",
+                  });
+                }
+              });
+          } else {
+            this.messageService.add({
+              key: "t1",
+              severity: "info",
+              summary: "info",
+              detail: "Training Program cannot be deleted",
+            });
+          }
+        });
+    } else {
+      this.messageService.add({
+        key: "t1",
+        severity: "warn",
+        summary: "Warning",
+        detail: "Sorry!! You dont have access to Delete Item",
+      });
+    }
+  }
+  _delete(code) {
+    if (this.deleteAccess) {
       this.commonService
         .setResetModify(
           "TrainingProgramMaster",
@@ -438,6 +520,10 @@ export class TrainingProgramMasterComponent implements OnInit {
                 "setLock"
               )
               .subscribe((data) => {
+                var type;
+                training.TrainingProgramMaster_emptype == "Staff"
+                  ? (type = 1)
+                  : (type = 2);
                 this.getFiles(trainingProgramUploadFolder, this.editingPKCode);
 
                 this.f["TrainingProgramMaster_ID"].setValue(
@@ -452,6 +538,10 @@ export class TrainingProgramMasterComponent implements OnInit {
                 this.f["TrainingProgramMaster_categoryid"].setValue(
                   training.TrainingProgramMaster_categoryid
                 );
+
+                this.f["TrainingProgramMaster_emptype"].setValue(type);
+
+                this.selectedEmpType();
                 this.f["TrainingProgramMaster_skilllevelid"].setValue(
                   training.TrainingProgramMaster_skilllevelid
                 );
@@ -533,17 +623,11 @@ export class TrainingProgramMasterComponent implements OnInit {
       });
   }
   downloadFile(fileName) {
-    this.commonService
-      .downloadFile(fileName, trainingProgramUploadFolder, this.editingPKCode)
-      .subscribe((data) => {
-        this.download(data);
-        this.messageService.add({
-          key: "t2",
-          severity: "success",
-          summary: "Success",
-          detail: "File Downloaded",
-        });
-      });
+    this.commonService.downloadFile(
+      fileName,
+      trainingProgramUploadFolder,
+      this.editingPKCode
+    );
   }
   download(data) {
     const blob = new Blob([data]);

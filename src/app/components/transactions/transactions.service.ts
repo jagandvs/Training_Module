@@ -17,6 +17,9 @@ import {
   UpdateAttendance,
   getQuestionBank,
   UPSERT_Eval,
+  getEmployeeListForOfflineEvaluation,
+  UPSERT_EvalOffline,
+  UpdateTraningConductedBy,
 } from "src/app/_helper/navigation-urls";
 import { CommonService } from "src/app/_services/common.service";
 
@@ -144,6 +147,25 @@ export class TransactionsService {
       getEmployeeListForAttendance + "?Training_ID=" + Training_ID
     );
   }
+
+  UpdateTraningConductedBy(TRAININGPROGRAMID, CONDUCTEDBY) {
+    return this.http.post(
+      UpdateTraningConductedBy,
+      { TRAININGPROGRAMID: TRAININGPROGRAMID, CONDUCTEDBY: CONDUCTEDBY },
+      httpOptions
+    );
+  }
+  getEmployeeListForOfflineEvaluation(
+    Training_ID,
+    COMPANY_ID
+  ): Observable<any[]> {
+    let body = { Trainingmaster_id: Training_ID, COMPANY_ID: COMPANY_ID };
+    return this.http.post<any[]>(
+      getEmployeeListForOfflineEvaluation,
+      body,
+      httpOptions
+    );
+  }
   updateAttendance(approvalList) {
     return this.http.post<any>(
       UpdateAttendance,
@@ -158,11 +180,11 @@ export class TransactionsService {
     );
   }
 
-  getQuestionBank(TrainingTransaction_id): Observable<any[]> {
+  getQuestionBank(TrainingTransaction_id, emp_id): Observable<any[]> {
     return this.http
       .post<any[]>(
         getQuestionBank,
-        { TrainingTransaction_id: TrainingTransaction_id },
+        { TrainingTransaction_id: TrainingTransaction_id, emp_id: emp_id },
         this.commonService.logger(
           "Training program Questions",
           "get questions",
@@ -173,43 +195,64 @@ export class TransactionsService {
       )
       .pipe(
         map((data) => {
-          console.log(data);
+          console.log(data.length);
           let allQuestions = [];
-          for (let questions of data) {
-            allQuestions.push({
-              id: questions.id,
-              Question: questions.Question,
-              options: [],
-            });
-          }
-          data.map((options) => {
-            for (let arr of allQuestions) {
-              if (options.id == arr.id) {
-                arr.options.push({
-                  QUESTIONBANKDETAIL_QUESTIONBANKDETAIL_ID:
-                    options.QUESTIONBANKDETAIL_QUESTIONBANKDETAIL_ID,
-                  QuestionBankDetail_Answer: options.QuestionBankDetail_Answer,
-                  QuestionBankDetail_weightage:
-                    options.QuestionBankDetail_weightage,
-                  Marks: options.Marks,
-                });
-              }
+          if (data.length == 0) {
+            return data;
+          } else {
+            if (data[0].hasOwnProperty("EVAL_TOTAL_MARKS")) {
+              return data;
             }
-          });
-          const setArray = new Set();
-          const filteredArr = allQuestions.filter((el) => {
-            const duplicate = setArray.has(el.id);
-            setArray.add(el.id);
-            return !duplicate;
-          });
-          return filteredArr;
-          // return allQuestions;
+            for (let questions of data) {
+              allQuestions.push({
+                id: questions.id,
+                Question: questions.Question,
+                options: [],
+              });
+            }
+            data.map((options) => {
+              for (let arr of allQuestions) {
+                if (options.id == arr.id) {
+                  arr.options.push({
+                    QUESTIONBANKDETAIL_QUESTIONBANKDETAIL_ID:
+                      options.QUESTIONBANKDETAIL_QUESTIONBANKDETAIL_ID,
+                    QuestionBankDetail_Answer:
+                      options.QuestionBankDetail_Answer,
+                    QuestionBankDetail_weightage:
+                      options.QuestionBankDetail_weightage,
+                    Marks: options.Marks,
+                  });
+                }
+              }
+            });
+            const setArray = new Set();
+            const filteredArr = allQuestions.filter((el) => {
+              const duplicate = setArray.has(el.id);
+              setArray.add(el.id);
+              return !duplicate;
+            });
+            return filteredArr;
+            // return allQuestions;
+          }
         })
       );
   }
   saveEvaluation(QuestionsAnswered) {
     return this.http.post(
       UPSERT_Eval,
+      QuestionsAnswered,
+      this.commonService.logger(
+        "Answers",
+        "get questions",
+        "Training program Questions",
+        "",
+        ""
+      )
+    );
+  }
+  saveOfflineEvaluation(QuestionsAnswered) {
+    return this.http.post(
+      UPSERT_EvalOffline,
       QuestionsAnswered,
       this.commonService.logger(
         "Answers",

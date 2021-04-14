@@ -13,7 +13,7 @@
           <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
               <div class="card-body">
-                <h4 class="card-title">Category To Skill Level Master</h4>
+                <h4 class="card-title">Skill Level Master</h4>
                 <div *ngIf="menuAccess">
                   <p-table
                     #dt
@@ -25,10 +25,11 @@
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                     [rowsPerPageOptions]="[10,25,50]"
                     [loading]="loading"
-                    [globalFilterFields]="['CategoryToSkillLevelMaster_title','CategoryToSkillLevelMaster_passingpercentage']"
+                    [globalFilterFields]="['CategoryToSkillLevelMaster_title','CategoryToSkillLevelMaster_categorymaster_id','CategoryToSkillLevelMaster_passingpercentage']"
                   >
                     <ng-template pTemplate="colgroup">
                       <colgroup>
+                        <col style="width: 200px;" />
                         <col style="width: 200px;" />
                         <col style="width: 200px;" />
                         <col style="width: 200px;" />
@@ -78,6 +79,15 @@
                           </p-sortIcon>
                         </th>
                         <th
+                          pSortableColumn="CategoryToSkillLevelMaster_categorymaster_id"
+                        >
+                          Employee Type
+                          <p-sortIcon
+                            field="CategoryToSkillLevelMaster_categorymaster_id"
+                          >
+                          </p-sortIcon>
+                        </th>
+                        <th
                           pSortableColumn="CategoryToSkillLevelMaster_passingpercentage"
                         >
                           Passing Percentage
@@ -98,9 +108,11 @@
                       <tr>
                         <td>{{category.CategoryToSkillLevelMaster_title}}</td>
                         <td>
+                          {{category.CategoryToSkillLevelMaster_categorymaster_id}}
+                        </td>
+                        <td>
                           {{category.CategoryToSkillLevelMaster_passingpercentage}}
                         </td>
-
                         <td>
                           <button
                             class="btn btn-warning mr-4"
@@ -138,7 +150,7 @@
           </div>
         </div>
         <p-dialog
-          header="Category Skill Level Master"
+          header="Skill Level Master"
           [(visible)]="displayBasic"
           [style]="{width: '80vw'}"
           [baseZIndex]="10000"
@@ -154,15 +166,16 @@
             <div class="co1-12 col-8">
               <form class="forms-sample" [formGroup]="categorySkillMasterForm">
                 <div class="form-group row">
-                  <label class="col-sm-6 col-form-label">Category Name</label>
+                  <label class="col-sm-6 col-form-label">Employee Type</label>
                   <div class="col-sm-6">
                     <p-dropdown
-                      [options]="categoryMasterDropdown"
+                      [options]="applicableToDropdown"
                       [filter]="true"
                       [showClear]="true"
-                      placeholder="Select Category Name"
+                      placeholder="Select Employee Type"
                       [resetFilterOnHide]="true"
                       formControlName="CategoryToSkillLevelMaster_categorymaster_id"
+                      (onChange)="checkDuplicate()"
                     >
                     </p-dropdown>
                     <div
@@ -172,7 +185,7 @@
                       <div
                         *ngIf="f.CategoryToSkillLevelMaster_categorymaster_id.errors.required"
                       >
-                        Category Name is required
+                        Employee Type is required
                       </div>
                     </div>
                   </div>

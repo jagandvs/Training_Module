@@ -21,7 +21,7 @@
                     [rows]="10"
                     [paginator]="true"
                     [loading]="loading"
-                    [globalFilterFields]="['CategoryToSkillLevel','QuestionBankMaster_questiontype', 'QuestionBankMaster_questionTitle']"
+                    [globalFilterFields]="['CategoryToSkillLevel','QUESTIONBANKMASRER_TRAININGTITLE', 'QuestionBankMaster_questionTitle']"
                     [rowsPerPageOptions]="[10,25,50]"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                     [totalRecords]="totalRecords"
@@ -76,7 +76,7 @@
                           </p-sortIcon>
                         </th>
                         <th pSortableColumn="QuestionBankMaster_questiontype">
-                          Question Type
+                          Training Program Title
                           <p-sortIcon field="QuestionBankMaster_questiontype">
                           </p-sortIcon>
                         </th>
@@ -95,7 +95,7 @@
                     >
                       <tr>
                         <td>{{question.CategoryToSkillLevel}}</td>
-                        <td>{{question.QuestionBankMaster_questiontype}}</td>
+                        <td>{{question.QUESTIONBANKMASRER_TRAININGTITLE}}</td>
                         <td>{{question.QuestionBankMaster_questionTitle}}</td>
                         <td>
                           <button
@@ -163,6 +163,7 @@
                       [resetFilterOnHide]="true"
                       [autofocus]="true"
                       formControlName="QUESTIONBANKMASTER_TRAININGMASTERID"
+                      (onChange)="selectProcessSkillLevel()"
                     >
                     </p-dropdown>
                     <div
@@ -176,43 +177,19 @@
                       </div>
                     </div>
                   </div>
+
                   <div class="p-field p-col-12 p-md-6">
-                    <label for="categorySkillLevel">Training Transaction</label>
-                    <p-dropdown
-                      [optionLabel]="label"
-                      [options]="trainingScheduleDropdown"
-                      [filter]="true"
-                      [showClear]="true"
-                      placeholder="Select Training Schedule Progaram"
-                      [resetFilterOnHide]="true"
-                      [autofocus]="true"
-                      formControlName="QUESTIONBANKMASTER_TRAININGTRANSACTIONID"
-                    >
-                    </p-dropdown>
-                    <div
-                      *ngIf="submitted && f.QUESTIONBANKMASTER_TRAININGTRANSACTIONID.errors"
-                      class="alert alert-danger"
-                    >
-                      <div
-                        *ngIf="f.QUESTIONBANKMASTER_TRAININGTRANSACTIONID.errors.required"
-                      >
-                        Training Schedule is required
-                      </div>
-                    </div>
-                  </div>
-                  <div class="p-field p-col-12 p-md-6">
-                    <label for="categorySkillLevel"
-                      >Category to Skill level</label
-                    >
+                    <label for="categorySkillLevel">Skill level</label>
                     <p-dropdown
                       [optionLabel]="label"
                       [options]="categorySkillDropdown"
                       [filter]="true"
-                      [showClear]="true"
-                      placeholder="Select Category to skill level"
+                      [showClear]="false"
+                      placeholder="Select skill level"
                       [resetFilterOnHide]="true"
                       [autofocus]="true"
                       formControlName="QUESTIONBANKMASTER_CATEGORYTOSKILLLEVELID"
+                      [disabled]="true"
                     >
                     </p-dropdown>
                     <div
@@ -222,29 +199,12 @@
                       <div
                         *ngIf="f.QUESTIONBANKMASTER_CATEGORYTOSKILLLEVELID.errors.required"
                       >
-                        Category to Skill level is required
+                        Skill level is required
                       </div>
                     </div>
                   </div>
+
                   <div class="p-field p-col-12 p-md-6">
-                    <label for="answer">Marks</label>
-                    <input
-                      type="number"
-                      inputId="marks"
-                      pInputText
-                      placeholder="Marks"
-                      formControlName="QUESTIONBANKMASTER_MARKS"
-                    />
-                    <div
-                      *ngIf="submitted && f.QUESTIONBANKMASTER_MARKS.errors"
-                      class="alert alert-danger"
-                    >
-                      <div *ngIf="f.QUESTIONBANKMASTER_MARKS.errors.required">
-                        Marks is required
-                      </div>
-                    </div>
-                  </div>
-                  <div class="p-field p-col-12">
                     <label for="questionTitle">Question Title</label>
                     <input
                       type="text"
@@ -264,10 +224,34 @@
                       </div>
                     </div>
                   </div>
-                  <div class="p-field p-col-3">
+                  <div class="p-field p-col-12 p-md-6">
+                    <label for="answer">Marks</label>
+                    <input
+                      type="number"
+                      inputId="marks"
+                      pInputText
+                      placeholder="Marks"
+                      formControlName="QUESTIONBANKMASTER_MARKS"
+                      (input)="checkMarks($event.target.value)"
+                    />
+                    <div class="alert alert-danger" *ngIf="marksError">
+                      Marks should between 0 and 100
+                    </div>
+                    <div
+                      *ngIf="submitted && f.QUESTIONBANKMASTER_MARKS.errors"
+                      class="alert alert-danger"
+                    >
+                      <div
+                        *ngIf="f.QUESTIONBANKMASTER_MARKS.errors.required && !marksError"
+                      >
+                        Marks is required
+                      </div>
+                    </div>
+                  </div>
+                  <!-- <div class="p-field p-col-3">
                     <label>Answer Type</label>
 
-                    <!-- <div class="form-check form-check-inline">
+                    <div class="form-check form-check-inline">
                       <input
                         class="form-check-input"
                         type="radio"
@@ -280,7 +264,7 @@
                         for="single"
                         >Single</label
                       >
-                    </div> -->
+                    </div>
                     <div class="form-check form-check-inline">
                       <input
                         class="form-check-input"
@@ -295,7 +279,7 @@
                         >Multiple</label
                       >
                     </div>
-                  </div>
+                  </div> -->
                 </div>
               </form>
             </div>

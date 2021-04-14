@@ -1,7 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
-import { UM_CODE } from "src/app/_helper/variables";
 import { CommonService } from "src/app/_services/common.service";
 import { TransactionsService } from "../transactions.service";
 import { Training_Need } from "src/app/_helper/SM_CODE";
@@ -60,6 +59,9 @@ export class TrainingNeedComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    var currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+    var UM_CODE = currentUser?.user.UM_CODE;
     this.commonService
       .checkRight(UM_CODE, Training_Need, "checkRight")
       .subscribe((data) => {

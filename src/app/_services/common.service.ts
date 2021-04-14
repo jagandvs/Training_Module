@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
+import { saveAs } from "file-saver";
 import {
   deleteFile,
   deleteRow,
@@ -114,6 +115,7 @@ export class CommonService {
   }
 
   checkRight(UR_UM_CODE: number, UR_SM_CODE: number, PROCESS: string) {
+    console.log(UR_UM_CODE, UR_SM_CODE);
     var body = {
       UR_UM_CODE: UR_UM_CODE,
       UR_SM_CODE: UR_SM_CODE,
@@ -133,6 +135,7 @@ export class CommonService {
       )
       .pipe(
         map((userRightsData) => {
+          console.log(userRightsData);
           var access = userRightsData[0].UR_RIGHTS.split("");
           return [
             {
@@ -177,17 +180,16 @@ export class CommonService {
     return this.http.post<any>(deleteFile, body, httpOptions);
   }
   downloadFile(fileName, name, pk) {
-    let body = {
-      name: name,
-      pk: pk,
-      fileName: fileName,
-    };
-    const httpOption = {
-      headers: new HttpHeaders({
-        "Content-Type": "application/json",
-        Accept: "application/pdf",
-      }),
-    };
-    return this.http.post(downloadFile, body, httpOption);
+    this.http
+      .get(`${downloadFile}?name=${name}&pk=${pk}&fileName=${fileName}`, {
+        responseType: "blob",
+      })
+      .toPromise()
+      .then((blob) => {
+        saveAs(blob, fileName);
+      })
+      .catch((err) => console.error("download error = ", err));
   }
+
+  getAccessRights() {}
 }

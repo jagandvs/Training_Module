@@ -2,7 +2,6 @@ const { sql, poolPromise } = require("../../database/db");
 const { encryptPWD, comparePWD } = require("../../helper/helper");
 
 exports.UPSERT_USER_MASTER = async (req, res) => {
-  console.log(req.body[1].process);
   try {
     const pool = await poolPromise;
     const result = await pool

@@ -23,6 +23,8 @@ import { AttendanceApprovalComponent } from "./attendance-approval/attendance-ap
 import { FileUploadModule } from "primeng/fileupload";
 import { EvaluationComponent } from "./evaluation/evaluation.component";
 import { NgxSpinnerModule } from "ngx-spinner";
+import { CalendarModule } from "primeng/calendar";
+import { OfflineEvaluationComponent } from "./offline-evaluation/offline-evaluation.component";
 
 const routes: Routes = [
   { path: "questionBank", component: QuestionBankComponent },
@@ -37,6 +39,10 @@ const routes: Routes = [
     path: "evaluation",
     component: EvaluationComponent,
   },
+  {
+    path: "offlineEvaluation",
+    component: OfflineEvaluationComponent,
+  },
   { path: "**", redirectTo: "DashboardComponent" },
 ];
 
@@ -48,6 +54,7 @@ const routes: Routes = [
     TrainingApprovalComponent,
     AttendanceApprovalComponent,
     EvaluationComponent,
+    OfflineEvaluationComponent,
   ],
   imports: [
     CommonModule,
@@ -63,6 +70,7 @@ const routes: Routes = [
     InputTextModule,
     FileUploadModule,
     NgxSpinnerModule,
+    CalendarModule,
     RouterModule.forChild(routes),
   ],
   providers: [

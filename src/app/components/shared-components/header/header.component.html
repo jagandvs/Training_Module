@@ -7,8 +7,12 @@
         <div
           class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center"
         >
-          <a class="navbar-brand brand-logo" href="#">Training Module</a>
-          <a class="navbar-brand brand-logo-mini" href="##">Training Module</a>
+          <a class="navbar-brand brand-logo"
+            ><img src="assets/images/logo.png"
+          /></a>
+          <a class="navbar-brand brand-logo-mini"
+            ><img src="assets/images/logo.png"
+          /></a>
         </div>
         <ul class="navbar-nav navbar-nav-right">
           <li class="nav-item nav-profile dropdown">
@@ -74,15 +78,15 @@
               <li class="nav-item">
                 <a
                   class="nav-link"
-                  (click)="router.navigate(['masters/categoryMaster'])"
-                  >Category</a
+                  (click)="router.navigate(['masters/ProcessMaster'])"
+                  >Process</a
                 >
               </li>
               <li class="nav-item">
                 <a
                   class="nav-link"
-                  (click)="router.navigate(['masters/CategoryToSkillLevelMaster'])"
-                  >Category To Skill Level</a
+                  (click)="router.navigate(['masters/ProcessToSkillLevelMaster'])"
+                  >Skill Level</a
                 >
               </li>
               <li class="nav-item">
@@ -106,20 +110,14 @@
                   >Employee Master</a
                 >
               </li>
-              <li class="nav-item">
+              <!-- <li class="nav-item">
                 <a
                   class="nav-link"
                   (click)="router.navigate(['masters/StudyMaterialMaster'])"
                   >Study Material</a
                 >
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  (click)="router.navigate(['masters/ProcessMaster'])"
-                  >Process</a
-                >
-              </li>
+              </li> -->
+
               <li class="nav-item">
                 <a
                   class="nav-link"
@@ -175,17 +173,75 @@
                 <a
                   class="nav-link"
                   (click)="router.navigate(['transactions/evaluation'])"
-                  >Evaluation</a
+                  >Online Evaluation</a
+                >
+              </li>
+
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  (click)="router.navigate(['transactions/offlineEvaluation'])"
+                  >Offline Evaluation</a
                 >
               </li>
             </ul>
           </div>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
           <a class="nav-link">
             <i class="mdi mdi-file-document-box-outline menu-icon"></i>
             <span class="menu-title">Reports</span></a
           >
+        </li> -->
+        <li
+          (click)="toggleSubmenuReports()"
+          [ngClass]="{'show-submenu' : submenuReports, 'nav-item': true}"
+        >
+          <a class="nav-link">
+            <i class="mdi mdi-file-document-box-outline menu-icon"></i>
+            <span class="menu-title">Reports</span>
+            <i class="menu-arrow"></i>
+          </a>
+          <div class="submenu" style="right: 0; left: auto;">
+            <ul class="submenu-item">
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  (click)="router.navigate(['reports/historyCard'])"
+                  >History Card</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  (click)="router.navigate(['reports/employeeHistoryCard'])"
+                  >Employee History Card</a
+                >
+              </li>
+
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  (click)="router.navigate(['reports/presentSkills'])"
+                  >Present Skills</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  (click)="router.navigate(['reports/trainingNeeds'])"
+                  >Training Needs</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  (click)="router.navigate(['reports/trainingCalender'])"
+                  >Training Calender</a
+                >
+              </li>
+            </ul>
+          </div>
         </li>
       </ul>
     </div>

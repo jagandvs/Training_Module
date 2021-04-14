@@ -2,7 +2,6 @@ import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ConfirmationService, MessageService } from "primeng/api";
 import { Department } from "src/app/_helper/SM_CODE";
-import { UM_CODE } from "src/app/_helper/variables";
 import { CommonService } from "src/app/_services/common.service";
 import { MastersService } from "../masters.service";
 
@@ -45,6 +44,9 @@ export class DepartmentMasterComponent implements OnInit {
 
   ngOnInit(): void {
     this.loading = true;
+    var currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+    var UM_CODE = currentUser?.user.UM_CODE;
     this.commonService
       .checkRight(UM_CODE, Department, "checkRight")
       .subscribe((data) => {
@@ -196,6 +198,38 @@ export class DepartmentMasterComponent implements OnInit {
     }
   }
   delete(code) {
+    if (this.deleteAccess) {
+      var DEL_CHECK_EMP_MASTER_QUERY = {
+        TableNames: "EmployeeMaster",
+        fieldNames: "*",
+        condition: `EMP_MASTER_DEPARTMENT_ID=${code}`,
+      };
+
+      this.commonService
+        .FillCombo(DEL_CHECK_EMP_MASTER_QUERY)
+        .subscribe((data) => {
+          console.log(data.length);
+          if (data.length == 0) {
+            this._delete(code);
+          } else {
+            this.messageService.add({
+              key: "t1",
+              severity: "info",
+              summary: "info",
+              detail: "Department cannot be deleted",
+            });
+          }
+        });
+    } else {
+      this.messageService.add({
+        key: "t1",
+        severity: "warn",
+        summary: "Warning",
+        detail: "Sorry!! You dont have access to Delete Item",
+      });
+    }
+  }
+  _delete(code) {
     if (this.deleteAccess) {
       this.commonService
         .setResetModify(

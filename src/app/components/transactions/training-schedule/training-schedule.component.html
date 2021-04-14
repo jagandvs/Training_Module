@@ -232,6 +232,7 @@
                       pInputText
                       placeholder="Percentage"
                       formControlName="TRAININGPROGRAM_ID_PASSING_PERCENTAGE"
+                      (input)="checkPassingPercentage($event.target.value)"
                     />
                     <div class="alert alert-danger" *ngIf="percentageError">
                       percentage should between 0 and 100
@@ -241,7 +242,7 @@
                       class="alert alert-danger"
                     >
                       <div
-                        *ngIf="f.TRAININGPROGRAM_ID_PASSING_PERCENTAGE.errors.required"
+                        *ngIf="f.TRAININGPROGRAM_ID_PASSING_PERCENTAGE.errors.required && !percentageError"
                       >
                         Percentage To is required
                       </div>
@@ -249,9 +250,11 @@
                   </div>
                   <div class="p-field p-col-12 p-md-6">
                     <label>From Date </label>
+
                     <input
                       type="date"
                       class="form-control"
+                      [min]="todayDate"
                       formControlName="TRAININGPROGRAM_ID_FROM_DATE"
                     />
                     <div
@@ -271,6 +274,7 @@
                       type="date"
                       class="form-control"
                       formControlName="TRAININGPROGRAM_ID_TO_DATE"
+                      [min]="todayDate"
                     />
                     <div
                       *ngIf="submitted && f.TRAININGPROGRAM_ID_TO_DATE.errors"
@@ -283,6 +287,7 @@
                   </div>
                 </div>
               </form>
+              <label>Upload Files(optional)</label>
               <p-fileUpload
                 #fileInput
                 name="demo[]"
@@ -292,7 +297,7 @@
                 [showCancelButton]="false"
               >
                 <ng-template pTemplate="content">
-                  <table *ngIf="uploadedFiles.length">
+                  <table *ngIf="uploadedFiles.length" class="table">
                     <thead>
                       <tr>
                         <th>File Name</th>
@@ -384,7 +389,11 @@
           </ng-template>
           <ng-template pTemplate="footer">
             <div class="row justify-content-center">
-              <button class="btn btn-outline-primary" (click)="save();">
+              <button
+                class="btn btn-outline-primary"
+                (click)="save();"
+                [disabled]="saveLoading"
+              >
                 <i class="fas fa-save"></i> Save
               </button>
               <button class="btn btn-outline-secondary" (click)="reset()">

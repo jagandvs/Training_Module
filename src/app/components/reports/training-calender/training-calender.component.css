@@ -1,0 +1,18 @@
+:host ::ng-deep .p-datatable .p-datatable-header input {
+  border: none;
+  border-bottom: 1px solid #2196f3;
+  background-color: #f8f9fa;
+}
+:host ::ng-deep .p-datatable .p-datatable-header input:enabled:focus {
+  border-bottom: 1px solid #2196f3;
+  box-shadow: none;
+}
+:host ::ng-deep .p-datatable .p-datatable-header input:enabled:hover {
+  border-bottom: 1px solid #2196f3;
+}
+:host ::ng-deep .p-dropdown {
+  width: 100%;
+}
+:host ::ng-deep .p-datatable .p-datatable-wrapper {
+  overflow-x: scroll;
+}

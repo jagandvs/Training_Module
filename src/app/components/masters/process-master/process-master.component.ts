@@ -3,7 +3,6 @@ import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
 import { Process } from "src/app/_helper/SM_CODE";
-import { UM_CODE } from "src/app/_helper/variables";
 import { CommonService } from "src/app/_services/common.service";
 import { MastersService } from "../masters.service";
 
@@ -48,6 +47,9 @@ export class ProcessMasterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    var currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+    var UM_CODE = currentUser?.user.UM_CODE;
     this.commonService
       .checkRight(UM_CODE, Process, "checkRight")
       .subscribe((data) => {
@@ -99,8 +101,9 @@ export class ProcessMasterComponent implements OnInit {
       .getTableResponse("*", "process_master", "es_delete=0")
       .subscribe((data) => {
         data.map((process) => {
+          console.log(process);
           let process_applicable_to = "";
-          if (process.cateogry_applicable_to == 1) {
+          if (process.process_applicable_to == 1) {
             process_applicable_to = "Staff";
           } else if (process.process_applicable_to == 2) {
             process_applicable_to = "Workers";
@@ -132,7 +135,74 @@ export class ProcessMasterComponent implements OnInit {
       });
     }
   }
-  delete(code) {
+  delete(deleteItem) {
+    if (this.deleteAccess) {
+      var DEL_CHECK_CATEGORYTOSKILLLEVEL_MASTER_QUERY = {
+        TableNames: "CategoryToSkillLevel_Master",
+        fieldNames: "*",
+        condition: `CategoryToSkillLevelMaster_categorymaster_id=${deleteItem}`,
+      };
+      var DEL_CHECK_TRAININGPROGRAM_MASTER_QUERY = {
+        TableNames: "TrainingProgramMaster",
+        fieldNames: "*",
+        condition: `TrainingProgramMaster_categoryid=${deleteItem}`,
+      };
+      var DEL_CHECK_QUESTIONBANK_MASTER_QUERY = {
+        TableNames: "QuestionBank_Master",
+        fieldNames: "*",
+        condition: `QUESTIONBANKMASTER_CATEGORYTOSKILLLEVELID=${deleteItem}`,
+      };
+
+      this.commonService
+        .FillCombo(DEL_CHECK_CATEGORYTOSKILLLEVEL_MASTER_QUERY)
+        .subscribe((data) => {
+          if (data.length == 0) {
+            this.commonService
+              .FillCombo(DEL_CHECK_TRAININGPROGRAM_MASTER_QUERY)
+              .subscribe((data) => {
+                if (data.length == 0) {
+                  this.commonService
+                    .FillCombo(DEL_CHECK_QUESTIONBANK_MASTER_QUERY)
+                    .subscribe((data) => {
+                      if (data.length == 0) {
+                        this._delete(deleteItem);
+                      } else {
+                        this.messageService.add({
+                          key: "t1",
+                          severity: "info",
+                          summary: "info",
+                          detail: "Process cannot be deleted",
+                        });
+                      }
+                    });
+                } else {
+                  this.messageService.add({
+                    key: "t1",
+                    severity: "info",
+                    summary: "info",
+                    detail: "Process cannot be deleted",
+                  });
+                }
+              });
+          } else {
+            this.messageService.add({
+              key: "t1",
+              severity: "info",
+              summary: "info",
+              detail: "Process cannot be deleted",
+            });
+          }
+        });
+    } else {
+      this.messageService.add({
+        key: "t1",
+        severity: "warn",
+        summary: "Warning",
+        detail: "Sorry!! You dont have access to Delete Item",
+      });
+    }
+  }
+  _delete(code) {
     if (this.deleteAccess) {
       this.commonService
         .setResetModify(

@@ -1,4 +1,7 @@
 const { sql, poolPromise } = require("../database/db");
+const uploadFile = require("../middleware/uploadMultiple");
+const fs = require("fs");
+const removeDir = require("../middleware/removeDir");
 
 exports.TableResponse = async (req, res) => {
   try {
@@ -114,4 +117,96 @@ exports.SP_CM_FillCombo = async (req, res) => {
     console.log(error);
     res.json({ message: error.message });
   }
+};
+
+exports.upload = async (req, res) => {
+  try {
+    var dir = __basedir + "/uploads";
+
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
+
+    var destFolder = dir + "/" + req.query.name;
+    if (!fs.existsSync(destFolder)) {
+      fs.mkdirSync(destFolder);
+    }
+    var inFolder = destFolder + "/" + req.query.pk;
+    if (!fs.existsSync(inFolder)) {
+      fs.mkdirSync(inFolder);
+    }
+
+    await uploadFile(req, res);
+
+    if (req.file == undefined) {
+      return res.status(400).send({ message: "Please upload a file!" });
+    }
+
+    res.status(200).send({
+      message: "Uploaded the file successfully: " + req.file.originalname,
+    });
+  } catch (err) {
+    res.status(500).send({
+      message: `Could not upload the file: ${req.file.originalname}. ${err}`,
+    });
+  }
+};
+
+exports.getListFiles = async (req, res) => {
+  const directoryPath =
+    __basedir + "/uploads/" + req.query.name + "/" + req.query.pk;
+
+  fs.readdir(directoryPath, function (err, files) {
+    if (err) {
+      return res.status(404).send({
+        message: "Files not found",
+      });
+    }
+    let fileInfos = [];
+
+    files.forEach((file) => {
+      fileInfos.push({
+        name: file,
+
+        url:
+          "http://localhost:3000/uploads/" +
+          req.query.name +
+          "/" +
+          req.query.pk +
+          "/" +
+          file,
+      });
+    });
+
+    res.status(200).send(fileInfos);
+  });
+};
+
+exports.deleteFile = async (req, res) => {
+  const directoryPath = `${__basedir}/uploads/${req.body.name}/${req.body.pk}/`;
+
+  try {
+    fs.unlinkSync(directoryPath + req.body.fileName);
+
+    res.status(200).send({
+      message: "File Deleted Successfully",
+    });
+  } catch (error) {
+    res.status(500).send({
+      message: "unable to delete" + error,
+    });
+  }
+};
+
+exports.downloadFile = async (req, res) => {
+  const fileName = req.query.fileName;
+  const directoryPath = `${__basedir}/uploads/${req.query.name}/${req.query.pk}/`;
+
+  res.download(directoryPath + fileName, (err) => {
+    if (err) {
+      res.status(500).send({
+        message: "Could not download the file. " + err,
+      });
+    }
+  });
 };

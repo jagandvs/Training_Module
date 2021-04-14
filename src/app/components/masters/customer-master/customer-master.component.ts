@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
 import { Customer } from "src/app/_helper/SM_CODE";
-import { UM_CODE } from "src/app/_helper/variables";
 import { CommonService } from "src/app/_services/common.service";
 import { MastersService } from "../masters.service";
 
@@ -49,6 +48,9 @@ export class CustomerMasterComponent implements OnInit {
 
   ngOnInit(): void {
     this.loading = true;
+    var currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+    var UM_CODE = currentUser?.user.UM_CODE;
     this.commonService
       .checkRight(UM_CODE, Customer, "checkRight")
       .subscribe((data) => {

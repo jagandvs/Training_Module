@@ -3,7 +3,6 @@ import { Component, OnInit } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
 import { Training_Need } from "src/app/_helper/SM_CODE";
-import { UM_CODE } from "src/app/_helper/variables";
 import { CommonService } from "src/app/_services/common.service";
 import { TransactionsService } from "../transactions.service";
 
@@ -27,10 +26,13 @@ export class AttendanceApprovalComponent implements OnInit {
   public printAccess: boolean = true;
   public backDateAccess: boolean = true;
 
+  public traineeName: string = "";
   public TRAINING_MASTER_QUERY = {
-    TableNames: "TrainingProgramMaster",
-    fieldNames: "TrainingProgramMaster_ID,TrainingProgramMaster_title",
-    condition: "es_delete=0",
+    TableNames: "trainingprogrammaster,trainingprogram_master",
+    fieldNames:
+      "TrainingProgram_ID,TrainingProgramMaster_title +' -> '+ CONVERT(varchar,TRAININGPROGRAM_ID_FROM_DATE,107) +' - '+ CONVERT(varchar,TRAININGPROGRAM_ID_TO_DATE,107) as TrainingProgramMaster_title",
+    condition:
+      "TrainingProgramMaster_ID=trainingprogram_training_program_id and trainingprogram_master.ES_DELETE=0",
   };
   constructor(
     private commonService: CommonService,
@@ -41,6 +43,9 @@ export class AttendanceApprovalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    var currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+    var UM_CODE = currentUser?.user.UM_CODE;
     this.commonService
       .checkRight(UM_CODE, Training_Need, "checkRight")
       .subscribe((data) => {
@@ -62,7 +67,7 @@ export class AttendanceApprovalComponent implements OnInit {
           for (let item of data) {
             this.trainingMasterDropdown.push({
               label: item.TrainingProgramMaster_title,
-              value: item.TrainingProgramMaster_ID,
+              value: item.TrainingProgram_ID,
             });
           }
         });
@@ -70,11 +75,22 @@ export class AttendanceApprovalComponent implements OnInit {
   }
 
   onTrainingProgramChange() {
+    console.log(this.selectedTraining);
+    this.traineeName = "";
     if (this.selectedTraining != null) {
+      var TRAINEE_QUERY = {
+        TableNames: "TRAININGPROGRAM_MASTER",
+        fieldNames: "TRAININGPROGRAM_TRAINING_CONDUCTEDBY",
+        condition: `TRAININGPROGRAM_ID=${this.selectedTraining}`,
+      };
+      this.commonService.FillCombo(TRAINEE_QUERY).subscribe((data) => {
+        this.traineeName = data[0].TRAININGPROGRAM_TRAINING_CONDUCTEDBY;
+      });
       this.appovalList = [];
       this.service
         .getEmployeeListForAttendance(this.selectedTraining)
         .subscribe((data) => {
+          console.log(data);
           this.appovalList = data;
         });
     } else {
@@ -82,6 +98,14 @@ export class AttendanceApprovalComponent implements OnInit {
     }
   }
   approve() {
+    if (this.traineeName == "" || this.traineeName == null) {
+      return this.messageService.add({
+        key: "t1",
+        severity: "error",
+        summary: "Error",
+        detail: "Please Enter Trainee Name",
+      });
+    }
     if (this.selectedAppovalList.length > 0) {
       for (let value of this.selectedAppovalList) {
         this.list.push({
@@ -92,16 +116,26 @@ export class AttendanceApprovalComponent implements OnInit {
       }
       this.service.updateAttendance(this.list).subscribe(
         (data) => {
-          this.list = [];
-          this.selectedAppovalList = [];
-          this.selectedTraining = "";
-          this.appovalList = [];
-          this.messageService.add({
-            key: "t1",
-            severity: "success",
-            summary: "Success",
-            detail: "Appoved",
-          });
+          this.service
+            .UpdateTraningConductedBy(this.selectedTraining, this.traineeName)
+            .subscribe(
+              (data) => {
+                this.list = [];
+                this.selectedAppovalList = [];
+                this.selectedTraining = "";
+                this.appovalList = [];
+                this.messageService.add({
+                  key: "t1",
+                  severity: "success",
+                  summary: "Success",
+                  detail: "Appoved",
+                });
+              },
+
+              (error: HttpErrorResponse) => {
+                console.log(error);
+              }
+            );
         },
         (error: HttpErrorResponse) => {
           console.log(error);

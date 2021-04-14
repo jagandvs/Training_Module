@@ -63,6 +63,8 @@ export class AuthenticationService {
       .pipe(
         map((user) => {
           localStorage.setItem("currentUser", JSON.stringify(user));
+          sessionStorage.setItem("currentUser", JSON.stringify(user));
+
           sessionStorage.setItem("token", user.token);
           localStorage.setItem(
             "companyDetails",

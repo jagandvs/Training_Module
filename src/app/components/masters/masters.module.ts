@@ -26,7 +26,7 @@ import { FileUploadModule } from "primeng/fileupload";
 const routes: Routes = [
   { path: "categoryMaster", component: CategoryMasterComponent },
   {
-    path: "CategoryToSkillLevelMaster",
+    path: "ProcessToSkillLevelMaster",
     component: CategoryToSkillLevelMasterComponent,
   },
   { path: "CustomerMaster", component: CustomerMasterComponent },

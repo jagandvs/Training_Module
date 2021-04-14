@@ -36,6 +36,14 @@ const routes: Routes = [
       ),
     canActivate: [AuthGuard],
   },
+  {
+    path: "reports",
+    loadChildren: () =>
+      import("./components/reports/reports.module").then(
+        (mod) => mod.ReportsModule
+      ),
+    canActivate: [AuthGuard],
+  },
   { path: "**", redirectTo: "login" },
 ];
 

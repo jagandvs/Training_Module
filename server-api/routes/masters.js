@@ -11,6 +11,8 @@ const {
   UPSERT_process_master,
   UPSERT_StudyMaterialMaster,
   UPSERT_TrainingProgramMaster,
+  UPSERT_EmployeeMaster,
+  INSERT_UPSERT_EmployeeMaster,
 } = require("../controller/masters/masters");
 
 const router = express.Router();
@@ -60,6 +62,14 @@ router.post(
   isSignedIn,
   logger,
   UPSERT_TrainingProgramMaster
+);
+
+router.post("/UPSERT_EmployeeMaster", UPSERT_EmployeeMaster);
+router.post(
+  "/INSERT_UPSERT_EmployeeMaster",
+  isSignedIn,
+  logger,
+  INSERT_UPSERT_EmployeeMaster
 );
 
 module.exports = router;

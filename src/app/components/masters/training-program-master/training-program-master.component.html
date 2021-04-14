@@ -21,7 +21,7 @@
                     [rows]="10"
                     [paginator]="true"
                     [loading]="loading"
-                    [globalFilterFields]="['TrainingProgramMaster_title','TrainingProgramMaster_duration','TrainingProgramMaster_location','TrainingProgramMaster_modeOfTraining']"
+                    [globalFilterFields]="['TrainingProgramMaster_title','TrainingProgramMaster_emptype','TrainingProgramMaster_duration','TrainingProgramMaster_location','TrainingProgramMaster_modeOfTraining']"
                     [rowsPerPageOptions]="[10,25,50]"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                     [totalRecords]="totalRecords"
@@ -30,6 +30,8 @@
                     <ng-template pTemplate="colgroup">
                       <colgroup>
                         <col style="width: 200px;" />
+                        <col style="width: 200px;" />
+
                         <col style="width: 200px;" />
                         <col style="width: 200px;" />
                         <col style="width: 200px;" />
@@ -76,6 +78,11 @@
                           <p-sortIcon field="TrainingProgramMaster_title">
                           </p-sortIcon>
                         </th>
+                        <th pSortableColumn="TrainingProgramMaster_emptype">
+                          Applicable To
+                          <p-sortIcon field="TrainingProgramMaster_emptype">
+                          </p-sortIcon>
+                        </th>
                         <th pSortableColumn="TrainingProgramMaster_duration">
                           Duration
                           <p-sortIcon field="TrainingProgramMaster_duration">
@@ -116,6 +123,7 @@
                     >
                       <tr>
                         <td>{{training.TrainingProgramMaster_title}}</td>
+                        <td>{{training.TrainingProgramMaster_emptype}}</td>
                         <td>{{training.TrainingProgramMaster_duration}}</td>
 
                         <td>{{training.TrainingProgramMaster_location}}</td>
@@ -208,7 +216,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="form-group row">
+                <!-- <div class="form-group row">
                   <label class="col-sm-6 col-form-label">Category Name</label>
                   <div class="col-sm-6">
                     <p-dropdown
@@ -231,17 +239,40 @@
                       </div>
                     </div>
                   </div>
+                </div> -->
+                <div class="form-group row">
+                  <label class="col-sm-6 col-form-label">Applicable To</label>
+                  <div class="col-sm-6">
+                    <p-dropdown
+                      [options]="applicableToDropdown"
+                      [filter]="true"
+                      [showClear]="true"
+                      placeholder="Select Applicable To"
+                      [resetFilterOnHide]="true"
+                      formControlName="TrainingProgramMaster_emptype"
+                      (onChange)="selectedEmpType()"
+                    >
+                    </p-dropdown>
+                    <div
+                      *ngIf="submitted && f.TrainingProgramMaster_emptype.errors"
+                      class="alert alert-danger"
+                    >
+                      <div
+                        *ngIf="f.TrainingProgramMaster_emptype.errors.required"
+                      >
+                        Applicable To is required
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div class="form-group row">
-                  <label class="col-sm-6 col-form-label"
-                    >Skill Level Master Title</label
-                  >
+                  <label class="col-sm-6 col-form-label">Skill Level </label>
                   <div class="col-sm-6">
                     <p-dropdown
                       [options]="skillMasterDropdown"
                       [filter]="true"
                       [showClear]="true"
-                      placeholder="Select Skill Level Master"
+                      placeholder="Select Skill Level"
                       [resetFilterOnHide]="true"
                       formControlName="TrainingProgramMaster_skilllevelid"
                     >
@@ -253,11 +284,12 @@
                       <div
                         *ngIf="f.TrainingProgramMaster_skilllevelid.errors.required"
                       >
-                        Skill Level Master is required
+                        Skill Level is required
                       </div>
                     </div>
                   </div>
                 </div>
+
                 <div class="form-group row">
                   <label class="col-sm-6 col-form-label">Title</label>
                   <div class="col-sm-6">
@@ -289,7 +321,7 @@
                 </div>
                 <div class="form-group row">
                   <label class="col-sm-6 col-form-label"
-                    >Duration(In Days)</label
+                    >Duration(In Hours)</label
                   >
                   <div class="col-sm-6">
                     <input
@@ -362,7 +394,7 @@
                   #fileInput
                   name="files[]"
                   multiple="multiple"
-                  maxFileSize="1000000"
+                  maxFileSize="5000000"
                   [showUploadButton]="false"
                   [showCancelButton]="false"
                   (onSelect)="selectedFiles($event)"

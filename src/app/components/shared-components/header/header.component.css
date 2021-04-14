@@ -1,3 +1,14 @@
 a:hover {
   cursor: pointer;
 }
+.navbar-brand.brand-logo-mini {
+  padding: 0px !important;
+}
+
+.navbar-brand.brand-logo img {
+  height: 50px;
+}
+
+.navbar-brand.brand-logo-mini img {
+  height: 30px;
+}

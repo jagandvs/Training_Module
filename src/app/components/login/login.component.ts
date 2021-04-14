@@ -32,12 +32,11 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private authenticationService: AuthenticationService,
     private commonService: CommonService
-  ) {}
-
-  ngOnInit(): void {
+  ) {
     this.commonService
       .getCompanyDetails("*", "COMPANY_MASTER", "CM_ACTIVE_IND=1")
       .subscribe((data) => {
+        console.log(data);
         this.companyMasterDetails = data;
         this.companyNames = [
           ...new Map(
@@ -45,15 +44,18 @@ export class LoginComponent implements OnInit {
           ).values(),
         ];
         let todayDate = new Date();
-        this.companyMasterDetails.filter((detail) => {
-          if (
-            new Date(detail.CM_OPENING_DATE).getTime() < todayDate.getTime() &&
-            new Date(detail.CM_CLOSING_DATE).getTime() > todayDate.getTime()
-          ) {
-            this.f.financialYear.setValue(detail.CM_CODE);
-          }
-        });
+        this.f.financialYear.setValue(this.companyMasterDetails[0].CM_CODE);
+        // this.companyMasterDetails.filter((detail) => {
+        //   if (
+        //     new Date(detail.CM_OPENING_DATE).getTime() < todayDate.getTime()
+        //   ) {
+        //     this.f.financialYear.setValue(detail.CM_CODE);
+        //   }
+        // });
       });
+  }
+
+  ngOnInit(): void {
     // Login form initialization
     this.loginForm = this.formBuilder.group({
       companyName: [1, Validators.required],

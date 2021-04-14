@@ -55,3 +55,16 @@ exports.isSignedIn = expressJwt({
   // userProperty: "auth",
   algorithms: ["HS256"],
 });
+
+exports.getUserEmployeeCode = async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool
+      .request()
+      .input("UM_USERNAME", sql.VarChar, req.query.username)
+      .output("getUserEmployeeCode");
+    res.json(result.recordset);
+  } catch (error) {
+    res.json(error.message);
+  }
+};

@@ -149,15 +149,46 @@
             <div class="container">
               <form focusInvalidInput [formGroup]="employeeMasterForm">
                 <div class="p-fluid p-formgrid p-grid">
+                  <div class="p-field p-col-6">
+                    <label for="employee">Employee Type</label>
+                    <p-dropdown
+                      [optionLabel]="label"
+                      [options]="employeeTypeDropdown"
+                      [filter]="true"
+                      [showClear]="true"
+                      placeholder="Select Employee Type"
+                      [resetFilterOnHide]="true"
+                      formControlName="EMP_MASTER_TYPE"
+                      (onChange)="onSelecteEmployeeType()"
+                      [readonly]="!newItem"
+                    >
+                    </p-dropdown>
+                  </div>
+
+                  <div class="p-field p-col-6">
+                    <label for="employee">Select Employee</label>
+                    <p-dropdown
+                      [optionLabel]="label"
+                      [options]="employeeDropdown"
+                      [filter]="true"
+                      [showClear]="true"
+                      placeholder="Select Employee"
+                      [resetFilterOnHide]="true"
+                      formControlName="EMP_MASTER_OUTSOURCE"
+                      (onChange)="selectedEmployee()"
+                      [readonly]="!newItem"
+                    >
+                    </p-dropdown>
+                  </div>
                   <div class="p-field p-col-12 p-md-6">
                     <label for="number">Employee Number</label>
                     <input
-                      type="number"
+                      type="text"
                       inputId="number"
                       pInputText
                       placeholder="Employee Number"
                       formControlName="EMP_MASTER_NUMBER"
-                      (input)="checkDuplicateEmployeeNumber()"
+                      readonly
                     />
                     <div
                       *ngIf="submitted && f.EMP_MASTER_NUMBER.errors"
@@ -182,7 +213,7 @@
                       pInputText
                       placeholder="Employee Name"
                       formControlName="EMP_MASTER_NAME"
-                      (input)="checkDuplicateEmployeeName()"
+                      readonly
                     />
                     <div
                       *ngIf="submitted && f.EMP_MASTER_NAME.errors"
@@ -210,7 +241,6 @@
                       placeholder="Select Department"
                       [resetFilterOnHide]="true"
                       [virtualScroll]="true"
-                      itemSize="10"
                       formControlName="EMP_MASTER_DEPARTMENT_ID"
                     >
                     </p-dropdown>
@@ -227,7 +257,7 @@
                     <label for="reportingto">Reporting To</label>
                     <p-dropdown
                       [optionLabel]="label"
-                      [options]="employeeDropdown"
+                      [options]="employeeReportingToDropdown"
                       [filter]="true"
                       [showClear]="true"
                       placeholder="Select Reporting To"
@@ -244,7 +274,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="p-field p-col-12 p-md-6">
+                  <div class="p-field p-col-12 p-md-12">
                     <label for="process">Process Name</label>
                     <p-dropdown
                       [optionLabel]="label"
@@ -265,7 +295,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="p-field p-col-12 p-md-6">
+                  <!-- <div class="p-field p-col-12 p-md-6">
                     <label for="type">Employee Type</label>
                     <p-dropdown
                       [optionLabel]="label"
@@ -285,7 +315,7 @@
                         Employee Type is required
                       </div>
                     </div>
-                  </div>
+                  </div> -->
                 </div>
                 <div class="row justify-content-end">
                   <div class="col-12 col-md-6">
@@ -306,8 +336,8 @@
             </div>
             <div class="container">
               <form focusInvalidInput [formGroup]="employeeDetailForm">
-                <div class="p-fluid p-formgrid p-grid">
-                  <div class="p-field p-col-12 p-md-4">
+                <div class="p-fluid p-formgrid p-grid p-jc-center">
+                  <!-- <div class="p-field p-col-12 p-md-4">
                     <label for="categorySkillLevel">Category Name</label>
                     <p-dropdown
                       [optionLabel]="label"
@@ -329,7 +359,7 @@
                         Category is required
                       </div>
                     </div>
-                  </div>
+                  </div> -->
                   <div class="p-field p-col-12 p-md-4">
                     <label for="categorySkillLevel">Present Skill</label>
                     <p-dropdown
@@ -388,7 +418,6 @@
               <table class="table table-bordered" id="dataTable">
                 <thead>
                   <tr>
-                    <th>Category</th>
                     <th>
                       Present Skill
                     </th>
@@ -404,7 +433,6 @@
                   <tr
                     *ngFor="let employee of employeeDetailTable; let i=index "
                   >
-                    <td>{{employee.CATEGORY}}</td>
                     <td>{{employee.PRESENT_SKILL}}</td>
                     <td>{{employee.NEXT_SKILL}}</td>
                     <td>

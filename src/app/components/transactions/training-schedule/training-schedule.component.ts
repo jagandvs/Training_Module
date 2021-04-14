@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { formatDate } from "@angular/common";
+import { DatePipe, formatDate } from "@angular/common";
 import { HttpErrorResponse } from "@angular/common/http";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
@@ -11,6 +11,7 @@ import {
 import { CommonService } from "src/app/_services/common.service";
 import { TransactionsService } from "../transactions.service";
 import { FileUpload } from "primeng/fileupload";
+import { isNull } from "@angular/compiler/src/output/output_ast";
 
 @Component({
   selector: "app-training-schedule",
@@ -41,11 +42,13 @@ export class TrainingScheduleComponent implements OnInit {
   public deleteAccess: boolean = true;
   public printAccess: boolean = true;
   public backDateAccess: boolean = true;
-
+  public datePipe: DatePipe;
   public trainingProgramMasterDropdown: SelectItem[] = [];
   public process: string;
   public comp_id: number;
   public pkcode: any;
+  public saveLoading: boolean = false;
+  public todayDate: string;
   public percentageError: boolean = false;
   public totalRecords = 0;
 
@@ -54,6 +57,7 @@ export class TrainingScheduleComponent implements OnInit {
     fieldNames: "TrainingProgramMaster_ID,TrainingProgramMaster_title",
     condition: "es_delete=0",
   };
+
   constructor(
     private commonService: CommonService,
     private fb: FormBuilder,
@@ -63,6 +67,11 @@ export class TrainingScheduleComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    var currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+    var UM_CODE = currentUser?.user.UM_CODE;
+    let datePipe: DatePipe = new DatePipe("en-US");
+    this.todayDate = datePipe.transform(new Date(), "yyyy-MM-dd");
     this.commonService
       .checkRight(UM_CODE, Training_Need, "checkRight")
       .subscribe((data) => {
@@ -116,6 +125,7 @@ export class TrainingScheduleComponent implements OnInit {
         0
       )
       .subscribe((data) => {
+        console.log(data);
         this.trainingMasterTable = data;
         this.loading = false;
         this.totalRecords = this.trainingMasterTable.length;
@@ -131,6 +141,18 @@ export class TrainingScheduleComponent implements OnInit {
           EMP_MASTER_ID: value.EMP_MASTER_ID,
           TRAININGPROGRAMDETAIL_TRAININGPROGRAM_ID: trainingId,
           TRAININGPROGRAMDETAIL_REQUIRED_FOR_TRAINING: false,
+        });
+      }
+      if (this.trainingDetailTable.length > 0) {
+        this.saveLoading = false;
+      } else {
+        this.saveLoading = true;
+
+        this.messageService.add({
+          key: "t2",
+          severity: "info",
+          summary: "Info",
+          detail: "No Employee found under this training",
         });
       }
     });
@@ -149,8 +171,6 @@ export class TrainingScheduleComponent implements OnInit {
 
       this.newItem = true;
       this.uploadedFiles = [];
-
-      this.fileInput.files = [];
     } else {
       this.messageService.add({
         key: "t1",
@@ -168,23 +188,81 @@ export class TrainingScheduleComponent implements OnInit {
     ].TRAININGPROGRAMDETAIL_REQUIRED_FOR_TRAINING;
   }
   save() {
+    console.log(this.trainingMasterForm.value);
     this.uploadedFiles = [];
     this.submitted = true;
+    var error = false;
 
     this.fileInput.files.forEach((file) => {
       this.uploadedFiles.push(file);
     });
 
-    if (this.uploadedFiles.length == 0) {
+    var fromDate = new Date(
+      this.f["TRAININGPROGRAM_ID_FROM_DATE"].value
+    ).getTime();
+    // var toDate = new Date(this.f["TRAININGPROGRAM_ID_TO_DATE"].value).getTime();
+
+    if (this.f["TRAININGPROGRAM_TRAINING_PROGRAM_ID"].value != "") {
+      console.log(this.f["TRAININGPROGRAM_TRAINING_PROGRAM_ID"].value);
+      if (this.newItem) {
+        var arr = this.trainingMasterTable.filter((master) => {
+          console.log(
+            fromDate,
+            new Date(master.TRAININGPROGRAM_ID_FROM_DATE).getTime()
+          );
+          if (
+            master.TRAININGPROGRAM_TRAINING_PROGRAM_ID ==
+              this.f["TRAININGPROGRAM_TRAINING_PROGRAM_ID"].value &&
+            fromDate == new Date(master.TRAININGPROGRAM_ID_FROM_DATE).getTime()
+          ) {
+            return master;
+          }
+        });
+        if (arr.length > 0) {
+          error = true;
+        } else {
+          error = false;
+        }
+      } else {
+        var arr = this.trainingMasterTable.filter((master) => {
+          if (
+            master.TRAININGPROGRAM_TRAINING_PROGRAM_ID ==
+              this.f["TRAININGPROGRAM_TRAINING_PROGRAM_ID"].value &&
+            fromDate ==
+              new Date(master.TRAININGPROGRAM_ID_FROM_DATE).getTime() &&
+            master.TRAININGPROGRAM_ID != this.f["TRAININGPROGRAM_ID"].value
+          ) {
+            return master;
+          }
+        });
+
+        if (arr.length > 0) {
+          error = true;
+        } else {
+          error = false;
+        }
+      }
+    }
+    console.log(error);
+
+    if (error) {
       return this.messageService.add({
         key: "t2",
         severity: "error",
         summary: "Error",
-        detail: "Please upload files",
+        detail: "Training already scheduled in this date",
       });
     }
-
-    if (this.trainingMasterForm.valid) {
+    if (this.percentageError) {
+      return this.messageService.add({
+        key: "t2",
+        severity: "error",
+        summary: "Error",
+        detail: "percentage should between 0 and 100",
+      });
+    }
+    if (this.trainingMasterForm.valid && !this.percentageError && !error) {
+      this.saveLoading = true;
       this.submitted = false;
       this.newItem ? (this.process = "Insert") : (this.process = "Update");
       this.confirmationService.confirm({
@@ -200,25 +278,28 @@ export class TrainingScheduleComponent implements OnInit {
             )
             .subscribe(
               (data) => {
-                this.newItem
-                  ? (this.pkcode = data.PK_CODE)
-                  : (this.pkcode = this.editingPKCODE);
-                for (let file of this.uploadedFiles) {
-                  this.commonService
-                    .upload(file, trainingScheduleUploadFolder, this.pkcode)
-                    .subscribe(
-                      (data) => {
-                        console.log(data);
-                      },
-                      (error) => {
-                        console.log(error);
-                      }
-                    );
+                if (this.uploadedFiles.length > 0) {
+                  this.newItem
+                    ? (this.pkcode = data.PK_CODE)
+                    : (this.pkcode = this.editingPKCODE);
+                  for (let file of this.uploadedFiles) {
+                    this.commonService
+                      .upload(file, trainingScheduleUploadFolder, this.pkcode)
+                      .subscribe(
+                        (data) => {
+                          console.log(data);
+                        },
+                        (error) => {
+                          console.log(error);
+                        }
+                      );
+                  }
                 }
                 this.editInsert = false;
                 this.getTrainingMasterTable();
                 this.displayBasic = false;
                 this.cancel();
+                this.saveLoading = false;
                 this.messageService.add({
                   key: "t1",
                   severity: "success",
@@ -231,6 +312,16 @@ export class TrainingScheduleComponent implements OnInit {
               }
             );
         },
+        reject: () => {
+          this.saveLoading = false;
+        },
+      });
+    } else {
+      this.messageService.add({
+        key: "t2",
+        severity: "error",
+        summary: "Error",
+        detail: "Fill all required fields",
       });
     }
   }
@@ -238,7 +329,7 @@ export class TrainingScheduleComponent implements OnInit {
     this.uploadedFiles = [];
     this.newItem = false;
     this.editingPKCODE = trainingId;
-    this.fileInput.files = [];
+
     let editarray = this.trainingMasterTable.filter((data) => {
       return trainingId == data.TRAININGPROGRAM_ID;
     });
@@ -363,56 +454,25 @@ export class TrainingScheduleComponent implements OnInit {
 
   delete(trainingId) {
     if (this.deleteAccess) {
-      this.commonService
-        .setResetModify(
-          "TRAININGPROGRAM_MASTER",
-          "ES_MODIFY",
-          "TRAININGPROGRAM_ID",
-          trainingId,
-          0,
-          "check"
-        )
-        .subscribe((data) => {
-          if (data == 0) {
-            this.confirmationService.confirm({
-              message: "Are you sure that you want to delete?",
-              header: "Delete Confirmation",
-              icon: "fas fa-trash",
-              key: "c1",
-              accept: () => {
-                this.commonService
-                  .deleteRow(
-                    trainingId,
-                    "TRAININGPROGRAM_ID",
-                    "1",
-                    "ES_DELETE",
-                    "TRAININGPROGRAM_MASTER"
-                  )
-                  .subscribe(
-                    (data) => {
-                      this.getTrainingMasterTable();
-                      this.messageService.add({
-                        key: "t1",
-                        severity: "success",
-                        summary: "Success",
-                        detail: "Deleted Successfully",
-                      });
-                    },
-                    (error) => {
-                      console.log(error);
-                    }
-                  );
-              },
-            });
-          } else {
-            this.messageService.add({
-              key: "t1",
-              severity: "info",
-              summary: "Success",
-              detail: "Someone Editing the Item/ Item is locked",
-            });
-          }
-        });
+      var DEL_CHECK_EVAL_QUERY = {
+        TableNames: "EVAL",
+        fieldNames: "*",
+        condition: `EVAL_TRAINING_SCHEDULE_ID=${trainingId}`,
+      };
+      console.log(DEL_CHECK_EVAL_QUERY.condition);
+      this.commonService.FillCombo(DEL_CHECK_EVAL_QUERY).subscribe((data) => {
+        console.log(data.length);
+        if (data.length == 0) {
+          this._delete(trainingId);
+        } else {
+          this.messageService.add({
+            key: "t1",
+            severity: "info",
+            summary: "info",
+            detail: "Schedule cannot be deleted",
+          });
+        }
+      });
     } else {
       this.messageService.add({
         key: "t1",
@@ -421,6 +481,58 @@ export class TrainingScheduleComponent implements OnInit {
         detail: "Sorry!! You dont have access to Delete Item",
       });
     }
+  }
+  _delete(trainingId) {
+    this.commonService
+      .setResetModify(
+        "TRAININGPROGRAM_MASTER",
+        "ES_MODIFY",
+        "TRAININGPROGRAM_ID",
+        trainingId,
+        0,
+        "check"
+      )
+      .subscribe((data) => {
+        if (data == 0) {
+          this.confirmationService.confirm({
+            message: "Are you sure that you want to delete?",
+            header: "Delete Confirmation",
+            icon: "fas fa-trash",
+            key: "c1",
+            accept: () => {
+              this.commonService
+                .deleteRow(
+                  trainingId,
+                  "TRAININGPROGRAM_ID",
+                  "1",
+                  "ES_DELETE",
+                  "TRAININGPROGRAM_MASTER"
+                )
+                .subscribe(
+                  (data) => {
+                    this.getTrainingMasterTable();
+                    this.messageService.add({
+                      key: "t1",
+                      severity: "success",
+                      summary: "Success",
+                      detail: "Deleted Successfully",
+                    });
+                  },
+                  (error) => {
+                    console.log(error);
+                  }
+                );
+            },
+          });
+        } else {
+          this.messageService.add({
+            key: "t1",
+            severity: "info",
+            summary: "Success",
+            detail: "Someone Editing the Item/ Item is locked",
+          });
+        }
+      });
   }
   reset() {
     this.trainingMasterForm.reset();
@@ -434,6 +546,7 @@ export class TrainingScheduleComponent implements OnInit {
     this.commonService
       .getListFiles(trainingScheduleUploadFolder, pkcode)
       .subscribe((data) => {
+        console.log(data);
         this.uploadedFiles = [];
         this.uploadedFiles = data;
       });
@@ -452,15 +565,10 @@ export class TrainingScheduleComponent implements OnInit {
       });
   }
   downloadFile(fileName) {
-    this.commonService
-      .downloadFile(fileName, trainingScheduleUploadFolder, this.editingPKCODE)
-      .subscribe((data) => {
-        this.messageService.add({
-          key: "t2",
-          severity: "success",
-          summary: "Success",
-          detail: "File Downloaded",
-        });
-      });
+    this.commonService.downloadFile(
+      fileName,
+      trainingScheduleUploadFolder,
+      this.editingPKCODE
+    );
   }
 }
