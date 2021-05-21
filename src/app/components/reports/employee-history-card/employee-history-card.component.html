@@ -63,8 +63,11 @@
                     [paginator]="true"
                     [loading]="loading"
                     [columns]="cols"
-                    [globalFilterFields]="['']"
+                    [globalFilterFields]="['process_name','TrainingProgramMaster_title','CategoryToSkillLevelMaster_title','CategoryToSkillLevelMaster_titleNextLevel','EMP_MASTER_NAME','EMP_MASTER_NUMBER','TRAININGPROGRAM_ID_FROM_DATE','TRAININGPROGRAM_ID_TO_DATE','TrainingProgramMaster_duration','TrainingProgramMaster_location','TrainingProgramMaster_modeOfTraining','evaldate','evalmarks']"
                     [rowsPerPageOptions]="[10,25,50]"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    [totalRecords]="totalRecords"
+                    [showCurrentPageReport]="true"
                   >
                     <ng-template pTemplate="colgroup" let-columns>
                       <colgroup *ngFor="let col of columns">
@@ -87,6 +90,16 @@
                         >
                           <i class="pi pi-file-pdf"></i>
                         </button>
+
+                        <span class="p-input-icon-left ml-auto">
+                          <i class="pi pi-search"></i>
+                          <input
+                            pInputText
+                            type="search"
+                            (input)="dt.filterGlobal($event.target.value, 'contains')"
+                            placeholder="Search..."
+                          />
+                        </span>
                       </div>
                     </ng-template>
                     <ng-template pTemplate="header" let-columns>

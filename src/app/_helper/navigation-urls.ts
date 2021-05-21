@@ -60,6 +60,13 @@ export const getQuestionBank = ApiURL + "transactions/getQuestionBank";
 export const UPSERT_Eval = ApiURL + "transactions/UPSERT_Eval";
 export const UPSERT_EvalOffline = ApiURL + "transactions/UPSERT_EvalOffline";
 
+export const getEmployeeListForHODFeedback =
+  ApiURL + "transactions/getEmployeeListForHODFeedback";
+export const updateUpdateHODRemarks =
+  ApiURL + "transactions/updateUpdateHODRemarks";
+
+export const UpdateUpdateHRRemarks =
+  ApiURL + "transactions/updateUpdateHRRemarks";
 // common routes
 export const setResetModify = ApiURL + "common/setResetModify";
 export const deleteRow = ApiURL + "common/deleteRow";
@@ -69,6 +76,8 @@ export const uploadFiles = ApiURL + "common/upload";
 export const getListFiles = ApiURL + "common/getListFiles";
 export const deleteFile = ApiURL + "common/deleteFile";
 export const downloadFile = ApiURL + "common/downloadFile";
+export const trainingcalender = ApiURL + "common/trainingcalender";
+export const employeenames = ApiURL + "common/employeenames";
 
 // Reports routes
 
@@ -79,6 +88,8 @@ export const getEmployeeHistoryCardofEmployee =
 export const getpresentskills = ApiURL + "reports/getpresentskills";
 
 export const getTrainingNeedsAndCalender = ApiURL + "reports/";
+export const getTrainngAttendancePrint =
+  ApiURL + "reports/getTrainngAttendancePrint";
 
 // Login Routes
 export const getCompanyDetails = ApiURL + "auth/getCompanyDetails";

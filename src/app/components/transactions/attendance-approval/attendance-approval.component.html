@@ -19,7 +19,7 @@
                     #dt
                     [value]="appovalList"
                     [(selection)]="selectedAppovalList"
-                    dataKey="EMP_MASTER_NUMBER"
+                    dataKey="id"
                     [rows]="10"
                     [paginator]="true"
                     [loading]="loading"
@@ -154,10 +154,17 @@
                           {{training.TRAININGPROGRAM_ID_TO_DATE | date :
                           'dd/MM/yyyy'}}
                         </td>
-                        <td>{{training.TRAININGPROGRAMDETAIL_APPROVED}}</td>
-                        <td>{{training.TRAININGPROGRAMDETAIL_ATTENDANCE}}</td>
                         <td>
-                          {{training.TRAININGPROGRAMDETAIL_REQUIRED_FOR_TRAINING}}
+                          {{training.TRAININGPROGRAMDETAIL_APPROVED |
+                          toggledata:'approve'}}
+                        </td>
+                        <td>
+                          {{training.TRAININGPROGRAMDETAIL_ATTENDANCE |
+                          toggledata:'attendance'}}
+                        </td>
+                        <td>
+                          {{training.TRAININGPROGRAMDETAIL_REQUIRED_FOR_TRAINING
+                          | toggledata : 'required'}}
                         </td>
                       </tr>
                     </ng-template>

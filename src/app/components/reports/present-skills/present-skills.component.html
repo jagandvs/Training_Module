@@ -19,7 +19,7 @@
                     <div class="col-12 col-md-2">
                       <label>Employee Type</label>
                     </div>
-                    <div class="col-12 col-md-2 text-right">
+                    <div class="col-12 col-md-2">
                       <p-dropdown
                         [optionLabel]="label"
                         [options]="employeeTypeDropdown"
@@ -40,7 +40,7 @@
                     [paginator]="true"
                     [loading]="loading"
                     [columns]="cols"
-                    [globalFilterFields]="['']"
+                    [globalFilterFields]="['empno','EmpName','DepartmentName','PresentSkill','QualifiedForMulti']"
                     [rowsPerPageOptions]="[10,25,50]"
                   >
                     <ng-template pTemplate="colgroup" let-columns>
@@ -64,6 +64,15 @@
                         >
                           <i class="pi pi-file-pdf"></i>
                         </button>
+                        <span class="p-input-icon-left ml-auto">
+                          <i class="pi pi-search"></i>
+                          <input
+                            pInputText
+                            type="search"
+                            (input)="dt.filterGlobal($event.target.value, 'contains')"
+                            placeholder="Search..."
+                          />
+                        </span>
                       </div>
                     </ng-template>
                     <ng-template pTemplate="header" let-columns>

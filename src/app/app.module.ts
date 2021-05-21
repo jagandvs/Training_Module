@@ -15,7 +15,21 @@ import { JwtInterceptor } from "./_helper/JwtInterceptor";
 import { LogoutComponent } from "./components/logout/logout.component";
 import { AdministratorComponent } from "./components/administrator/administrator.component";
 import { NgxSpinnerModule } from "ngx-spinner";
+import { FullCalendarModule } from "@fullcalendar/angular";
+import { CalenderviewComponent } from "./calenderview/calenderview.component";
+import dayGridPlugin from "@fullcalendar/daygrid"; // a plugin
+import interactionPlugin from "@fullcalendar/interaction";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import listPlugin from "@fullcalendar/list";
 
+FullCalendarModule.registerPlugins([
+  // register FullCalendar plugins
+
+  dayGridPlugin,
+  timeGridPlugin,
+  listPlugin,
+  interactionPlugin,
+]);
 @NgModule({
   declarations: [
     AppComponent,
@@ -23,6 +37,7 @@ import { NgxSpinnerModule } from "ngx-spinner";
     DashboardComponent,
     LogoutComponent,
     AdministratorComponent,
+    CalenderviewComponent,
   ],
   imports: [
     BrowserModule,
@@ -33,6 +48,7 @@ import { NgxSpinnerModule } from "ngx-spinner";
     FormsModule,
     ReactiveFormsModule,
     NgxSpinnerModule,
+    FullCalendarModule,
   ],
   providers: [
     AuthenticationService,

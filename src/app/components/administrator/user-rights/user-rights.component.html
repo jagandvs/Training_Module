@@ -9,7 +9,7 @@
           [baseZIndex]="10000"
           key="c1"
         ></p-confirmDialog>
-        <div class="row mt-4 mb-4">
+        <div class="row mt-4 mb-4" *ngIf="menuAccess">
           <div class="col-lg-12 grid-margin">
             <form [formGroup]="userRightForm">
               <div class="card card-body shadow">
@@ -419,6 +419,12 @@
               </div>
             </form>
           </div>
+        </div>
+        <div class="container align-item-center" *ngIf="!menuAccess">
+          <h1 class="text-center" style="padding: 80px 20px;">
+            OOPS!!! You don't have access to this Page...
+          </h1>
+          <p class="text-center">Please Contact Administrator</p>
         </div>
       </div>
     </div>

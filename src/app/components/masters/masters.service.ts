@@ -12,6 +12,7 @@ import {
   uploadFiles,
 } from "src/app/_helper/navigation-urls";
 import { Observable } from "rxjs";
+import { ObserveOnSubscriber } from "rxjs/internal/operators/observeOn";
 @Injectable({
   providedIn: "root",
 })

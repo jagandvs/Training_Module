@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { Workbook } from "exceljs";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
-import { Training_Need } from "src/app/_helper/SM_CODE";
+import { Present_Skills } from "src/app/_helper/SM_CODE";
 import { CommonService } from "src/app/_services/common.service";
 import { ReportsService } from "../reports.service";
 import * as fs from "file-saver";
@@ -39,7 +39,7 @@ export class PresentSkillsComponent implements OnInit {
 
     var UM_CODE = currentUser?.user.UM_CODE;
     this.commonService
-      .checkRight(UM_CODE, Training_Need, "checkRight")
+      .checkRight(UM_CODE, Present_Skills, "checkRight")
       .subscribe((data) => {
         for (let access of data) {
           this.menuAccess = access.MENU;

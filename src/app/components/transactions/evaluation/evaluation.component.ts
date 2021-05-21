@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
 import { NgxSpinnerService } from "ngx-spinner";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
-import { Question_Bank } from "src/app/_helper/SM_CODE";
+import { Online_Evaluation } from "src/app/_helper/SM_CODE";
 import { CommonService } from "src/app/_services/common.service";
 import { TransactionsService } from "../transactions.service";
 
@@ -66,7 +66,7 @@ export class EvaluationComponent implements OnInit {
     console.log(empID);
     this.emp_id = empID.user.EMP_CODE;
     this.commonService
-      .checkRight(UM_CODE, Question_Bank, "checkRight")
+      .checkRight(UM_CODE, Online_Evaluation, "checkRight")
       .subscribe((data) => {
         for (let access of data) {
           this.menuAccess = access.MENU;

@@ -94,7 +94,9 @@
                       <tr>
                         <td>{{employee.EMP_MASTER_NUMBER}}</td>
                         <td>{{employee.EMP_MASTER_NAME}}</td>
-                        <td>{{employee.EMP_MASTER_IS_HOD}}</td>
+                        <td>
+                          {{employee.EMP_MASTER_IS_HOD | toggledata:'boolean'}}
+                        </td>
 
                         <td>
                           <button

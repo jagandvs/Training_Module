@@ -1,0 +1,200 @@
+.mediaViewInfo {
+	--web-view-name: custom – 1;
+	--web-view-id: custom__1;
+	--web-scale-on-resize: true;
+	--web-center-horizontally: true;
+	--web-enable-deep-linking: true;
+}
+:root {
+	--web-view-ids: custom__1;
+}
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	border: none;
+	outline: 1px dashed red;
+}
+#custom__1 {
+	position: absolute;
+	width: 600px;
+	height: 4391px;
+	background-color: rgba(255,255,255,1);
+	overflow: hidden;
+	--web-view-name: custom – 1;
+	--web-view-id: custom__1;
+	--web-scale-on-resize: true;
+	--web-center-horizontally: true;
+	--web-enable-deep-linking: true;
+	outline: 1px dashed red;
+}
+#ID1 {
+	position: absolute;
+	width: 600px;
+	height: 148px;
+	left: 0px;
+	top: 0px;
+	overflow: visible;
+}
+#ID2 {
+	position: absolute;
+	width: 600px;
+	height: 160px;
+	left: 0px;
+	top: 178px;
+	overflow: visible;
+}
+#ID3 {
+	position: absolute;
+	width: 540px;
+	height: 540px;
+	left: 30px;
+	top: 368px;
+	overflow: visible;
+}
+#ID4 {
+	position: absolute;
+	width: 540px;
+	height: 540px;
+	left: 30px;
+	top: 938px;
+	overflow: visible;
+}
+#ID5 {
+	position: absolute;
+	width: 600px;
+	height: 160px;
+	left: 0px;
+	top: 1508px;
+	overflow: visible;
+}
+#ID6 {
+	position: absolute;
+	width: 540px;
+	height: 540px;
+	left: 30px;
+	top: 1698px;
+	overflow: visible;
+}
+#ID7 {
+	position: absolute;
+	width: 540px;
+	height: 540px;
+	left: 30px;
+	top: 2268px;
+	overflow: visible;
+}
+#ID8 {
+	position: absolute;
+	width: 600px;
+	height: 200px;
+	left: 0px;
+	top: 2838px;
+	overflow: visible;
+}
+#ID9 {
+	position: absolute;
+	width: 600px;
+	height: 600px;
+	left: 0px;
+	top: 3068px;
+	overflow: visible;
+}
+#ID10 {
+	position: absolute;
+	width: 265px;
+	height: 35.401px;
+	left: 30px;
+	top: 3698px;
+	overflow: visible;
+}
+#ID11 {
+	position: absolute;
+	width: 265px;
+	height: 35.401px;
+	left: 305px;
+	top: 3698px;
+	overflow: visible;
+}
+#ID17 {
+	position: absolute;
+	width: 265px;
+	height: 35.401px;
+	left: 305px;
+	top: 3848px;
+	overflow: visible;
+}
+#ID12 {
+	position: absolute;
+	width: 265px;
+	height: 35.401px;
+	left: 30px;
+	top: 3748px;
+	overflow: visible;
+}
+#ID13 {
+	position: absolute;
+	width: 265px;
+	height: 35.401px;
+	left: 305px;
+	top: 3748px;
+	overflow: visible;
+}
+#ID14 {
+	position: absolute;
+	width: 265px;
+	height: 35.401px;
+	left: 30px;
+	top: 3798px;
+	overflow: visible;
+}
+#ID15 {
+	position: absolute;
+	width: 265px;
+	height: 35.401px;
+	left: 305px;
+	top: 3798px;
+	overflow: visible;
+}
+#ID16 {
+	position: absolute;
+	width: 265px;
+	height: 35.401px;
+	left: 30px;
+	top: 3848px;
+	overflow: visible;
+}
+#ID18 {
+	position: absolute;
+	width: 600px;
+	height: 477px;
+	left: 0px;
+	top: 3913px;
+	overflow: visible;
+}
+#facebook {
+	position: absolute;
+	width: 36px;
+	height: 36px;
+	left: 219px;
+	top: 4247px;
+	overflow: visible;
+}
+#instagram {
+	position: absolute;
+	width: 36px;
+	height: 36px;
+	left: 285px;
+	top: 4247px;
+	overflow: visible;
+}
+#pinterest {
+	position: absolute;
+	width: 30px;
+	height: 36px;
+	left: 351px;
+	top: 4247px;
+	overflow: visible;
+}
+
+

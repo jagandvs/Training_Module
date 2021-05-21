@@ -75,7 +75,7 @@
                     [paginator]="true"
                     [loading]="loading"
                     [columns]="cols"
-                    [globalFilterFields]="['']"
+                    [globalFilterFields]="['department_name','TrainingProgramMaster_title']"
                     [rowsPerPageOptions]="[10,25,50]"
                   >
                     <ng-template pTemplate="colgroup" let-columns>
@@ -99,6 +99,15 @@
                         >
                           <i class="pi pi-file-pdf"></i>
                         </button>
+                        <span class="p-input-icon-left ml-auto">
+                          <i class="pi pi-search"></i>
+                          <input
+                            pInputText
+                            type="search"
+                            (input)="dt.filterGlobal($event.target.value, 'contains')"
+                            placeholder="Search..."
+                          />
+                        </span>
                       </div>
                     </ng-template>
                     <ng-template pTemplate="header" let-columns>

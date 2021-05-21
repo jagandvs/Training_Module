@@ -1,14 +1,16 @@
 <div class="container-scroller">
   <app-header></app-header>
   <div class="container-fluid page-body-wrapper">
-    <!-- <div class="main-panel">
+    <div class="main-panel">
       <div class="content-wrapper">
         <div class="row mt-4">
           <div class="col-lg-8 grid-margin stretch-card">
             <div class="card">
               <div class="card-body">
-                <div class="row">
-                  <div class="col-lg-4">
+                <!-- <div class="row"> -->
+                <full-calendar [options]="calendarOptions"></full-calendar>
+
+                <!-- <div class="col-lg-4">
                     <h4 class="card-title">Sales Difference</h4>
                     <canvas id="salesDifference"></canvas>
                     <p class="mt-3 mb-4 mb-lg-0">
@@ -89,8 +91,8 @@
                     <p class="mb-0 mt-2">
                       Lorem ipsum dolor sit amet, consectetur adipisicing elit.
                     </p>
-                  </div>
-                </div>
+                  </div>-->
+                <!-- </div>  -->
               </div>
             </div>
           </div>
@@ -98,18 +100,19 @@
             <div class="card congratulation-bg text-center">
               <div class="card-body pb-0">
                 <img src="images/dashboard/face29.png" alt="" />
-                <h2 class="mt-3 text-white mb-3 font-weight-bold">
-                  Congratulations Johnson
+                <h2
+                  class="mt-3 text-white mb-3 font-weight-bold text-capitalize"
+                >
+                  Welcome {{user}}
                 </h2>
-                <p>
-                  You have done 57.6% more sales today. Check your new badge in
-                  your profile.
-                </p>
+                <h3 class="text-white">
+                  {{welcomeMessage}}
+                </h3>
               </div>
             </div>
           </div>
         </div>
-        <div class="row">
+        <!-- <div class="row">
           <div class="col-sm-8 flex-column d-flex stretch-card">
             <div class="row">
               <div class="col-lg-4 d-flex grid-margin stretch-card">
@@ -467,8 +470,120 @@
             </div>
           </div>
         </div>
-        <app-footer></app-footer>
+        <div class="row">
+          <div class="col-lg-2 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body pb-0">
+                <div class="d-flex align-items-center justify-content-between">
+                  <h2 class="text-success font-weight-bold">18390</h2>
+                  <i class="mdi mdi-account-outline mdi-18px text-dark"></i>
+                </div>
+              </div>
+              <canvas id="newClient"></canvas>
+              <div class="line-chart-row-title">MY NEW CLIENTS</div>
+            </div>
+          </div>
+          <div class="col-lg-2 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body pb-0">
+                <div class="d-flex align-items-center justify-content-between">
+                  <h2 class="text-danger font-weight-bold">839</h2>
+                  <i class="mdi mdi-refresh mdi-18px text-dark"></i>
+                </div>
+              </div>
+              <canvas id="allProducts"></canvas>
+              <div class="line-chart-row-title">All Products</div>
+            </div>
+          </div>
+          <div class="col-lg-2 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body pb-0">
+                <div class="d-flex align-items-center justify-content-between">
+                  <h2 class="text-info font-weight-bold">244</h2>
+                  <i
+                    class="mdi mdi-file-document-outline mdi-18px text-dark"
+                  ></i>
+                </div>
+              </div>
+              <canvas id="invoices"></canvas>
+              <div class="line-chart-row-title">NEW INVOICES</div>
+            </div>
+          </div>
+          <div class="col-lg-2 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body pb-0">
+                <div class="d-flex align-items-center justify-content-between">
+                  <h2 class="text-warning font-weight-bold">3259</h2>
+                  <i class="mdi mdi-folder-outline mdi-18px text-dark"></i>
+                </div>
+              </div>
+              <canvas id="projects"></canvas>
+              <div class="line-chart-row-title">All PROJECTS</div>
+            </div>
+          </div>
+          <div class="col-lg-2 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body pb-0">
+                <div class="d-flex align-items-center justify-content-between">
+                  <h2 class="text-secondary font-weight-bold">586</h2>
+                  <i class="mdi mdi-cart-outline mdi-18px text-dark"></i>
+                </div>
+              </div>
+              <canvas id="orderRecieved"></canvas>
+              <div class="line-chart-row-title">Orders Received</div>
+            </div>
+          </div>
+          <div class="col-lg-2 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body pb-0">
+                <div class="d-flex align-items-center justify-content-between">
+                  <h2 class="text-dark font-weight-bold">7826</h2>
+                  <i class="mdi mdi-cash text-dark mdi-18px"></i>
+                </div>
+              </div>
+              <canvas id="transactions"></canvas>
+              <div class="line-chart-row-title">TRANSACTIONS</div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 grid-margin grid-margin-md-0 stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                  <h4 class="card-title">Support Tracker</h4>
+                  <h4 class="text-success font-weight-bold">
+                    Tickets<span class="text-dark ml-3">163</span>
+                  </h4>
+                </div>
+                <div
+                  id="support-tracker-legend"
+                  class="support-tracker-legend"
+                ></div>
+                <canvas id="supportTracker"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 grid-margin grid-margin-md-0 stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <div
+                  class="d-lg-flex align-items-center justify-content-between mb-4"
+                >
+                  <h4 class="card-title">Product Orders</h4>
+                  <p class="text-dark">+5.2% vs last 7 days</p>
+                </div>
+                <div class="product-order-wrap padding-reduced">
+                  <div
+                    id="productorder-gage"
+                    class="gauge productorder-gage"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> -->
       </div>
-    </div> -->
+    </div>
   </div>
 </div>

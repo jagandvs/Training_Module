@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
 import { ConfirmationService, MessageService } from "primeng/api";
-import { Training_Need } from "src/app/_helper/SM_CODE";
+import { Employee_History_Card } from "src/app/_helper/SM_CODE";
 import { CommonService } from "src/app/_services/common.service";
 import { ReportsService } from "../reports.service";
 import jspdf from "jspdf";
@@ -33,6 +33,7 @@ export class EmployeeHistoryCardComponent implements OnInit {
   public fromDate: Date;
   public toDate: Date;
   public allCheckbox: boolean = true;
+  public totalRecords = 0;
   constructor(
     private commonService: CommonService,
     private fb: FormBuilder,
@@ -46,7 +47,7 @@ export class EmployeeHistoryCardComponent implements OnInit {
 
     var UM_CODE = currentUser?.user.UM_CODE;
     this.commonService
-      .checkRight(UM_CODE, Training_Need, "checkRight")
+      .checkRight(UM_CODE, Employee_History_Card, "checkRight")
       .subscribe((data) => {
         for (let access of data) {
           this.menuAccess = access.MENU;
@@ -109,6 +110,7 @@ export class EmployeeHistoryCardComponent implements OnInit {
       this.service.getEmployeeHistory(null, null).subscribe((data) => {
         console.log(data);
         this.employeeList = data;
+        this.totalRecords = this.employeeList.length;
       });
     } else {
       if (!!this.fromDate || !!this.toDate) {
@@ -124,6 +126,7 @@ export class EmployeeHistoryCardComponent implements OnInit {
         .subscribe((data) => {
           console.log(data);
           this.employeeList = data;
+          this.totalRecords = this.employeeList.length;
         });
     }
   }

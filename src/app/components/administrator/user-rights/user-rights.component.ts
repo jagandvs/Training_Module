@@ -1,6 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MessageService } from "primeng/api";
+import { User_Right } from "src/app/_helper/SM_CODE";
+import { CommonService } from "src/app/_services/common.service";
 import { AdministratorService } from "../administrator.service";
 
 @Component({
@@ -28,39 +30,64 @@ export class UserRightsComponent implements OnInit {
   public MOD_CODE: number = 0;
 
   public p: number = 1;
-
+  public menuAccess: boolean = true;
+  public addAccess: boolean = true;
+  public viewAccess: boolean = true;
+  public updateAccess: boolean = true;
+  public deleteAccess: boolean = true;
+  public printAccess: boolean = true;
+  public backDateAccess: boolean = true;
   public showUserRightTable: boolean = false;
   constructor(
     private formBuilder: FormBuilder,
     private service: AdministratorService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private commonService: CommonService
   ) {}
 
   ngOnInit() {
-    this.service.userMaster().subscribe((users) => {
-      this.users = users;
-    });
-    this.service.getModule().subscribe((modules) => {
-      this.moduleNames = modules;
-    });
+    var currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
 
-    this.userRightForm = this.formBuilder.group({
-      username: ["", Validators.required],
-      copyRights: [false],
-      fromUserName: [{ value: "", disabled: true }],
-      moduleName: ["", Validators.required],
-      formName: ["", Validators.required],
-      forms: [false],
-      menu: [false],
-      add: [false],
-      view: [false],
-      update: [false],
-      delete: [false],
-      print: [false],
-      back_date: [false],
-      all: [false],
-      userRightsTable: this.formBuilder.array([]),
-    });
+    var UM_CODE = currentUser?.user.UM_CODE;
+    this.commonService
+      .checkRight(UM_CODE, User_Right, "checkRight")
+      .subscribe((data) => {
+        for (let access of data) {
+          this.menuAccess = access.MENU;
+          this.addAccess = access.ADD;
+          this.deleteAccess = access.DELETE;
+          this.viewAccess = access.VIEW;
+          this.printAccess = access.PRINT;
+          this.backDateAccess = access.BACK_DATE;
+          this.updateAccess = access.UPDATE;
+        }
+      });
+    if (this.menuAccess) {
+      this.service.userMaster().subscribe((users) => {
+        this.users = users;
+      });
+      this.service.getModule().subscribe((modules) => {
+        this.moduleNames = modules;
+      });
+
+      this.userRightForm = this.formBuilder.group({
+        username: ["", Validators.required],
+        copyRights: [false],
+        fromUserName: [{ value: "", disabled: true }],
+        moduleName: ["", Validators.required],
+        formName: ["", Validators.required],
+        forms: [false],
+        menu: [false],
+        add: [false],
+        view: [false],
+        update: [false],
+        delete: [false],
+        print: [false],
+        back_date: [false],
+        all: [false],
+        userRightsTable: this.formBuilder.array([]),
+      });
+    }
   }
 
   get f() {
@@ -225,6 +252,13 @@ export class UserRightsComponent implements OnInit {
             }
           });
       } else if (this.PROCESS == "show") {
+        console.log(
+          this.UR_UM_CODE,
+          this.UR_SM_CODE,
+          this.UR_RIGHTS,
+          this.PROCESS,
+          this.MOD_CODE
+        );
         this.service
           .userRightShow(
             this.UR_UM_CODE,

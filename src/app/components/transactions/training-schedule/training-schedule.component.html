@@ -138,10 +138,17 @@
                           {{training.TRAININGPROGRAM_ID_TO_DATE | date :
                           'dd/MM/yyyy'}}
                         </td>
-                        <td>{{training.TRAININGPROGRAMDETAIL_APPROVED}}</td>
-                        <td>{{training.TRAININGPROGRAMDETAIL_ATTENDANCE}}</td>
                         <td>
-                          {{training.TRAININGPROGRAMDETAIL_REQUIRED_FOR_TRAINING}}
+                          {{training.TRAININGPROGRAMDETAIL_APPROVED |
+                          toggledata:'approve'}}
+                        </td>
+                        <td>
+                          {{training.TRAININGPROGRAMDETAIL_ATTENDANCE |
+                          toggledata:'attendance'}}
+                        </td>
+                        <td>
+                          {{training.TRAININGPROGRAMDETAIL_REQUIRED_FOR_TRAINING
+                          | toggledata : 'required'}}
                         </td>
 
                         <td>
@@ -282,6 +289,40 @@
                     >
                       <div *ngIf="f.TRAININGPROGRAM_ID_TO_DATE.errors.required">
                         To Date is required
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-field p-col-12 p-md-6">
+                    <label>From Time </label>
+                    <input
+                      type="time"
+                      class="form-control"
+                      formControlName="TRAININGPROGRAM_ID_FROM_TIME"
+                    />
+                    <div
+                      *ngIf="submitted && f.TRAININGPROGRAM_ID_FROM_TIME.errors"
+                      class="alert alert-danger"
+                    >
+                      <div
+                        *ngIf="f.TRAININGPROGRAM_ID_FROM_TIME.errors.required"
+                      >
+                        From Time is required
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-field p-col-12 p-md-6">
+                    <label>To Time </label>
+                    <input
+                      type="time"
+                      class="form-control"
+                      formControlName="TRAININGPROGRAM_ID_TO_TIME"
+                    />
+                    <div
+                      *ngIf="submitted && f.TRAININGPROGRAM_ID_TO_TIME.errors"
+                      class="alert alert-danger"
+                    >
+                      <div *ngIf="f.TRAININGPROGRAM_ID_TO_TIME.errors.required">
+                        To Time is required
                       </div>
                     </div>
                   </div>

@@ -2,7 +2,7 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
-import { Training_Need } from "src/app/_helper/SM_CODE";
+import { Training_Attendance_Approval } from "src/app/_helper/SM_CODE";
 import { CommonService } from "src/app/_services/common.service";
 import { TransactionsService } from "../transactions.service";
 
@@ -47,7 +47,7 @@ export class AttendanceApprovalComponent implements OnInit {
 
     var UM_CODE = currentUser?.user.UM_CODE;
     this.commonService
-      .checkRight(UM_CODE, Training_Need, "checkRight")
+      .checkRight(UM_CODE, Training_Attendance_Approval, "checkRight")
       .subscribe((data) => {
         for (let access of data) {
           this.menuAccess = access.MENU;
@@ -92,6 +92,15 @@ export class AttendanceApprovalComponent implements OnInit {
         .subscribe((data) => {
           console.log(data);
           this.appovalList = data;
+
+          if (!this.appovalList.length) {
+            this.messageService.add({
+              key: "t1",
+              severity: "error",
+              summary: "Error",
+              detail: "No Employee Found",
+            });
+          }
         });
     } else {
       this.appovalList = [];

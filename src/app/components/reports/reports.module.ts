@@ -21,6 +21,7 @@ import { HistoryCardComponent } from "./history-card/history-card.component";
 import { TrainingNeedsComponent } from "./training-needs/training-needs.component";
 import { PresentSkillsComponent } from "./present-skills/present-skills.component";
 import { TrainingCalenderComponent } from "./training-calender/training-calender.component";
+import { AttendanceReportComponent } from "./attendance-report/attendance-report.component";
 
 const routes: Routes = [
   { path: "employeeHistoryCard", component: EmployeeHistoryCardComponent },
@@ -28,6 +29,7 @@ const routes: Routes = [
   { path: "presentSkills", component: PresentSkillsComponent },
   { path: "trainingNeeds", component: TrainingNeedsComponent },
   { path: "trainingCalender", component: TrainingCalenderComponent },
+  { path: "trainingAttendanceReport", component: AttendanceReportComponent },
 ];
 
 @NgModule({
@@ -37,6 +39,7 @@ const routes: Routes = [
     TrainingNeedsComponent,
     PresentSkillsComponent,
     TrainingCalenderComponent,
+    AttendanceReportComponent,
   ],
   imports: [
     CommonModule,
@@ -53,6 +56,7 @@ const routes: Routes = [
     NgxSpinnerModule,
     CalendarModule,
     ButtonModule,
+
     RouterModule.forChild(routes),
   ],
   providers: [

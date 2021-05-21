@@ -56,11 +56,23 @@ export class UserMasterComponent implements OnInit {
   }
 
   getUserMaster() {
+    var currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+    var UM_CODE = currentUser?.user.UM_CODE;
+    var UM_USERNAME = currentUser?.user.UM_USERNAME;
     this.userMaster = [];
     this.commonService
-      .getTableResponse("*", "USER_MASTER", "ES_DELETE=0")
+      .getTableResponse("*", "USER_MASTER", `ES_DELETE=0 `)
       .subscribe((data) => {
-        this.userMaster = data;
+        if (UM_USERNAME === "admin") {
+          this.userMaster = data;
+        } else {
+          data.map((value) => {
+            if (value.UM_CODE === UM_CODE) {
+              this.userMaster.push(value);
+            }
+          });
+        }
       });
   }
 

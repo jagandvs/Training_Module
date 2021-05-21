@@ -7,6 +7,7 @@ import {
   getEmployeeHistoryCardofEmployee,
   getpresentskills,
   getTrainingNeedsAndCalender,
+  getTrainngAttendancePrint,
 } from "src/app/_helper/navigation-urls";
 import { Observable } from "rxjs";
 
@@ -53,6 +54,12 @@ export class ReportsService {
       getTrainingNeedsAndCalender + url,
       body,
       httpOptions
+    );
+  }
+
+  getTrainingAttendance(trainingscheudleid): Observable<any[]> {
+    return this.http.get<any[]>(
+      getTrainngAttendancePrint + "?trainingscheudleid=" + trainingscheudleid
     );
   }
 }

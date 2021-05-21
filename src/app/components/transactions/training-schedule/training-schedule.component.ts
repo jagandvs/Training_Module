@@ -3,7 +3,7 @@ import { DatePipe, formatDate } from "@angular/common";
 import { HttpErrorResponse } from "@angular/common/http";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
-import { Training_Need } from "src/app/_helper/SM_CODE";
+import { Training_Schedule } from "src/app/_helper/SM_CODE";
 import {
   trainingScheduleUploadFolder,
   UM_CODE,
@@ -73,7 +73,7 @@ export class TrainingScheduleComponent implements OnInit {
     let datePipe: DatePipe = new DatePipe("en-US");
     this.todayDate = datePipe.transform(new Date(), "yyyy-MM-dd");
     this.commonService
-      .checkRight(UM_CODE, Training_Need, "checkRight")
+      .checkRight(UM_CODE, Training_Schedule, "checkRight")
       .subscribe((data) => {
         for (let access of data) {
           this.menuAccess = access.MENU;
@@ -108,6 +108,8 @@ export class TrainingScheduleComponent implements OnInit {
         TRAININGPROGRAM_ID_FROM_DATE: ["", Validators.required],
         TRAININGPROGRAM_ID_TO_DATE: ["", Validators.required],
         TRAININGPROGRAM_ID_PASSING_PERCENTAGE: ["", Validators.required],
+        TRAININGPROGRAM_ID_TO_TIME: ["", Validators.required],
+        TRAININGPROGRAM_ID_FROM_TIME: ["", Validators.required],
       });
     }
   }
@@ -132,6 +134,7 @@ export class TrainingScheduleComponent implements OnInit {
       });
   }
   getEmployeeList(trainingId) {
+    console.log(trainingId);
     this.service.getEmployeeList(trainingId).subscribe((data) => {
       this.trainingDetailTable = [];
       for (let value of data) {
@@ -388,6 +391,12 @@ export class TrainingScheduleComponent implements OnInit {
                       "yyyy-MM-dd",
                       "en"
                     )
+                  );
+                  this.f["TRAININGPROGRAM_ID_TO_TIME"].setValue(
+                    trainingMasterAndDetail[0].TRAININGPROGRAM_ID_TO_TIME
+                  );
+                  this.f["TRAININGPROGRAM_ID_FROM_TIME"].setValue(
+                    trainingMasterAndDetail[0].TRAININGPROGRAM_ID_FROM_TIME
                   );
                   this.f["TRAININGPROGRAM_ID_PASSING_PERCENTAGE"].setValue(
                     trainingMasterAndDetail[0]

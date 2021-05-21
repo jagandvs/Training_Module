@@ -14,10 +14,69 @@
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title">User Master</h4>
-                <button class="btn btn-primary float-right" (click)="addUser()">
+                <!-- <button class="btn btn-primary float-right" (click)="addUser()">
                   <i class="mdi mdi-plus-circle-multiple-outline"></i> Add New
-                </button>
-                <div class="table-responsive">
+                </button> -->
+                <p-table
+                  #dt
+                  [value]="userMaster"
+                  [rows]="10"
+                  [paginator]="true"
+                  [globalFilterFields]="['UM_USERNAME','UM_NAME','UM_EMAIL']"
+                  [rowsPerPageOptions]="[10,25,50]"
+                  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                  [showCurrentPageReport]="true"
+                >
+                  <ng-template pTemplate="colgroup" let-columns>
+                    <colgroup *ngFor="let col of columns">
+                      <col style="width: 200px;" />
+                    </colgroup>
+                  </ng-template>
+                  <ng-template pTemplate="caption">
+                    <div class="d-flex flex-row">
+                      <span class="p-input-icon-left ml-auto">
+                        <input
+                          pInputText
+                          type="search"
+                          (input)="dt.filterGlobal($event.target.value, 'contains')"
+                          placeholder="Search..."
+                        />
+                      </span>
+                    </div>
+                  </ng-template>
+                  <ng-template pTemplate="header" let-columns>
+                    <tr>
+                      <th>User ID</th>
+                      <th>User Name</th>
+                      <th>User Email</th>
+                      <th>Action</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-user let-ri="rowIndex">
+                    <tr>
+                      <td>{{user.UM_USERNAME}}</td>
+                      <td>{{user.UM_NAME}}</td>
+                      <td>{{user.UM_EMAIL}}</td>
+                      <td>
+                        <button
+                          class="btn btn-primary mr-4"
+                          (click)="editUser(user)"
+                        >
+                          <i class="mdi mdi-pencil-box"></i> Edit
+                        </button>
+                      </td>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="emptymessage">
+                    <tr>
+                      <td colspan="3" style="text-align: center;">
+                        <h4>No Records Found.</h4>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+
+                <!-- <div class="table-responsive">
                   <table class="table table-striped">
                     <thead>
                       <tr class="text-center">
@@ -40,17 +99,17 @@
                             <i class="mdi mdi-pencil-box"></i> Edit
                           </button>
 
-                          <button
+                          <!-- <button
                             class="btn btn-danger"
                             (click)="deleteUser(user.UM_CODE)"
                           >
                             <i class="mdi mdi-delete"></i> Delete
-                          </button>
+                          </button> 
                         </td>
                       </tr>
                     </tbody>
                   </table>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -79,6 +138,7 @@
                       class="form-control"
                       placeholder="User Name"
                       formControlName="UM_NAME"
+                      readonly
                     />
                   </div>
                 </div>
@@ -90,13 +150,18 @@
                       class="form-control"
                       placeholder="User Id"
                       formControlName="UM_USERNAME"
+                      readonly
                     />
                   </div>
                 </div>
                 <div class="form-group row">
                   <label class="col-sm-6 col-form-label">User Type</label>
                   <div class="col-sm-6">
-                    <select class="form-control" formControlName="UM_LEVEL">
+                    <select
+                      class="form-control"
+                      formControlName="UM_LEVEL"
+                      disabled
+                    >
                       <option value="">Select User Type..</option>
                       <option value="Administrator">Administrator</option>
                       <option value="Manager">Manager</option>

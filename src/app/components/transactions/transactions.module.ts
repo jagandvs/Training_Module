@@ -25,6 +25,8 @@ import { EvaluationComponent } from "./evaluation/evaluation.component";
 import { NgxSpinnerModule } from "ngx-spinner";
 import { CalendarModule } from "primeng/calendar";
 import { OfflineEvaluationComponent } from "./offline-evaluation/offline-evaluation.component";
+import { HodFeedbackComponent } from "./hod-feedback/hod-feedback.component";
+import { HrFeedbackComponent } from "./hr-feedback/hr-feedback.component";
 
 const routes: Routes = [
   { path: "questionBank", component: QuestionBankComponent },
@@ -43,6 +45,14 @@ const routes: Routes = [
     path: "offlineEvaluation",
     component: OfflineEvaluationComponent,
   },
+  {
+    path: "hodFeedback",
+    component: HodFeedbackComponent,
+  },
+  {
+    path: "hrFeedback",
+    component: HrFeedbackComponent,
+  },
   { path: "**", redirectTo: "DashboardComponent" },
 ];
 
@@ -55,6 +65,8 @@ const routes: Routes = [
     AttendanceApprovalComponent,
     EvaluationComponent,
     OfflineEvaluationComponent,
+    HodFeedbackComponent,
+    HrFeedbackComponent,
   ],
   imports: [
     CommonModule,

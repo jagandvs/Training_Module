@@ -1,0 +1,142 @@
+<p>hr-feedback works!</p>
+<div class="container-scroller">
+  <app-header></app-header>
+  <div class="container-fluid page-body-wrapper">
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <p-toast position="bottom-center" key="t1"></p-toast>
+        <p-confirmDialog
+          [style]="{width: '30vw'}"
+          [baseZIndex]="10000"
+          key="c1"
+        ></p-confirmDialog>
+        <div class="row mt-4 mb-4">
+          <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Training Attendance Report</h4>
+                <div *ngIf="menuAccess">
+                  <p-table
+                    #dt
+                    [value]="empList"
+                    [rows]="10"
+                    [paginator]="true"
+                    [loading]="loading"
+                    [globalFilterFields]="['employeenumber','nameofemployee', 'Trainingtopic', 'Deartmentname','Faculty']"
+                    [rowsPerPageOptions]="[10,25,50]"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    [totalRecords]="totalRecords"
+                    [showCurrentPageReport]="true"
+                  >
+                    <ng-template pTemplate="colgroup">
+                      <colgroup>
+                        <col style="width: 200px;" />
+                        <col style="width: 200px;" />
+                        <col style="width: 200px;" />
+                        <col style="width: 200px;" />
+                        <col style="width: 200px;" />
+                      </colgroup>
+                    </ng-template>
+                    <ng-template pTemplate="caption">
+                      <div class="row justify-content-between">
+                        <div class="col-md-5">
+                          <p-dropdown
+                            [options]="trainingMasterDropdown"
+                            [(ngModel)]="selectedTraining"
+                            [filter]="true"
+                            [showClear]="true"
+                            placeholder="Select Training Title"
+                            [resetFilterOnHide]="true"
+                            appendTo="body"
+                            (onChange)="onTrainingProgramChange()"
+                          >
+                          </p-dropdown>
+                        </div>
+                        <div class="col-md-2">
+                          <button
+                            class="btn btn-success p-mr-2 text-white"
+                            type="button"
+                            (click)="exportExcel()"
+                          >
+                            <i class="pi pi-file-excel"></i> Export Excel
+                          </button>
+                        </div>
+
+                        <div class="col-md-3">
+                          <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input
+                              pInputText
+                              type="search"
+                              (input)="dt.filterGlobal($event.target.value, 'contains')"
+                              placeholder="Search..."
+                            />
+                          </span>
+                        </div>
+                      </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                      <tr class="text-center">
+                        <th pSortableColumn="employeenumber">
+                          Employee Number
+                          <p-sortIcon field="employeenumber"> </p-sortIcon>
+                        </th>
+                        <th pSortableColumn="nameofemployee">
+                          Employee Name
+                          <p-sortIcon field="nameofemployee"> </p-sortIcon>
+                        </th>
+                        <th pSortableColumn="Trainingtopic">
+                          Program Title
+                          <p-sortIcon field="Trainingtopic"> </p-sortIcon>
+                        </th>
+                        <th pSortableColumn="Deartmentname">
+                          Department Name
+                          <p-sortIcon field="Deartmentname"> </p-sortIcon>
+                        </th>
+                        <th pSortableColumn="Faculty">
+                          Faculty
+                          <p-sortIcon field="Faculty"> </p-sortIcon>
+                        </th>
+                      </tr>
+                    </ng-template>
+                    <ng-template
+                      pTemplate="body"
+                      let-training
+                      let-ri="rowIndex"
+                    >
+                      <tr>
+                        <td>{{training.employeenumber}}</td>
+                        <td>{{training.nameofemployee}}</td>
+                        <td>{{training.Trainingtopic}}</td>
+                        <td>
+                          {{training.Deartmentname }}
+                        </td>
+                        <td>
+                          {{training.Faculty}}
+                        </td>
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                      <tr>
+                        <td colspan="3" style="text-align: center;">
+                          <h4>No Records Found.</h4>
+                        </td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+                </div>
+                <div class="container align-item-center" *ngIf="!menuAccess">
+                  <h1 class="text-center" style="padding: 80px 20px;">
+                    OOPS!!! You don't have access to this Page...
+                  </h1>
+                  <p class="text-center">Please Contact Administrator</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <app-footer></app-footer>
+    </div>
+  </div>
+</div>

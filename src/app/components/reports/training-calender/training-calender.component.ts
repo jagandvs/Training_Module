@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { Workbook } from "exceljs";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
-import { Training_Need } from "src/app/_helper/SM_CODE";
+import { Training_Calendar } from "src/app/_helper/SM_CODE";
 import { CommonService } from "src/app/_services/common.service";
 import { ReportsService } from "../reports.service";
 import * as fs from "file-saver";
@@ -28,8 +28,10 @@ export class TrainingCalenderComponent implements OnInit {
   public deptId;
   public deptDropdown: SelectItem[] = [];
   public exportColumns: any[];
+  public exportMonthly: any[] = [];
   public columns: any[];
   public Q1: any[] = [];
+  public totalRecords = 0;
 
   public employeeTypeDropdown: SelectItem[] = [];
   constructor(
@@ -45,7 +47,7 @@ export class TrainingCalenderComponent implements OnInit {
 
     var UM_CODE = currentUser?.user.UM_CODE;
     this.commonService
-      .checkRight(UM_CODE, Training_Need, "checkRight")
+      .checkRight(UM_CODE, Training_Calendar, "checkRight")
       .subscribe((data) => {
         for (let access of data) {
           this.menuAccess = access.MENU;
@@ -108,6 +110,53 @@ export class TrainingCalenderComponent implements OnInit {
     });
   }
 
+  getMonthlyList() {
+    this.service
+      .getTrainingNeedsAndCalender(
+        this.emptype,
+        this.deptId,
+        this.deptAll,
+        "getmonthwisetrainingcalender"
+      )
+      .subscribe((data) => {
+        console.log(data);
+        data.map((value, index) => {
+          this.exportMonthly.push({
+            SR_NO: index + 1,
+            TrainingTitle: value.TrainingTitle,
+            department_name: value.department_name,
+            processname: value.processname,
+            JANA: value.JANA == 1 ? "Actual" : "",
+            JANP: value.JANP == 1 ? "Planned" : "",
+            FEBA: value.FEBA == 1 ? "Actual" : "",
+            FEBP: value.FEBP == 1 ? "Planned" : "",
+            MARCHA: value.MARCHA == 1 ? "Actual" : "",
+            MARCHP: value.MARCHP == 1 ? "Planned" : "",
+            APRILA: value.APRILA == 1 ? "Actual" : "",
+            APRILP: value.APRILP == 1 ? "Planned" : "",
+            MAYA: value.MAYA == 1 ? "Actual" : "",
+            MAYP: value.MAYP == 1 ? "Planned" : "",
+            JUNEA: value.JUNEA == 1 ? "Actual" : "",
+            JUNEP: value.JUNEP == 1 ? "Planned" : "",
+            JULYA: value.JULYA == 1 ? "Actual" : "",
+            JULYP: value.JULYP == 1 ? "Planned" : "",
+            AUGA: value.AUGA == 1 ? "Actual" : "",
+            AUGP: value.AUGP == 1 ? "Planned" : "",
+            SEPA: value.SEPA == 1 ? "Actual" : "",
+            SEPP: value.SEPP == 1 ? "Planned" : "",
+            OCTA: value.OCTA == 1 ? "Actual" : "",
+            OCTP: value.OCTP == 1 ? "Planned" : "",
+            NOVA: value.NOVA == 1 ? "Actual" : "",
+            NOVP: value.NOVP == 1 ? "Planned" : "",
+            DECA: value.DECA == 1 ? "Actual" : "",
+            DECP: value.DECP == 1 ? "Planned" : "",
+          });
+        });
+        console.log(this.exportMonthly);
+        this.exportMonthlyExcel();
+      });
+  }
+
   getList() {
     this.employeeList = [];
     this.employeeTable = [];
@@ -123,6 +172,7 @@ export class TrainingCalenderComponent implements OnInit {
       .subscribe((data) => {
         // console.log(data);
         this.employeeList = data;
+        this.totalRecords = this.employeeList.length;
         data.forEach((value) => {
           this.employeeTable.push({
             ProcessName: value.ProcessName,
@@ -144,7 +194,177 @@ export class TrainingCalenderComponent implements OnInit {
         // console.log(this.Q1);
       });
   }
+  exportMonthlyExcel() {
+    var exportExcelColumns = [
+      "SR NO",
+      "Training Title",
+      "Department Name",
+      "Process Name",
+      "JANA",
+      "JANP",
+      "FEBA",
+      "FEBP",
+      "MARCHA",
+      "MARCHP",
+      "APRILA",
+      "APRILP",
+      "MAYA",
+      "MAYP",
+      "JUNEA",
+      "JUNEP",
+      "JULYA",
+      "JULYP",
+      "AUGA",
+      "AUGP",
+      "SEPA",
+      "SEPP",
+      "OCTA",
+      "OCTP",
+      "NOVA",
+      "NOVP",
+      "DECA",
+      "DECP",
+    ];
+    let workbook = new Workbook();
+    let worksheet = workbook.addWorksheet("Training Calender Monthly");
+    worksheet.mergeCells("B2:AC2");
+    worksheet.properties.defaultRowHeight = 55;
+    // ... merged cells are linked
+    worksheet.getCell("B2").value = "TRAINING CALENDER MONTHLY";
 
+    worksheet.getCell("B2").alignment = {
+      vertical: "middle",
+      horizontal: "center",
+    };
+
+    worksheet.getCell("B2").font = {
+      size: 20,
+      underline: true,
+      bold: true,
+    };
+    worksheet.getCell("B2").border = {
+      top: { style: "thick" },
+      left: { style: "thick" },
+      bottom: { style: "thick" },
+      right: { style: "thick" },
+    };
+
+    worksheet.getRows(3, 1).forEach((row) => {
+      for (let i = 2; i <= 29; i++) {
+        row.getCell(i).value = exportExcelColumns[i - 2];
+        row.alignment = {
+          vertical: "middle",
+          horizontal: "center",
+        };
+        row.font = {
+          size: 10,
+          bold: true,
+        };
+        row.getCell(i).fill = {
+          type: "pattern",
+          pattern: "lightGray",
+        };
+        row.getCell(i).border = {
+          top: { style: "thick" },
+          left: { style: "thick" },
+          bottom: { style: "thick" },
+          right: { style: "thick" },
+        };
+      }
+    });
+
+    worksheet.columns = [
+      { width: 10 },
+      { width: 8 },
+      { width: 40 },
+      { width: 20 },
+      { width: 20 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+      { width: 10 },
+    ];
+    this.exportMonthly.map((data) => {
+      const rowValues = [];
+      rowValues[2] = data.SR_NO;
+      rowValues[3] = data.TrainingTitle;
+      rowValues[4] = data.department_name;
+      rowValues[5] = data.processname;
+      rowValues[6] = data.JANA;
+      rowValues[7] = data.JANP;
+      rowValues[8] = data.FEBA;
+      rowValues[9] = data.FEBP;
+      rowValues[10] = data.MARCHA;
+      rowValues[11] = data.MARCHP;
+      rowValues[12] = data.APRILA;
+      rowValues[13] = data.APRILP;
+      rowValues[14] = data.MAYA;
+      rowValues[15] = data.MAYP;
+      rowValues[16] = data.JUNEA;
+      rowValues[17] = data.JUNEP;
+      rowValues[18] = data.JULYA;
+      rowValues[19] = data.JULYP;
+      rowValues[20] = data.AUGA;
+      rowValues[21] = data.AUGP;
+      rowValues[22] = data.SEPA;
+      rowValues[23] = data.SEPP;
+      rowValues[24] = data.OCTA;
+      rowValues[25] = data.OCTP;
+      rowValues[26] = data.NOVA;
+      rowValues[27] = data.NOVP;
+      rowValues[28] = data.DECA;
+      rowValues[29] = data.DECP;
+
+      worksheet.addRow(rowValues, "n");
+    });
+
+    worksheet.getRows(4, this.exportMonthly.length).forEach((row) => {
+      for (let i = 2; i <= 29; i++) {
+        row.alignment = {
+          vertical: "middle",
+          horizontal: "center",
+        };
+        row.font = {
+          size: 10,
+          bold: false,
+        };
+        row.getCell(i).border = {
+          top: { style: "thick" },
+          left: { style: "thick" },
+          bottom: { style: "thick" },
+          right: { style: "thick" },
+        };
+      }
+      row.height = 55;
+    });
+
+    workbook.xlsx.writeBuffer().then((data) => {
+      let blob = new Blob([data], {
+        type:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      fs.saveAs(blob, "TrainingNeeds" + "_export_" + new Date().getTime());
+    });
+  }
   exportExcel() {
     if (this.employeeList.length == 0) {
       return this.messageService.add({

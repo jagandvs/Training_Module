@@ -29,7 +29,7 @@
             ],
             "scripts": [
               "src/assets/vendor/base/vendor.bundle.base.js",
-              "src/assets/js/template.js",
+
               "node_modules/jspdf-autotable/dist/jspdf.plugin.autotable.js"
             ]
           },
@@ -97,7 +97,6 @@
             ],
             "scripts": [
               "src/assets/vendor/base/vendor.bundle.base.js",
-              "src/assets/js/template.js",
 
               "node_modules/jspdf-autotable/dist/jspdf.plugin.autotable.js"
             ]

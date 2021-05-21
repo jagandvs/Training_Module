@@ -20,6 +20,9 @@ import {
   getEmployeeListForOfflineEvaluation,
   UPSERT_EvalOffline,
   UpdateTraningConductedBy,
+  getEmployeeListForHODFeedback,
+  updateUpdateHODRemarks,
+  UpdateUpdateHRRemarks,
 } from "src/app/_helper/navigation-urls";
 import { CommonService } from "src/app/_services/common.service";
 
@@ -258,6 +261,51 @@ export class TransactionsService {
         "Answers",
         "get questions",
         "Training program Questions",
+        "",
+        ""
+      )
+    );
+  }
+  GetEmployeeListForHODFeedback(Training_ID, hodemployeeid): Observable<any[]> {
+    let body = {
+      Training_ID: Training_ID,
+      hodemployeeid: hodemployeeid,
+    };
+    return this.http.post<any[]>(
+      getEmployeeListForHODFeedback,
+      body,
+      this.commonService.logger(
+        "Remarks",
+        "get Employee list for remarks",
+        "Hod Feedback",
+        "",
+        ""
+      )
+    );
+  }
+
+  UpdateUpdateHODRemarks(employeeRemarks) {
+    return this.http.post(
+      updateUpdateHODRemarks,
+      employeeRemarks,
+      this.commonService.logger(
+        "Remarks",
+        "get Employee list for remarks",
+        "Hod Feedback",
+        "",
+        ""
+      )
+    );
+  }
+
+  UpdateUpdateHRRemarks(employeeRemarks) {
+    return this.http.post(
+      UpdateUpdateHRRemarks,
+      employeeRemarks,
+      this.commonService.logger(
+        "Remarks",
+        "get Employee list for remarks",
+        "Hod Feedback",
         "",
         ""
       )

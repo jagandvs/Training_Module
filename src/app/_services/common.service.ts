@@ -7,6 +7,7 @@ import {
   deleteFile,
   deleteRow,
   downloadFile,
+  employeenames,
   getCompanyDetails,
   getListFiles,
   httpLogin,
@@ -14,6 +15,7 @@ import {
   setResetModify,
   SP_CM_FillCombo,
   TableResponse,
+  trainingcalender,
   uploadFiles,
   userRight,
 } from "../_helper/navigation-urls";
@@ -191,5 +193,11 @@ export class CommonService {
       .catch((err) => console.error("download error = ", err));
   }
 
-  getAccessRights() {}
+  trainingcalender(empid): Observable<any[]> {
+    return this.http.get<any[]>(`${trainingcalender}?empid=${empid}`);
+  }
+
+  employeenames(): Observable<any[]> {
+    return this.http.get<any[]>(employeenames);
+  }
 }

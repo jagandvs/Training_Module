@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
 import { CommonService } from "src/app/_services/common.service";
 import { TransactionsService } from "../transactions.service";
-import { Training_Need } from "src/app/_helper/SM_CODE";
+import { Training_Schedule } from "src/app/_helper/SM_CODE";
 import { HttpErrorResponse } from "@angular/common/http";
 
 @Component({
@@ -63,7 +63,7 @@ export class TrainingNeedComponent implements OnInit {
 
     var UM_CODE = currentUser?.user.UM_CODE;
     this.commonService
-      .checkRight(UM_CODE, Training_Need, "checkRight")
+      .checkRight(UM_CODE, Training_Schedule, "checkRight")
       .subscribe((data) => {
         for (let access of data) {
           this.menuAccess = access.MENU;

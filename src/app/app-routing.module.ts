@@ -1,5 +1,6 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
+import { CalenderviewComponent } from "./calenderview/calenderview.component";
 import { DashboardComponent } from "./components/dashboard/dashboard.component";
 import { LoginComponent } from "./components/login/login.component";
 import { AuthGuard } from "./_guards/auth.guard";
@@ -7,6 +8,7 @@ import { AuthGuard } from "./_guards/auth.guard";
 const routes: Routes = [
   { path: "", component: LoginComponent },
   { path: "login", component: LoginComponent },
+  { path: "calender", component: CalenderviewComponent },
   {
     path: "dashboard",
     component: DashboardComponent,

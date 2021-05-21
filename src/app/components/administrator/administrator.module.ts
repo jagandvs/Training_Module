@@ -15,6 +15,7 @@ import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { JwtInterceptor } from "src/app/_helper/JwtInterceptor";
 import { ConfirmationService, MessageService } from "primeng/api";
 import { NgxPaginationModule } from "ngx-pagination";
+import { TableModule } from "primeng/table";
 
 const routes: Routes = [
   { path: "", component: AdministratorComponent },
@@ -32,6 +33,7 @@ const routes: Routes = [
     ReactiveFormsModule,
     DialogModule,
     DropdownModule,
+    TableModule,
     ToastModule,
     ConfirmDialogModule,
     NgxPaginationModule,

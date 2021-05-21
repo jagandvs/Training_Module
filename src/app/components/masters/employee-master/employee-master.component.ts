@@ -73,7 +73,7 @@ export class EmployeeMasterComponent implements OnInit {
   };
   public EMPLOYEE_MASTER_QUERY = {
     TableNames: "EmployeeMaster",
-    fieldNames: "EMP_MASTER_ID,EMP_MASTER_NAME",
+    fieldNames: "EMP_MASTER_ID,EMP_MASTER_NAME,EMP_MASTER_NUMBER",
     condition: "ES_DELETE=0",
   };
   public OUTSOURCE_EMP_QUERY = {
@@ -177,18 +177,30 @@ export class EmployeeMasterComponent implements OnInit {
           });
         }
       });
-    this.commonService
-      .FillCombo(this.EMPLOYEE_MASTER_QUERY)
-      .subscribe((data) => {
-        this.employeeReportingToDropdown = [];
-        for (let item of data) {
-          this.employeeReportingToDropdown.push({
-            label: item.EMP_MASTER_NAME,
-            value: item.EMP_MASTER_ID,
-          });
-        }
-      });
+    // this.commonService
+    //   .FillCombo(this.EMPLOYEE_MASTER_QUERY)
+    //   .subscribe((data) => {
+    //     this.employeeReportingToDropdown = [];
+    //     for (let item of data) {
+    //       this.employeeDropdown;
+    //       this.employeeReportingToDropdown.push({
+    //         label: `${item.EMP_MASTER_NAME} - ${item.EMP_MASTER_NUMBER}`,
+    //         value: item.EMP_MASTER_ID,
+    //       });
+    //     }
+    //     console.log(this.employeeReportingToDropdown);
+    //   });
 
+    this.commonService.employeenames().subscribe((data) => {
+      console.log(data);
+      this.employeeReportingToDropdown = [];
+      for (let item of data) {
+        this.employeeReportingToDropdown.push({
+          label: item.empname,
+          value: item.empcode,
+        });
+      }
+    });
     // this.commonService
     //   .FillCombo(this.CATEGORY_MASTER_QUERY)
     //   .subscribe((data) => {
@@ -238,9 +250,11 @@ export class EmployeeMasterComponent implements OnInit {
       this.f["EMP_MASTER_DEPARTMENT_ID"].setValue("");
 
       this.employees = data;
+      console.log(data);
+
       for (let item of data) {
         this.employeeDropdown.push({
-          label: item.EMPFNAME,
+          label: `${item.EMPFNAME} ${item.EMPLNAME} - ${item.EMPNO}`,
           value: item.EMPNO,
         });
       }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
 import { ConfirmationService, MessageService, SelectItem } from "primeng/api";
-import { Training_Need } from "src/app/_helper/SM_CODE";
+import { Offline_Evaluation } from "src/app/_helper/SM_CODE";
 import { CommonService } from "src/app/_services/common.service";
 import { TransactionsService } from "../transactions.service";
 
@@ -47,7 +47,7 @@ export class OfflineEvaluationComponent implements OnInit {
 
     var UM_CODE = currentUser?.user.UM_CODE;
     this.commonService
-      .checkRight(UM_CODE, Training_Need, "checkRight")
+      .checkRight(UM_CODE, Offline_Evaluation, "checkRight")
       .subscribe((data) => {
         for (let access of data) {
           this.menuAccess = access.MENU;
@@ -101,6 +101,14 @@ export class OfflineEvaluationComponent implements OnInit {
               EVAL_TOTAL_MARKS: "",
               ES_DELETE: 0,
               MODIFY: 0,
+            });
+          }
+          if (!this.appovalList.length) {
+            this.messageService.add({
+              key: "t1",
+              severity: "error",
+              summary: "Error",
+              detail: "No Employee Found",
             });
           }
         });
